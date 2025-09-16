@@ -1,68 +1,256 @@
-:root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
+@import url("./assets/styles/theme.css");
 
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+@font-face {
+  font-family: 'Montserrat';
+  src: url('./assets/font/Montserrat-VariableFont_wght.ttf') format('truetype');
+  font-weight: 100 900;
+  font-style: normal;
 }
 
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
+@font-face {
+  font-family: 'Montserrat';
+  src: url('./assets/font/Montserrat-Italic-VariableFont_wght.ttf') format('truetype');
+  font-weight: 100 900;
+  font-style: italic;
 }
-a:hover {
-  color: #535bf2;
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: var(--font-family-base);
 }
 
 body {
-  margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
+  background: #fafafa !important;
 }
 
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
+@font-face {
+  font-family: 'Montserrat';
+  src: url('./assets/font/Montserrat-VariableFont_wght.ttf') format('truetype');
+  font-weight: 100 900;
+  font-style: normal;
 }
 
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
-  cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+@font-face {
+  font-family: 'Montserrat';
+  src: url('./assets/font/Montserrat-Italic-VariableFont_wght.ttf') format('truetype');
+  font-weight: 100 900;
+  font-style: italic;
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
-  }
+* {
+  font-family: var(--font-family-base);
+}
+
+body {
+  background: #fafafa !important;
+}
+
+.main-layout {
+  margin-top: 65px;
+}
+
+.main-layout-admin {
+  margin-top: 65px;
+  margin-left: 70px;
+  transition: .25s;
+}
+
+.main-layout-admin.openNav {
+  margin-left: calc(15% + 10px);
+  transition: .25s;
+}
+
+/* ================== custom input ================== */
+.MuiInputLabel-root.Mui-focused {
+  color: var(--primary-color) !important;
+}
+
+.MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline {
+  border-color: var(--primary-color) !important;
+}
+
+.MuiInput-underline:after {
+  border-bottom: 2px solid var(--primary-color) !important;
+}
+
+.primary-text__field input {
+  font-size: var(--font-size-base) !important;
+  padding: 12px !important; 
+}
+
+/* ================== custom select ================== */
+.MuiSelect-select {
+  height: 1.4375em !important;
+  line-height: 1.4375em !important;
+  padding: 12px !important;
+}
+
+.MuiMenu-paper {
+  padding: 8px;
+}
+
+.MuiMenu-list {
+  padding: 0 !important;
+}
+
+.select-primary__label {
+  top: -4px !important;
+}
+
+.select-primary__label.MuiInputLabel-shrink {
+  transform: translate(14px, -4px) scale(0.75);
+}
+
+.primary-text__field .MuiSelect-select {
+  padding: 12px !important;
+  font-size: var(--font-size-base) !important;
+}
+
+/* ================== datetime picker ==================*/
+.MuiPickersSectionList-root  {
+  padding: 12px 0 !important;
+  font-size: var(--font-size-base) !important;
+}
+
+.primary-text__field .MuiPickersOutlinedInput-root.Mui-focused .MuiPickersOutlinedInput-notchedOutline {
+  border-color: var(--primary-color) !important; 
+}
+
+.primary-text__field .MuiPickersOutlinedInput-root.Mui-focused .MuiPickersOutlinedInput-notchedOutline {
+  outline: none !important;
+}
+
+.MuiPickersTextField-root:focus-visible .MuiPickersOutlinedInput-notchedOutline {
+  border: 2px solid var(--primary-color) !important; 
+}
+
+/* ================== tab ================== */
+.MuiTabs-indicator {
+  background: var(--primary-color) !important;
+}
+
+/* ================== Title ================== */
+.primary-title {
+  text-align: center;   
+  font-weight: var(--font-weight-bold) !important;
+  font-size: var(--font-size-large) !important;
+  color: var(--primary-color);
+}
+
+/* ================== Table ================== */
+.primary-table-container {
+  box-shadow: none !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+}
+
+.sticky-table-container {
+  box-shadow: none !important;
+  border-radius: 0 !important;
+  max-height: 55vh;
+  background: transparent !important;
+  margin-bottom: 10px;
+}
+
+.primary-thead {
+  background: var(--primary-color) !important;
+}
+
+.primary-thead__cell {
+  color: #fff !important;
+  font-weight: var(--font-weight-bold) !important;
+  border-right: 1px solid #fff;
+  padding: 12px !important;
+}
+
+.MuiTableCell-stickyHeader {
+  background: var(--primary-color) !important;
+}
+
+.primary-thead__cell:first-child {
+  border-left: 1px solid var(--primary-color);
+}
+
+.primary-thead__cell:last-child {
+  border-right: 1px solid var(--primary-color);
+}
+
+.sticky-table {
+  border-left: 1px solid var(--primary-color) !important;
+}
+
+.thead-cell__border--right{
+  border-right: 1px solid #fff !important;
+}
+
+.primary-trow {
+  border-radius: 4px !important;
+}
+
+.primary-tbody .primary-trow:nth-child(2n) {
+  background: #f3f3f3;
+}
+
+.primary-tcell{
+  border: 1px solid var(--primary-color);
+  border-bottom: 1px solid var(--primary-color) !important;
+  font-size: var(--font-size-base) !important;
+  color: black !important;
+  padding: 8px !important;
+}
+
+.sticky-tcell {
+  padding: 8px !important;
+  font-size: var(--font-size-base) !important;
+  border-right: 1px solid var(--primary-color) !important;
+  border-bottom: 1px solid var(--primary-color) !important;
+}
+
+.primary-tcell__button--icon {
+  color: var(--primary-color) !important;
+  padding: 0 8px!important;
+  transition: .25s;
+}
+
+.primary-tcell__button--icon:hover {
+  background: transparent !important;
+  transform: scale(1.1);
+}
+
+.primary-tcell__button--icon svg {
+  font-size: 20px;
+}
+
+.primary-tcell__button--delete {
+  color: var(--delete-color) !important;
+}
+
+/* ================== tool tip ================== */
+.primary-tooltip .MuiTooltip-tooltip {
+  background-color: #fff !important;
+  color: #000 !important; 
+  border-radius: var(--border-radius-base);
+  padding: 8px; 
+  box-shadow: var(--box-shadow-base);
+}
+
+/* ================== dialog ==================*/
+.primary-dialog-title {
+  padding: 16px !important;
+  text-align: center;
+  font-weight: var(--font-weight-bold) !important;
+}
+
+.primary-dialog-content {
+  padding: 0 16px 16px 16px !important;
+}
+
+.primary-dialog-actions {
+  padding: 0 16px 16px 16px !important;
+}
+
+.primary-dialog-input {
+  margin-bottom: 25px !important; 
 }
