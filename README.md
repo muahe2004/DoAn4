@@ -11,7 +11,7 @@ The goal is to build a fullstack web application with a robust REST API (FastAPI
 
 ## Environment Configuration
 
-Create a `.env` file inside the `backend/` directory with the following content:
+Create a `.env` file inside the `DoAn4/` directory with the following content:
 
 ```env
 # PostgreSQL
