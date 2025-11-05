@@ -33,7 +33,7 @@ const Header: React.FC = () => {
   };
 
   return (
-    <AppBar position="static" className="header">
+    <AppBar position="static" className="header" elevation={0}>
       <Toolbar className="header-toolbar">
         <Box onClick={() => handleNavigate(homeUrl)} className="header-flex">
           <img src={logo} alt="Logo" className="header-logo"/>
