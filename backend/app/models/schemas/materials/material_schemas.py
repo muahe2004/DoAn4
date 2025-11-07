@@ -9,7 +9,7 @@ class MaterialBase(SQLModel):
     material_name: str = Field(sa_column=Column(String(500), nullable=False))
     unit: str = Field(sa_column=Column(String(50), nullable=False))
     description: str = Field(sa_column=Column(String(500), nullable=True))
-    country_id: Optional[UUID] | None = Field(default=None, foreign_key="country.id")
+    country_id: Optional[UUID] | None = Field(default=None, foreign_key="countries.id")
     status: str | None = Field(default=None, sa_column=Column(String(50), nullable=True))
     created_at: datetime = Field(default_factory=datetime.now, sa_column=Column(DateTime, nullable=False))
     updated_at: datetime = Field(default_factory=datetime.now, sa_column=Column(DateTime, nullable=False, onupdate=datetime.now))

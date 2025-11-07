@@ -1,16 +1,14 @@
 from datetime import datetime
-from typing import List, Optional
 from sqlmodel import SQLModel, Field, Column, String, DateTime
-from sqlalchemy import Boolean, Column, String, Integer, DateTime 
+from sqlalchemy import Column, String, DateTime 
 from uuid import UUID
 
-class NormBase(SQLModel):
-    norm_name: str = Field(sa_column=Column(String(100), nullable=False))
+class CurrencyBase(SQLModel):
+    currency_name: str = Field(sa_column=Column(String(100), nullable=False))
     description: str = Field(sa_column=Column(String(500), nullable=True))
-    is_check: bool = Field(default=True, sa_column=Column(Boolean, nullable=False))
     status: str | None = Field(default=None, sa_column=Column(String(50), nullable=True))
     created_at: datetime = Field(default_factory=datetime.now, sa_column=Column(DateTime, nullable=False))
     updated_at: datetime = Field(default_factory=datetime.now, sa_column=Column(DateTime, nullable=False, onupdate=datetime.now))
 
-class NormPublic(NormBase):
+class CurrencyPublic(CurrencyBase):
     id: UUID
