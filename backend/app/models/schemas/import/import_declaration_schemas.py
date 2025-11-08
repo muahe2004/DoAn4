@@ -6,7 +6,8 @@ from uuid import UUID
 
 class ImportDeclarationBase(SQLModel):
     import_declaration_number: str | None = Field(default=None, sa_column=Column(String(50), nullable=False))
-    import_licence_number: str = Field(sa_column=Column(String(50), nullable=False))
+    licence_number: str | None = Field(default=None, sa_column=Column(String(50), nullable=True))
+    licence_date: datetime = Field(default_factory=datetime.now, sa_column=Column(DateTime, nullable=True))
     bill_number: str = Field(sa_column=Column(String(50), nullable=True))
     exporter: str = Field(sa_column=Column(String(500), nullable=False, unique=True))
     usd_exchange_rate: float | None = Field(default=None, sa_column=Column(Float, nullable=True))

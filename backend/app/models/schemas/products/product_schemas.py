@@ -8,6 +8,7 @@ class ProductBase(SQLModel):
     product_code: str = Field(sa_column=Column(String(50), nullable=False))
     product_name: str = Field(sa_column=Column(String(100), nullable=False))
     unit_id: UUID = Field(sa_column=Column(ForeignKey("units.id"), nullable=False))
+    unit_id_2: UUID = Field(sa_column=Column(ForeignKey("units.id"), nullable=False))
     norm_id: UUID = Field(sa_column=Column(ForeignKey("norms.id"), nullable=False))
     description: str = Field(sa_column=Column(String(500), nullable=True))
     is_semi_product: bool = Field(default=True, sa_column=Column(Boolean, nullable=False))
