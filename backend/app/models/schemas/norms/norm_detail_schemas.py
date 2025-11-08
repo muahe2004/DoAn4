@@ -7,7 +7,7 @@ from uuid import UUID
 class NormDetailBase(SQLModel):
     unit_id: UUID = Field(sa_column=Column(ForeignKey("units.id"), nullable=False))
     norm_id: UUID = Field(sa_column=Column(ForeignKey("norms.id"), nullable=False))
-    material_id: UUID = Field(sa_column=Column(ForeignKey("material.id"), nullable=False))
+    material_id: UUID = Field(sa_column=Column(ForeignKey("materials.id"), nullable=False))
     description: str = Field(sa_column=Column(String(500), nullable=True))
     norm_value: float = Field(sa_column=Column(Float, nullable=False))
     status: str | None = Field(default=None, sa_column=Column(String(50), nullable=True))
