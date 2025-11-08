@@ -13,5 +13,5 @@ class ContractBase(SQLModel):
     created_at: datetime = Field(default_factory=datetime.now, sa_column=Column(DateTime, nullable=False))
     updated_at: datetime = Field(default_factory=datetime.now, sa_column=Column(DateTime, nullable=False, onupdate=datetime.now))
 
-class Contract(ContractBase):
+class ContractPublic(ContractBase):
     id: UUID
