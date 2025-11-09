@@ -80,6 +80,10 @@ body {
   padding: 12px !important; 
 }
 
+input::-ms-reveal, input::-ms-clear {
+  display: none !important;
+}
+
 /* ================== custom select ================== */
 .MuiSelect-select {
   height: 1.4375em !important;
