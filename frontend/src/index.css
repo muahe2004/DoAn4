@@ -227,6 +227,25 @@ body {
   color: var(--delete-color) !important;
 }
 
+.primary-button {
+  background-color: var(--primary-color) !important;
+  padding: 0.6rem 0 !important;
+  margin-top: 1rem !important;
+  font-weight: var(--font-weight-bold) !important;
+  font-size: var(--font-size-base) !important;
+  border-radius: 5px !important;
+  text-transform: none !important;
+  color: white !important;
+}
+
+.primary-button:hover {
+  background-color: var(--primary-color) !important;
+}
+
+.primary-text__field__title {
+  font-size: var(--font-size-title) !important;
+}
+
 /* ================== tool tip ================== */
 .primary-tooltip .MuiTooltip-tooltip {
   background-color: #fff !important;
