@@ -9,8 +9,8 @@ type Props = {
   expanded: boolean;
   onToggle: (id: string) => void;
   collapsed?: boolean;
-  onIconMouseEnter?: (e: React.MouseEvent<HTMLElement>) => void;
-  onIconMouseLeave?: (e: React.MouseEvent<HTMLElement>) => void;
+  onIconMouseEnter?: (e: React.MouseEvent<HTMLElement>, id: string) => void;
+  onIconMouseLeave?: () => void;
 };
 
 export const SidebarItem: React.FC<Props> = ({
@@ -18,24 +18,42 @@ export const SidebarItem: React.FC<Props> = ({
   expanded,
   onToggle,
   collapsed = false,
-  onIconMouseEnter,
-  onIconMouseLeave,
+  onIconMouseEnter: onIconMouseEnterProp,
+  onIconMouseLeave: onIconMouseLeaveProp,
 }) => {
   const hasChildren = (parent.children && parent.children.length > 0) ?? false;
   const navigate = useNavigate();
 
+  const onIconMouseEnter = (e: React.MouseEvent<HTMLElement>) => {
+    if (onIconMouseEnterProp) {
+      onIconMouseEnterProp(e, parent.id);
+    }
+  };
+
+  const onIconMouseLeave = (e: React.MouseEvent<HTMLElement>) => {
+    const timer = setTimeout(() => {
+      if (onIconMouseLeaveProp) {
+        onIconMouseLeaveProp();
+      }
+    }, 300);
+    
+    const relatedTarget = e.relatedTarget as HTMLElement;
+    if (relatedTarget?.closest('.sidebar__popover')) {
+      clearTimeout(timer);
+    }
+    
+    return () => clearTimeout(timer);
+  };
+
   // Handle click on parent item
   const handleParentClick = () => {
     if (hasChildren) {
-      // If not expanded, expand it and navigate to first child
       if (!expanded) {
         onToggle(parent.id);
-        // Navigate to first child if exists and has path
         if (parent.children?.[0]?.path) {
           navigate(parent.children[0].path);
         }
       } else {
-        // If already expanded, just navigate to first child if exists
         if (parent.children?.[0]?.path) {
           navigate(parent.children[0].path);
         }
@@ -50,13 +68,15 @@ export const SidebarItem: React.FC<Props> = ({
     return (
       <div className="collapsed-icon-wrapper">
         <button
-          className="parent-icon"
+          className="sidebar__button"
           aria-label={parent.label}
           onMouseEnter={onIconMouseEnter}
           onMouseLeave={onIconMouseLeave}
           onClick={() => !hasChildren && parent.path && (window.location.href = parent.path)}
         >
-          {parent.icon}
+          <span className="sidebar__icon">
+            {parent.icon}
+          </span>
         </button>
       </div>
     );
