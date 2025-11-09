@@ -22,13 +22,6 @@ export default function Register() {
   const handleToggleConfirmPassword = () => setShowConfirmPassword(!showConfirmPassword);
 
   const handleRegister = () => {
-    // TODO: Gửi dữ liệu lên API backend
-    // Ví dụ payload:
-    // {
-    //   name, code, phone_number, email, password,
-    //   tax_code, representative, position, address,
-    //   role: "admin"
-    // }
     navigate('/sign-in');
   };
 
@@ -45,7 +38,6 @@ export default function Register() {
         <Header_Auth type="register" />
 
         <Box component="form" mt={3} display="flex" flexDirection="column" gap={2}>
-          {/* Thông tin doanh nghiệp */}
           <Box display="flex" gap={2} flexWrap="wrap">
             <Box flex={1} minWidth="300px">
               <LabelPrimary value="Tên doanh nghiệp" required />
@@ -77,7 +69,6 @@ export default function Register() {
             />
           </Box>
 
-          {/* Người đại diện */}
           <Box display="flex" gap={2} flexWrap="wrap">
             <Box flex={1} minWidth="300px">
               <LabelPrimary value="Người đại diện" />
@@ -99,7 +90,6 @@ export default function Register() {
             </Box>
           </Box>
 
-          {/* Liên hệ */}
           <Box display="flex" gap={2} flexWrap="wrap">
             <Box flex={1} minWidth="300px">
               <LabelPrimary value="Số điện thoại liên hệ" required />
@@ -172,30 +162,17 @@ export default function Register() {
             </Box>
           </Box>
 
-          
-
-          <Button
-            className="primary-button"
-            onClick={handleRegister}
-            variant="contained"
-            fullWidth
-            sx={{ mt: 3 }}
-          >
+          <Button className="primary-button" onClick={handleRegister} variant="contained" fullWidth sx={{ mt: 3 }}>
             Đăng ký doanh nghiệp
           </Button>
 
           <Divider sx={{ my: 2 }}>Hoặc</Divider>
 
-          <Typography
-            variant="body2"
-            color="primary"
+          <Typography variant="body2" color="primary"
             sx={{
-              cursor: 'pointer',
-              textAlign: 'center',
-              ':hover': { textDecoration: 'underline' },
+              cursor: 'pointer', textAlign: 'center', ':hover': { textDecoration: 'underline' },
             }}
-            onClick={() => navigate('/sign-in')}
-          >
+            onClick={() => navigate('/sign-in')}>
             Đã có tài khoản? Đăng nhập
           </Typography>
         </Box>
