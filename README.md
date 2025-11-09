@@ -44,3 +44,9 @@ PROJECT4_SECRET_KEY=your_secret_key
 # Step 4. RUN FRONTEND
 # npm run dev
 ```
+
+## Update Database
+0. alembic init alembic
+1. update file alembic.init (sqlalchemy.url = postgresql+psycopg2://postgres:12522w2ks@localhost:5439/PROJECT4) 
+3. alembic revision --autogenerate -m "initial database" (only use if you update database)
+4. alembic upgrade head (if you pull a version of database, you can use this prompt to update database)
