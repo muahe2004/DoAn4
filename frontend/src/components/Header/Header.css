@@ -1,6 +1,6 @@
 .customs-header {
   background: #f8fafc;
-  color: #2d3748;
+  color: var(--primary-color);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   position: fixed;
   top: 0;
@@ -38,151 +38,17 @@
   justify-content: center;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  color: #4a5568;
+  color: var(--normal-color);
   font-size: 18px;
 }
 
 .menu-btn:hover {
   background: #edf2f7;
-  color: #2d3748;
+  color: var(--primary-color);
   transform: translateY(-1px);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-.customer-dropdown {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.dropdown-label {
-  color: #718096;
-  font-size: 13px;
-  font-weight: 500;
-  white-space: nowrap;
-}
-
-.dropdown-container {
-  position: relative;
-}
-
-.dropdown-toggle {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  background: white;
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
-  padding: 8px 16px;
-  color: #2d3748;
-  cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  min-width: 240px;
-  justify-content: space-between;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-}
-
-.dropdown-toggle:hover {
-  border-color: #4299e1;
-  box-shadow: 0 4px 12px rgba(66, 153, 225, 0.15);
-  transform: translateY(-1px);
-}
-
-.selected-value {
-  font-weight: 600;
-  font-size: 14px;
-  color: #2d3748;
-}
-
-.dropdown-arrow {
-  font-size: 10px;
-  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  color: #718096;
-}
-
-.dropdown-arrow.open {
-  transform: rotate(180deg);
-}
-
-.header-center {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex: 1;
-}
-
-.fiscal-year-section {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.fiscal-year-label {
-  font-size: 14px;
-  font-weight: 500;
-  color: #718096;
-  white-space: nowrap;
-}
-
-.fiscal-year-dropdown {
-  position: relative;
-}
-
-.fiscal-year-dropdown .dropdown-toggle {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  min-width: 80px;
-  background: white;
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
-  padding: 8px 16px;
-  color: #2d3748;
-  cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  justify-content: space-between;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-}
-
-.fiscal-year-dropdown .dropdown-toggle:hover {
-  background: #ebf8ff;
-  border-color: #4299e1;
-  box-shadow: 0 2px 8px rgba(66, 153, 225, 0.15);
-  transform: translateY(-1px);
-}
-
-.fiscal-year-value {
-  color: #2d3748;
-  font-weight: 700;
-  font-size: 16px;
-  font-family: 'Segoe UI Semibold', 'Roboto Medium', sans-serif;
-}
-
-.fiscal-year-dropdown .dropdown-menu {
-  min-width: 100px;
-  left: 50%;
-  transform: translateX(-50%);
-  text-align: center;
-}
-
-.fiscal-year-dropdown .dropdown-item {
-  justify-content: center;
-  padding: 10px 12px;
-  font-size: 14px;
-  font-weight: 500;
-  color: #4a5568;
-  border-bottom: 1px solid #f7fafc;
-}
-
-.fiscal-year-dropdown .dropdown-item:hover {
-  background: #ebf8ff;
-  color: #2b6cb0;
-  font-weight: 600;
-}
-
-.fiscal-year-dropdown .dropdown-item:last-child {
-  border-bottom: none;
-}
 .header-right {
   display: flex;
   align-items: center;
@@ -199,7 +65,7 @@
   border: none;
   border-radius: 6px;
   padding: 8px 12px;
-  color: #334371;
+  color: var(--normal-color);
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   text-decoration: none;
@@ -209,7 +75,7 @@
 
 .help-link:hover {
   background: #ebf8ff;
-  color: #2b6cb0;
+  color: var(--primary-color);
   transform: translateY(-1px);
   box-shadow: 0 2px 8px rgba(66, 153, 225, 0.15);
 }
@@ -222,7 +88,7 @@
 }
 
 .help-link:hover .help-icon {
-  background: #2b6cb0;
+  color: var(--primary-color);
   transform: scale(1.1);
 }
 
@@ -242,7 +108,7 @@
   border: none;
   border-radius: 8px;
   padding: 6px 12px;
-  color: #4a5568;
+  color: var(--normal-color);
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   min-width: auto;
@@ -280,7 +146,7 @@
 .user-name {
   font-weight: 600;
   font-size: 14px;
-  color: #334371;
+  color: var(--normal-color);
   font-family: 'Segoe UI Semibold', 'Roboto Medium', sans-serif;
   white-space: nowrap;
 }
@@ -322,7 +188,7 @@
   transition: all 0.2s ease;
   text-align: left;
   font-size: 14px;
-  color: #334371;
+  color: var(--normal-color);
   border-bottom: 1px solid #f7fafc;
   gap: 12px;
 }
@@ -334,7 +200,7 @@
 .user-menu-item:hover {
   background: #f8fafc;
   padding-left: 20px;
-  border-left: 3px solid #4299e1;
+  border-left: 3px solid var(--primary-color);
 }
 
 .menu-item-icon {
@@ -355,21 +221,21 @@
 }
 
 .user-menu-item:hover .menu-item-text {
-  color: #4299e1;
+  color: var(--primary-color);
 }
 
 .logout-item {
-  color: #e53e3e;
+  color: var(--normal-color);
 }
 
 .logout-item:hover {
-  background: #fed7d7;
-  color: #c53030;
-  border-left: 3px solid #e53e3e;
+  background: #f8fafc;
+  color: var(--primary-color);
+  border-left: 3px solid var(--primary-color);
 }
 
 .logout-item:hover .menu-item-text {
-  color: #c53030;
+  color: var(--primary-color);
 }
 
 .dropdown-menu {
@@ -397,7 +263,7 @@
   border: none;
   cursor: pointer;
   font-size: 14px;
-  color: #334371;
+  color: var(--normal-color);
   transition: all 0.2s ease;
   text-align: left;
   border-bottom: 1px solid #f7fafc;
@@ -410,7 +276,7 @@
 
 .dropdown-item:hover {
   background: #ebf8ff;
-  color: #2b6cb0;
+  color: var(--primary-color);
   padding-left: 20px;
 }
 
