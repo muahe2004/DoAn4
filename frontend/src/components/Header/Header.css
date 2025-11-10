@@ -200,7 +200,7 @@
 .user-menu-item:hover {
   background: #f8fafc;
   padding-left: 20px;
-  border-left: 3px solid var(--primary-color);
+  border-left: 3px solid #4299e1;
 }
 
 .menu-item-icon {
@@ -229,13 +229,13 @@
 }
 
 .logout-item:hover {
-  background: #f8fafc;
-  color: var(--primary-color);
-  border-left: 3px solid var(--primary-color);
+  background: #ffeaea;
+  color: var(--normal-color);
+  border-left: 3px solid var(--delete-color);
 }
 
 .logout-item:hover .menu-item-text {
-  color: var(--primary-color);
+  color: var(--delete-color);
 }
 
 .dropdown-menu {
