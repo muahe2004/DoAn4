@@ -11,7 +11,8 @@
 
 .header-auth__logo {
   max-width: 200px;
-  min-height: 100px;
+  min-width: 100px;
+  height: auto;
   object-fit: contain;
   margin: 0;
 }

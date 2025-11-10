@@ -14,7 +14,7 @@ const Header_Auth: React.FC<Header_AuthProps> = ({ type }) => {
       </Paper>
 
       <Typography className="header-auth__title primary-text__field__title" fontWeight="bold" gutterBottom>
-        {type === 'register' ? 'Đăng ký doanh nghiệp' : 'Đăng nhập'}
+        {type === 'register' ? 'Đăng ký' : 'Đăng nhập'}
       </Typography>
     </Box>
   );
