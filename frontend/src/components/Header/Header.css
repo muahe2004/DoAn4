@@ -199,7 +199,7 @@
   border: none;
   border-radius: 6px;
   padding: 8px 12px;
-  color: #2c5282;
+  color: #334371;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   text-decoration: none;
@@ -217,7 +217,7 @@
 .help-icon {
   width: 20px;
   height: 20px;
-  background: #2c5282;
+  background: #334371;
   transition: all 0.3s ease;
 }
 
@@ -280,7 +280,7 @@
 .user-name {
   font-weight: 600;
   font-size: 14px;
-  color: #2d3748;
+  color: #334371;
   font-family: 'Segoe UI Semibold', 'Roboto Medium', sans-serif;
   white-space: nowrap;
 }
@@ -322,7 +322,7 @@
   transition: all 0.2s ease;
   text-align: left;
   font-size: 14px;
-  color: #2d3748;
+  color: #334371;
   border-bottom: 1px solid #f7fafc;
   gap: 12px;
 }
@@ -397,7 +397,7 @@
   border: none;
   cursor: pointer;
   font-size: 14px;
-  color: #4a5568;
+  color: #334371;
   transition: all 0.2s ease;
   text-align: left;
   border-bottom: 1px solid #f7fafc;
