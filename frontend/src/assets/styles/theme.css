@@ -1,7 +1,8 @@
 :root {
   --primary-color: #334371;
   --secondary-color: #f3961a;
-  --delete-color: #8b0000;
+  --normal-color:#666666;
+  --delete-color: #e53e3e;
   --font-size-base: 14px;
   --font-size-large: 20px;
   --font-weight-bold: 700;
