@@ -4,7 +4,9 @@
   --normal-color:#666666;
   --delete-color: #e53e3e;
   --font-size-base: 14px;
+  --font-size-medium: 16px;
   --font-size-large: 20px;
+  --font-size-title: 24px;
   --font-weight-bold: 700;
   --font-family-base: 'Montserrat', sans-serif;
 }
