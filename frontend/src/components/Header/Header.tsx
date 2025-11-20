@@ -1,6 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import './Header.css';
 import { MdHelpOutline } from "react-icons/md";
+import { useSidebar } from "../../contexts/SidebarContext";
+
 interface HeaderProps {
   customerName?: string;
   fiscalYear?: string;
@@ -14,7 +16,7 @@ const Header: React.FC<HeaderProps> = ({
   userName = 'demo',
 }) => {
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
-  
+  const { toggleSidebar } = useSidebar();
   const userDropdownRef = useRef<HTMLDivElement>(null);
 
   // Đóng user menu khi click ra ngoài
@@ -46,7 +48,7 @@ const Header: React.FC<HeaderProps> = ({
     <header className="customs-header">
       <div className="header-top">
         <div className="header-left">
-          <button className="menu-btn">
+          <button className="menu-btn" onClick={toggleSidebar}>
             <span className="menu-icon">☰</span>
           </button>
           

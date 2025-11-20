@@ -1,12 +1,15 @@
 import React, { useCallback, useEffect, useState } from "react";
-import type { SidebarData } from "./types";
+import type { SidebarData, SidebarParent } from "./types";
 import { SidebarItem } from "./SidebarItem";
 import { SidebarPopover } from "./SidebarPopover";
 import { useLocation } from "react-router-dom";
 import { useSidebar } from "../../contexts/SidebarContext";
 import "./Sidebar.css";
+import IconButton from "@mui/material/IconButton";
+import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
+import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 
-export const SIDEBAR_WIDTH = '18vw';  // 18% of viewport width
+export const SIDEBAR_WIDTH = '18vw'; 
 
 type Props = {
   data: SidebarData;
@@ -16,6 +19,7 @@ type Props = {
 export const Sidebar: React.FC<Props> = ({ data }) => {
   const { collapsed } = useSidebar();
   const [expandedMap, setExpandedMap] = useState<Record<string, boolean>>({});
+  const { toggleSidebar } = useSidebar();
 
   const toggle = useCallback((id: string) => {
     setExpandedMap((prev) => ({ ...prev, [id]: !prev[id] }));
@@ -25,12 +29,12 @@ export const Sidebar: React.FC<Props> = ({ data }) => {
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
   const [hoveredParent, setHoveredParent] = useState<string | null>(null);
   const openPopover = Boolean(anchorEl) && !!hoveredParent;
-  const [popoverParent, setPopoverParent] = useState<any>(null);
+  const [popoverParent, setPopoverParent] = useState<SidebarParent>();
 
   const handleIconEnter = (e: React.MouseEvent<HTMLElement>, pId: string) => {
     setAnchorEl(e.currentTarget);
     setHoveredParent(pId);
-    const p = data.find((x) => x.id === pId) ?? null;
+    const p = data.find((x) => x.id === pId) ?? undefined;
     setPopoverParent(p);
   };
   const handleIconLeave = () => {
@@ -38,7 +42,7 @@ export const Sidebar: React.FC<Props> = ({ data }) => {
     setTimeout(() => {
       setAnchorEl(null);
       setHoveredParent(null);
-      setPopoverParent(null);
+      setPopoverParent(undefined);
     }, 150);
   };
 
@@ -46,7 +50,7 @@ export const Sidebar: React.FC<Props> = ({ data }) => {
   const handlePopoverClose = () => {
     setAnchorEl(null);
     setHoveredParent(null);
-    setPopoverParent(null);
+    setPopoverParent(undefined);
   };
 
   const location = useLocation();
@@ -54,13 +58,11 @@ export const Sidebar: React.FC<Props> = ({ data }) => {
   // Auto-open parent that contains current route when in expanded mode
   useEffect(() => {
     if (collapsed) return;
-    // find parent that contains current path
     const path = location.pathname;
     const found = data.find((p) => p.children?.some((c) => c.path === path));
     if (found) {
       setExpandedMap((prev) => ({ ...prev, [found.id]: true }));
     }
-    // optionally, you may close others or leave as-is
   }, [location.pathname, collapsed, data]);
 
 
@@ -85,11 +87,21 @@ export const Sidebar: React.FC<Props> = ({ data }) => {
         ))}
       </nav>
 
-      {/* Popover for collapsed mode */}
+      <IconButton
+        className="sidebar__toggle-btn"
+        onClick={toggleSidebar}
+      >
+        {collapsed ? (
+          <ArrowForwardIosIcon fontSize="small" />
+        ) : (
+          <ArrowBackIosNewIcon fontSize="small" />
+        )}
+      </IconButton>
+
       <SidebarPopover
         anchorEl={anchorEl}
         open={openPopover}
-        parent={popoverParent}
+        parent={popoverParent!} 
         onClose={handlePopoverClose}
         onNavigate={handlePopoverClose}
       />

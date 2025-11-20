@@ -19,68 +19,40 @@ export const SidebarItem: React.FC<Props> = ({
   onToggle,
   collapsed = false,
   onIconMouseEnter: onIconMouseEnterProp,
-  onIconMouseLeave: onIconMouseLeaveProp,
 }) => {
   const hasChildren = (parent.children && parent.children.length > 0) ?? false;
   const navigate = useNavigate();
 
-  const onIconMouseEnter = (e: React.MouseEvent<HTMLElement>) => {
-    if (onIconMouseEnterProp) {
-      onIconMouseEnterProp(e, parent.id);
-    }
-  };
-
-  const onIconMouseLeave = (e: React.MouseEvent<HTMLElement>) => {
-    const timer = setTimeout(() => {
-      if (onIconMouseLeaveProp) {
-        onIconMouseLeaveProp();
-      }
-    }, 300);
-    
-    const relatedTarget = e.relatedTarget as HTMLElement;
-    if (relatedTarget?.closest('.sidebar__popover')) {
-      clearTimeout(timer);
-    }
-    
-    return () => clearTimeout(timer);
-  };
-
   // Handle click on parent item
   const handleParentClick = () => {
     if (hasChildren) {
-      if (!expanded) {
-        onToggle(parent.id);
-        if (parent.children?.[0]?.path) {
-          navigate(parent.children[0].path);
-        }
-      } else {
-        if (parent.children?.[0]?.path) {
-          navigate(parent.children[0].path);
-        }
-      }
+      onToggle(parent.id);
     } else if (parent.path) {
-      navigate(parent.path);
+      navigate(parent.path);  
     }
   };
 
   // When collapsed: we only render icon button with hover handlers
   if (collapsed) {
-    return (
-      <div className="collapsed-icon-wrapper">
-        <button
-          className="sidebar__button"
-          aria-label={parent.label}
-          onMouseEnter={onIconMouseEnter}
-          onMouseLeave={onIconMouseLeave}
-          onClick={() => !hasChildren && parent.path && (window.location.href = parent.path)}
-        >
-          <span className="sidebar__icon">
-            {parent.icon}
-          </span>
-        </button>
-      </div>
-    );
-  }
+  return (
+    <div 
+      className="collapsed-icon-wrapper"
+      onMouseEnter={(e) => onIconMouseEnterProp?.(e, parent.id)}
+      onMouseLeave={() => {}}
+    >
+      <button
+        className="sidebar__button"
+        aria-label={parent.label}
+        onClick={() => !hasChildren && parent.path && navigate(parent.path)}
+      >
+        <span className="sidebar__icon">
+          {parent.icon}
+        </span>
+      </button>
+    </div>
+  );
+}
+
 
   // Expanded rendering
   return (
@@ -116,9 +88,9 @@ export const SidebarItem: React.FC<Props> = ({
         <div className="sidebar__children" style={{
           display: expanded ? 'block' : 'none'
         }}>
-          {parent.children!.map((child) => (
+          {parent.children!.map((child, index) => (
             <NavLink
-              key={child.id}
+              key={`${child.id}-${index}`}
               to={child.path}
               className={({ isActive }) => 
                 `sidebar__link ${isActive ? 'sidebar__link--active' : ''}`

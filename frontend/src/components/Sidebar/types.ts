@@ -5,7 +5,7 @@ export type SidebarChild = {
   label: string;
   path: string;
   icon?: ReactNode;
-  meta?: Record<string, any>;
+  meta?: Record<string, string>;
 };
 
 export type SidebarParent = {

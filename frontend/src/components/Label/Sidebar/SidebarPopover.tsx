@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from "react";
 import { createPortal } from 'react-dom';
-import type { SidebarParent, SidebarChild } from "./types";
+import type { SidebarParent, SidebarChild } from "../../../components/Sidebar/types";
 import { NavLink } from "react-router-dom";
 import "./Sidebar.css";
 
@@ -90,7 +90,7 @@ export const SidebarPopover: React.FC<Props> = ({ anchorEl, open, parent, onClos
           </NavLink>    
         ) : (
           <div className="sidebar__popover-list">
-            {children.map((c: SidebarChild, index) => (
+            {children.map((c: SidebarChild, index: number) => (
               <NavLink
                 key={`${c.id}-${index}`}
                 to={c.path}

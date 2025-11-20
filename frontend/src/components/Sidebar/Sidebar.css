@@ -2,9 +2,10 @@
 
 /* Sidebar root */
 .sidebar {
+  position: relative;
   width: 18vw;
-  min-width: 200px;
-  max-width: 280px;
+  min-width: 220px;
+  max-width: 360px;
   background-color: var(--primary-color);
   color: white;
   height: calc(100vh - 65px);
@@ -76,7 +77,6 @@
 
 .sidebar--collapsed .sidebar__button {
   justify-content: center;
-  padding: 12px 0;
   width: 100%;
   border-radius: 6px;
   margin: 0 auto;
@@ -138,7 +138,7 @@
   align-items: center;
   gap: 12px;
   border-radius: 6px;
-  padding: 10px 12px;
+  padding: 12px;
   text-transform: none;
   color: rgba(255, 255, 255, 0.9);
   text-decoration: none;
@@ -178,7 +178,8 @@
   background-color: rgba(255, 255, 255, 0.1);
 }
 
-.sidebar__label {
+.sidebar__label, .sidebar__link,
+.sidebar__popover-item  {
   font-weight: 600;
   font-size: 0.95rem;
   white-space: nowrap;
@@ -203,7 +204,7 @@
 }
 
 .sidebar__link {
-  padding: 6px 8px;
+  padding: 12px;
   border-radius: 4px;
   display: flex;
   align-items: center;
@@ -273,6 +274,37 @@
 .sidebar {
   z-index: 100;
   position: relative;
+}
+
+.sidebar__toggle-btn {
+  position: absolute;
+  top: 50%;
+  right: 0;                                      /* bám sát mép phải sidebar */
+  transform: translateY(-50%) translateX(50%);   /* dịch ra ngoài đúng 50% width nút */
+  
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  
+  background-color: white !important;
+  color: var(--primary-color) !important;
+  border: 3px solid var(--primary-color);
+  
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+  z-index: 9999;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
+  
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Khi sidebar collapsed: vẫn giữ nguyên vị trí đẹp */
+.sidebar--collapsed .sidebar__toggle-btn {
+  width: 30px;
+  height: 30px;
+  /* không cần ghi lại right hay transform → tự inherit và vẫn đúng vị trí */
 }
 
 @keyframes fadeIn {
