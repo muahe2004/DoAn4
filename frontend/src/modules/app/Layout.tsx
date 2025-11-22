@@ -1,14 +1,32 @@
 import { Outlet } from "react-router-dom";
+import { useSidebar } from "../../contexts/SidebarContext";
 import Header from "../../components/Header/Header";
-
-import "../../index.css"; 
+import { Sidebar } from "../../components/Sidebar/Sidebar";
+import { sidebarData } from "../../components/Sidebar/data";
+import { SidebarProvider } from "../../contexts/SidebarContext";
+import "../../index.css";
 import "./Layout.css";
 
-export default function Layout() {
+const LayoutContent = () => {
+  const { collapsed } = useSidebar();
+  
   return (
     <div className="app-layout">
-      <Header></Header>
-      <main><Outlet/></main>
+      <Header />
+      <div className={`layout-main ${collapsed ? 'collapsed' : ''}`}>
+        <Sidebar data={sidebarData} />
+        <main className="layout-content">
+          <Outlet />
+        </main>
+      </div>
     </div>
   );
 };
+
+export default function Layout() {
+  return (
+    <SidebarProvider>
+      <LayoutContent />
+    </SidebarProvider>
+  );
+}
