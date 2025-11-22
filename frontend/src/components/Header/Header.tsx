@@ -1,7 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import './Header.css';
-import { Select, MenuItem } from '@mui/material';
 import { MdHelpOutline } from "react-icons/md";
+import { useSidebar } from "../../contexts/SidebarContext";
+
 interface HeaderProps {
   customerName?: string;
   fiscalYear?: string;
@@ -12,26 +13,10 @@ interface HeaderProps {
 }
 
 const Header: React.FC<HeaderProps> = ({ 
-  customerName = 'CONG TY TNHH TX',
-  fiscalYear = '2025',
   userName = 'demo',
-  customers = [
-    'CONG TY TNHH TX',
-    'CONG TY CP ABC',
-    'CONG TY TNHH XYZ',
-    'DOANH NGHIEP TNHH 123'
-  ],
-  fiscalYears = [
-    '2025',
-    '2024', 
-    '2023',
-    '2022'
-  ]
 }) => {
-  const [selectedCustomer, setSelectedCustomer] = useState(customerName);
-  const [selectedFiscalYear, setSelectedFiscalYear] = useState(fiscalYear);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
-  
+  const { toggleSidebar } = useSidebar();
   const userDropdownRef = useRef<HTMLDivElement>(null);
 
   // Đóng user menu khi click ra ngoài
@@ -63,7 +48,7 @@ const Header: React.FC<HeaderProps> = ({
     <header className="customs-header">
       <div className="header-top">
         <div className="header-left">
-          <button className="menu-btn">
+          <button className="menu-btn" onClick={toggleSidebar}>
             <span className="menu-icon">☰</span>
           </button>
           
