@@ -3,6 +3,8 @@ import { FiChevronDown } from "react-icons/fi";
 import type { SidebarParent } from "./types";
 import { NavLink, useNavigate } from "react-router-dom";
 import "./Sidebar.css";
+import Typography from "@mui/material/Typography";
+import Tooltip from "@mui/material/Tooltip";
 
 type Props = {
   parent: SidebarParent;
@@ -32,29 +34,26 @@ export const SidebarItem: React.FC<Props> = ({
     }
   };
 
-  // When collapsed: we only render icon button with hover handlers
   if (collapsed) {
-  return (
-    <div 
-      className="collapsed-icon-wrapper"
-      onMouseEnter={(e) => onIconMouseEnterProp?.(e, parent.id)}
-      onMouseLeave={() => {}}
-    >
-      <button
-        className="sidebar__button"
-        aria-label={parent.label}
-        onClick={() => !hasChildren && parent.path && navigate(parent.path)}
+    return (
+      <div 
+        className="collapsed-icon-wrapper"
+        onMouseEnter={(e) => onIconMouseEnterProp?.(e, parent.id)}
+        onMouseLeave={() => {}}
       >
-        <span className="sidebar__icon">
-          {parent.icon}
-        </span>
-      </button>
-    </div>
-  );
-}
+        <button
+          className="sidebar__button"
+          aria-label={parent.label}
+          onClick={() => !hasChildren && parent.path && navigate(parent.path)}
+        >
+          <span className="sidebar__icon">
+            {parent.icon}
+          </span>
+        </button>
+      </div>
+    );
+  }
 
-
-  // Expanded rendering
   return (
     <div className="sidebar__item">
       <button 
@@ -85,23 +84,26 @@ export const SidebarItem: React.FC<Props> = ({
       </button>
 
       {hasChildren && (
-        <div className="sidebar__children" style={{
-          display: expanded ? 'block' : 'none'
-        }}>
-          {parent.children!.map((child, index) => (
-            <NavLink
-              key={`${child.id}-${index}`}
-              to={child.path}
-              className={({ isActive }) => 
-                `sidebar__link ${isActive ? 'sidebar__link--active' : ''}`
-              }
-            >
-              {child.icon && <span className="sidebar__link-icon">{child.icon}</span>}
-              {child.label}
-            </NavLink>
-          ))}
+        <div className="sidebar__children" style={{ display: expanded ? "block" : "none" }}>
+          {parent.children!.map((child, index) => {          
+            return (    
+              <Tooltip className="sidebar__link" key={child.id} title={child.label} placement="top" arrow disableInteractive>
+                <NavLink key={`${child.id}-${index}`} to={child.path}
+                  className={({ isActive }) => `sidebar__link ${isActive ? "sidebar__link--active" : ""}`}>
+                    {child.icon && (
+                      <span className="sidebar__link-icon">{child.icon}</span>
+                    )}
+
+                  <Typography noWrap className="sidebar__label">
+                    {child.label}
+                  </Typography>
+                </NavLink>
+              </Tooltip>
+            );
+            })}
         </div>
       )}
+
     </div>
   );
 };

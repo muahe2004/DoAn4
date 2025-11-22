@@ -9,7 +9,7 @@ import IconButton from "@mui/material/IconButton";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 
-export const SIDEBAR_WIDTH = '18vw'; 
+export const SIDEBAR_WIDTH = "18vw";
 
 type Props = {
   data: SidebarData;
@@ -17,28 +17,27 @@ type Props = {
 };
 
 export const Sidebar: React.FC<Props> = ({ data }) => {
-  const { collapsed } = useSidebar();
-  const [expandedMap, setExpandedMap] = useState<Record<string, boolean>>({});
-  const { toggleSidebar } = useSidebar();
+  const { collapsed, toggleSidebar } = useSidebar();
 
+  const [expandedMap, setExpandedMap] = useState<Record<string, boolean>>({});
   const toggle = useCallback((id: string) => {
     setExpandedMap((prev) => ({ ...prev, [id]: !prev[id] }));
   }, []);
 
-  // Hover state for collapsed popover
+  // Popover
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
   const [hoveredParent, setHoveredParent] = useState<string | null>(null);
-  const openPopover = Boolean(anchorEl) && !!hoveredParent;
   const [popoverParent, setPopoverParent] = useState<SidebarParent>();
+  const openPopover = Boolean(anchorEl) && !!hoveredParent;
 
   const handleIconEnter = (e: React.MouseEvent<HTMLElement>, pId: string) => {
     setAnchorEl(e.currentTarget);
     setHoveredParent(pId);
-    const p = data.find((x) => x.id === pId) ?? undefined;
+    const p = data.find((x) => x.id === pId);
     setPopoverParent(p);
   };
+
   const handleIconLeave = () => {
-    // small delay to allow moving mouse to popover
     setTimeout(() => {
       setAnchorEl(null);
       setHoveredParent(null);
@@ -46,16 +45,14 @@ export const Sidebar: React.FC<Props> = ({ data }) => {
     }, 150);
   };
 
-  // When popover opens, we want to keep it until mouse leaves popover area:
   const handlePopoverClose = () => {
     setAnchorEl(null);
     setHoveredParent(null);
     setPopoverParent(undefined);
   };
 
+  // Auto-open parent of active child
   const location = useLocation();
-
-  // Auto-open parent that contains current route when in expanded mode
   useEffect(() => {
     if (collapsed) return;
     const path = location.pathname;
@@ -65,27 +62,36 @@ export const Sidebar: React.FC<Props> = ({ data }) => {
     }
   }, [location.pathname, collapsed, data]);
 
-
   return (
-    <div 
-      className={`sidebar ${collapsed ? 'sidebar--collapsed' : ''}`}
-      role="navigation"
-      aria-label="Main sidebar"
-    >
-      <nav className="sidebar__nav">
-        {data.map((p) => (
-          <div key={p.id} className="sidebar__item">
-            <SidebarItem
-              parent={p}
-              expanded={!!expandedMap[p.id]}
-              onToggle={toggle}
-              collapsed={collapsed}
-              onIconMouseEnter={(e) => handleIconEnter(e, p.id)}
-              onIconMouseLeave={() => handleIconLeave()}
-            />
-          </div>
-        ))}
-      </nav>
+    <>
+      <div
+        className={`sidebar ${collapsed ? "sidebar--collapsed" : ""}`}
+        role="navigation"
+        aria-label="Main sidebar"
+      >
+        <nav className="sidebar__nav">
+          {data.map((p) => (
+            <div key={p.id} className="sidebar__item">
+              <SidebarItem
+                parent={p}
+                expanded={!!expandedMap[p.id]}
+                onToggle={toggle}
+                collapsed={collapsed}
+                onIconMouseEnter={(e) => handleIconEnter(e, p.id)}
+                onIconMouseLeave={handleIconLeave}
+              />
+            </div>
+          ))}
+        </nav>
+
+        <SidebarPopover
+          anchorEl={anchorEl}
+          open={openPopover}
+          parent={popoverParent!}
+          onClose={handlePopoverClose}
+          onNavigate={handlePopoverClose}
+        />
+      </div>
 
       <IconButton
         className="sidebar__toggle-btn"
@@ -97,14 +103,6 @@ export const Sidebar: React.FC<Props> = ({ data }) => {
           <ArrowBackIosNewIcon fontSize="small" />
         )}
       </IconButton>
-
-      <SidebarPopover
-        anchorEl={anchorEl}
-        open={openPopover}
-        parent={popoverParent!} 
-        onClose={handlePopoverClose}
-        onNavigate={handlePopoverClose}
-      />
-    </div>
+    </>
   );
 };
