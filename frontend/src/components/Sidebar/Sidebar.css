@@ -27,13 +27,13 @@
 /* Đường cấu trúc thư mục */
 .sidebar__children .sidebar__link {
   position: relative;
-  padding-left: 32px;
+  padding-left: 38px;
 }
 
 .sidebar__children .sidebar__link::before {
   content: "";
   position: absolute;
-  left: 10px;
+  left: 15px;
   top: 0;
   bottom: 0;
   width: 1px;
@@ -43,7 +43,7 @@
 .sidebar__children .sidebar__link::after {
   content: "";
   position: absolute;
-  left: 10px;
+  left: 15px;
   top: 16px;
   width: 15px;
   height: 1px;
@@ -172,7 +172,7 @@
 }
 
 .sidebar__link {
-  padding: 8px;
+  padding: 8px 0px;
   border-radius: 4px;
   display: flex;
   align-items: center !important;
