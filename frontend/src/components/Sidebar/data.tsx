@@ -1,3 +1,4 @@
+import { productsURL } from "../../routes/urls";
 import type { SidebarData } from "./types";
 import { FiBox, FiGrid, FiFileText, FiHome } from "react-icons/fi";
 
@@ -22,7 +23,7 @@ export const sidebarData: SidebarData = [
       {
         id: "sp",
         label: "Danh mục sản phẩm",
-        path: "/product",
+        path: productsURL,
         icon: <FiFileText />,
       },
       {
