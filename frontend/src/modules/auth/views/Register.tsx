@@ -10,8 +10,8 @@ import {
 } from '@mui/material';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
-import LabelPrimary from '../../components/Label/Label';
-import Header_Auth from '../../components/Header/Header_Auth';
+import LabelPrimary from '../../../components/Label/Label';
+import Header_Auth from '../components/Header_Auth';
 
 export default function Register() {
   const [showPassword, setShowPassword] = React.useState(false);
