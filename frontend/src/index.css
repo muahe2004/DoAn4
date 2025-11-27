@@ -249,3 +249,8 @@ input::-ms-reveal, input::-ms-clear {
 .primary-dialog-input {
   margin-bottom: 25px !important; 
 }
+
+/* ================== autocomplete ==================*/
+.primary-autocomplete .MuiAutocomplete-inputRoot {
+  padding: 0 !important;
+}
