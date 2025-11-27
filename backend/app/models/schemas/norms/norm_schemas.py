@@ -1,7 +1,6 @@
 from datetime import datetime
-from typing import List, Optional
 from sqlmodel import SQLModel, Field, Column, String, DateTime
-from sqlalchemy import Boolean, Column, String, Integer, DateTime 
+from sqlalchemy import Column, String, DateTime 
 from uuid import UUID
 
 class NormBase(SQLModel):
@@ -13,3 +12,7 @@ class NormBase(SQLModel):
 
 class NormPublic(NormBase):
     id: UUID
+
+class NormDropdownResponse(SQLModel):
+    id: UUID
+    norm_name: str

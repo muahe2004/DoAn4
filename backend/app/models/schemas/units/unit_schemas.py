@@ -1,7 +1,8 @@
 from datetime import datetime
 from typing import List, Optional
+from app.models.schemas.common.query import BaseQueryParams
 from sqlmodel import SQLModel, Field, Column, String, DateTime
-from sqlalchemy import Column, String, Integer, DateTime 
+from sqlalchemy import Column, String, DateTime 
 from uuid import UUID
 
 class UnitBase(SQLModel):
@@ -14,3 +15,10 @@ class UnitBase(SQLModel):
 
 class UnitPublic(UnitBase):
     id: UUID
+
+class UnitQueryParams(BaseQueryParams):
+    type: Optional[str] = Field(None)
+
+class UnitDropdownResponse(SQLModel):
+    id: UUID
+    unit_name: str
