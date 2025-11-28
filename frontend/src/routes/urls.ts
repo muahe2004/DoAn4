@@ -6,3 +6,4 @@ export const signinUrl = "/sign-in";
 export const registerUrl = "/register";
 
 export const testURL = "/test";
+export const productsURL = "/products";
