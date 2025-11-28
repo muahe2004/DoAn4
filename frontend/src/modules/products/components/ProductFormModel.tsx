@@ -1,50 +1,39 @@
 import React, { useState, useEffect } from 'react';
 import {
-  Box,
-  Button,
   Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
   TextField,
-  MenuItem,
-  FormControlLabel,
-  Checkbox,
   Grid,
   Autocomplete,
 } from '@mui/material';
-import type { IProduct } from '../types';
+import type { IProduct, IProductResponse } from '../types';
 import LabelPrimary from '../../../components/Label/Label';
+import Button from '../../../components/Button/Button';
 
 interface ProductFormModelProps {
   open: boolean;
   onClose: () => void;
   onSubmit: (data: IProduct) => void;
-  initialData?: IProduct;
+  initialData?: IProductResponse;
   mode?: 'add' | 'edit';
 }
 
 const unitOptions = [
-  { id: 1, label: "Kg" },
-  { id: 2, label: "Gram" },
-  { id: 3, label: "Box" },
+  { id: "uuid-1", label: "Kg" },
+  { id: "uuid-2", label: "Gram" },
+  { id: "uuid-3", label: "Box" },
 ];
 
 const normOptions = [
-  { id: 1, label: "Norm 001" },
-  { id: 2, label: "Norm 002" },
-  { id: 3, label: "Norm 003" },
+  { id: "uuid-1", label: "Norm 001" },
+  { id: "uuid-2", label: "Norm 002" },
+  { id: "uuid-3", label: "Norm 003" },
 ];
 
-
-const ProductFormModel: React.FC<ProductFormModelProps> = ({
-  open,
-  onClose,
-  onSubmit,
-  initialData,
-  mode = 'add',
-}) => {
-  const [formData, setFormData] = useState<IProduct>({
+const ProductFormModel: React.FC<ProductFormModelProps> = ({ open, onClose, onSubmit, initialData, mode = 'add', }) => {
+  const [formData, setFormData] = useState<IProductResponse>({
     product_code: '',
     product_name: '',
     unit_id: '',
@@ -53,11 +42,22 @@ const ProductFormModel: React.FC<ProductFormModelProps> = ({
     description: '',
     is_semi_product: false,
     status: 'active',
+    unit_name: "",
+    unit_name_2: "",
+    norm_name: ""
   });
 
   useEffect(() => {
     if (mode === 'edit' && initialData) {
-      setFormData(initialData);
+      setFormData({
+        ...initialData,
+        unit_id: initialData.unit_id ? String(initialData.unit_id) : "",
+        unit_id_2: initialData.unit_id_2 ? String(initialData.unit_id_2) : "",
+        norm_id: initialData.norm_id ? String(initialData.norm_id) : "",
+        unit_name: initialData.unit_name || "",
+        unit_name_2: initialData.unit_name_2 || "",
+        norm_name: initialData.norm_name || ""
+      });
     } else if (mode === 'add') {
       setFormData({
         product_code: '',
@@ -68,18 +68,16 @@ const ProductFormModel: React.FC<ProductFormModelProps> = ({
         description: '',
         is_semi_product: false,
         status: 'active',
+        unit_name: "",
+        unit_name_2: "",
+        norm_name: ""
       });
     }
   }, [initialData, mode, open]);
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    const { name, value, type, checked } = e.target as HTMLInputElement;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: type === 'checkbox' ? checked : value,
-    }));
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({...prev, [name]: value}));
   };
 
   const handleSubmit = () => {
@@ -89,10 +87,11 @@ const ProductFormModel: React.FC<ProductFormModelProps> = ({
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
-      <DialogTitle>{mode === 'edit' ? 'Edit Product' : 'Add Product'}</DialogTitle>
-      <DialogContent>
+      <DialogTitle className='primary-dialog-title'>{mode === 'edit' ? 'SỬA THÔNG TIN SẢN PHẨM' : 'THÊM SẢN PHẨM'}</DialogTitle>
+      <DialogContent className='primary-dialog-content'>
         <Grid container spacing={2} className="myprofile-form">
-          {/* Mã sản phẩm */}
+
+          {/* PRODUCT CODE */}
           <Grid size={6} className="myprofile-form__group">
             <LabelPrimary value="Mã sản phẩm" required />
             <TextField
@@ -105,8 +104,32 @@ const ProductFormModel: React.FC<ProductFormModelProps> = ({
             />
           </Grid>
 
-          {/* Tên sản phẩm */}
+          {/* NORM ID */}
           <Grid size={6} className="myprofile-form__group">
+            <LabelPrimary value="Định mức" required/>
+            <Autocomplete
+              className='primary-autocomplete'
+              options={normOptions}
+              value={
+                formData.norm_id
+                  ? { id: formData.norm_id, label: formData.norm_name }
+                  : null
+              }
+              onChange={(e, val) =>
+                setFormData(prev => ({
+                  ...prev,
+                  norm_id: val ? String(val.id) : "",
+                  norm_name: val ? val.label : ""
+                }))
+              }
+              renderInput={(params) => (
+                <TextField {...params} variant="outlined" className="primary-text__field" />
+              )}
+            />
+          </Grid>
+
+          {/* PRODUCT NAME */}
+          <Grid size={12} className="myprofile-form__group">
             <LabelPrimary value="Tên sản phẩm" required />
             <TextField
               value={formData.product_name}
@@ -118,93 +141,55 @@ const ProductFormModel: React.FC<ProductFormModelProps> = ({
             />
           </Grid>
 
-          {/* UNIT ID */}
+          {/* UNIT */}
           <Grid size={6} className="myprofile-form__group">
-            <LabelPrimary value="Unit ID" />
+            <LabelPrimary value="Đơn vị tính" required/>
             <Autocomplete
               className='primary-autocomplete'
               options={unitOptions}
               value={
-                unitOptions.find(u => u.id === Number(formData.unit_id)) || null
+                formData.unit_id
+                  ? { id: formData.unit_id, label: formData.unit_name }
+                  : null
               }
               onChange={(e, val) =>
                 setFormData(prev => ({
                   ...prev,
-                  unit_id: val ? String(val.id) : ""
+                  unit_id: val ? String(val.id) : "",
+                  unit_name: val ? val.label : ""
                 }))
               }
-
-              fullWidth
               renderInput={(params) => (
                 <TextField {...params} variant="outlined" className="primary-text__field" />
               )}
             />
           </Grid>
 
-          {/* UNIT ID 2 */}
+          {/* UNIT 2 */}
           <Grid size={6} className="myprofile-form__group">
-            <LabelPrimary value="Unit ID 2" />
+            <LabelPrimary value="Đơn vị tính 2" />
             <Autocomplete
               className='primary-autocomplete'
               options={unitOptions}
               value={
-                unitOptions.find(u => u.id === Number(formData.unit_id_2)) || null
+                formData.unit_id_2
+                  ? { id: formData.unit_id_2, label: formData.unit_name_2 }
+                  : null
               }
               onChange={(e, val) =>
                 setFormData(prev => ({
                   ...prev,
-                  unit_id_2: val ? String(val.id) : ""
+                  unit_id_2: val ? String(val.id) : "",
+                  unit_name_2: val ? val.label : ""
                 }))
               }
-
-              fullWidth
               renderInput={(params) => (
                 <TextField {...params} variant="outlined" className="primary-text__field" />
               )}
             />
           </Grid>
 
-          {/* NORM ID */}
-          <Grid size={6} className="myprofile-form__group">
-            <LabelPrimary value="Norm ID" />
-            <Autocomplete
-              className='primary-autocomplete'
-              options={normOptions}
-              value={
-                normOptions.find(n => n.id === Number(formData.norm_id)) || null
-              }
-              onChange={(e, val) =>
-                setFormData(prev => ({
-                  ...prev,
-                  norm_id: val ? String(val.id) : ""
-                }))
-              }
-
-              fullWidth
-              renderInput={(params) => (
-                <TextField {...params} variant="outlined" className="primary-text__field" />
-              )}
-            />
-          </Grid>
-
-          {/* Status */}
-          <Grid size={6} className="myprofile-form__group">
-            <LabelPrimary value="Trạng thái" />
-            <TextField
-              select
-              name="status"
-              value={formData.status}
-              onChange={handleChange}
-              fullWidth
-              variant="outlined"
-              className="primary-text__field"
-            >
-              <MenuItem value="active">Active</MenuItem>
-              <MenuItem value="inactive">Inactive</MenuItem>
-            </TextField>
-          </Grid>
-
-          {/* Description */}
+          {/* DESC */}
           <Grid size={12} className="myprofile-form__group">
             <LabelPrimary value="Mô tả" />
             <TextField
@@ -220,11 +205,10 @@ const ProductFormModel: React.FC<ProductFormModelProps> = ({
           </Grid>
         </Grid>
       </DialogContent>
-      <DialogActions>
-        <Button onClick={onClose}>Cancel</Button>
-        <Button onClick={handleSubmit} variant="contained">
-          {mode === 'edit' ? 'Update' : 'Add'}
-        </Button>
+
+      <DialogActions className='primary-dialog-actions'>
+        <Button className='button-cancel' onClick={onClose}> HUỶ </Button>
+        <Button onClick={handleSubmit} variant="contained"> LƯU </Button>
       </DialogActions>
     </Dialog>
   );

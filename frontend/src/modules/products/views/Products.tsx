@@ -48,6 +48,8 @@ export function Products() {
     const handleOpenEdit = (prod: IProductResponse) => {
         setSelectedProduct(prod);
         setOpenModal(true);
+
+        console.log(prod);
     }
 
     const handleOpenAdd = () => {
@@ -129,6 +131,9 @@ export function Products() {
                     description: selectedProduct.description || '',
                     is_semi_product: selectedProduct.is_semi_product,
                     status: selectedProduct.status,
+                    unit_name: selectedProduct.unit_name,
+                    unit_name_2: selectedProduct.unit_name_2,
+                    norm_name: selectedProduct.norm_name,
                     created_at: selectedProduct.created_at,
                     updated_at: selectedProduct.updated_at,
                 } : undefined}
