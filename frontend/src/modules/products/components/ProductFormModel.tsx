@@ -11,7 +11,8 @@ import {
 import type { IProduct, IProductResponse } from '../types';
 import LabelPrimary from '../../../components/Label/Label';
 import Button from '../../../components/Button/Button';
-
+import { useGetDropdownUnits } from '../../units/apis/dropdown';
+import { useGetDropdownNorms } from '../../norms/apis/dropdown';
 interface ProductFormModelProps {
   open: boolean;
   onClose: () => void;
@@ -19,18 +20,6 @@ interface ProductFormModelProps {
   initialData?: IProductResponse;
   mode?: 'add' | 'edit';
 }
-
-const unitOptions = [
-  { id: "uuid-1", label: "Kg" },
-  { id: "uuid-2", label: "Gram" },
-  { id: "uuid-3", label: "Box" },
-];
-
-const normOptions = [
-  { id: "uuid-1", label: "Norm 001" },
-  { id: "uuid-2", label: "Norm 002" },
-  { id: "uuid-3", label: "Norm 003" },
-];
 
 const ProductFormModel: React.FC<ProductFormModelProps> = ({ open, onClose, onSubmit, initialData, mode = 'add', }) => {
   const [formData, setFormData] = useState<IProductResponse>({
@@ -46,6 +35,28 @@ const ProductFormModel: React.FC<ProductFormModelProps> = ({ open, onClose, onSu
     unit_name_2: "",
     norm_name: ""
   });
+
+  const ParamsUnit = {
+    limit: 5,
+    skip: 0,
+  };
+
+  const {
+    data: dropdownUnits,
+    isLoading: isLoadingUnits,
+    error: errorUnits,
+  } = useGetDropdownUnits(ParamsUnit);
+
+  const ParamsNorm = {
+    limit: 5,
+    skip: 0,
+  };
+
+  const {
+    data: dropdownNorms,
+    isLoading: isLoadingNorms,
+    error: errorNorms,
+  } = useGetDropdownNorms(ParamsNorm);
 
   useEffect(() => {
     if (mode === 'edit' && initialData) {
@@ -109,17 +120,18 @@ const ProductFormModel: React.FC<ProductFormModelProps> = ({ open, onClose, onSu
             <LabelPrimary value="Định mức" required/>
             <Autocomplete
               className='primary-autocomplete'
-              options={normOptions}
+              options={dropdownNorms || []}
               value={
                 formData.norm_id
-                  ? { id: formData.norm_id, label: formData.norm_name }
+                  ? { id: formData.norm_id, norm_name: formData.norm_name }
                   : null
               }
+              getOptionLabel={(option) => option.norm_name || ""}
               onChange={(e, val) =>
                 setFormData(prev => ({
                   ...prev,
                   norm_id: val ? String(val.id) : "",
-                  norm_name: val ? val.label : ""
+                  norm_name: val ? val.norm_name : ""
                 }))
               }
               renderInput={(params) => (
@@ -146,17 +158,18 @@ const ProductFormModel: React.FC<ProductFormModelProps> = ({ open, onClose, onSu
             <LabelPrimary value="Đơn vị tính" required/>
             <Autocomplete
               className='primary-autocomplete'
-              options={unitOptions}
+              options={dropdownUnits || []}
               value={
                 formData.unit_id
-                  ? { id: formData.unit_id, label: formData.unit_name }
+                  ? { id: formData.unit_id, unit_name: formData.unit_name }
                   : null
               }
+              getOptionLabel={(option) => option.unit_name || ""}
               onChange={(e, val) =>
                 setFormData(prev => ({
                   ...prev,
                   unit_id: val ? String(val.id) : "",
-                  unit_name: val ? val.label : ""
+                  unit_name: val ? val.unit_name : ""
                 }))
               }
               renderInput={(params) => (
@@ -170,17 +183,18 @@ const ProductFormModel: React.FC<ProductFormModelProps> = ({ open, onClose, onSu
             <LabelPrimary value="Đơn vị tính 2" />
             <Autocomplete
               className='primary-autocomplete'
-              options={unitOptions}
+              options={dropdownUnits || []}
               value={
                 formData.unit_id_2
-                  ? { id: formData.unit_id_2, label: formData.unit_name_2 }
+                  ? { id: formData.unit_id_2, unit_name: formData.unit_name_2 }
                   : null
               }
+              getOptionLabel={(option) => option.unit_name || ""}
               onChange={(e, val) =>
-                setFormData(prev => ({
+                setFormData((prev) => ({
                   ...prev,
                   unit_id_2: val ? String(val.id) : "",
-                  unit_name_2: val ? val.label : ""
+                  unit_name_2: val ? val.unit_name : ""
                 }))
               }
               renderInput={(params) => (

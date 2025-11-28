@@ -8,15 +8,17 @@ import {
     TableHead,
     TableRow,
 } from "@mui/material";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useGetProducts } from "../apis/getProducts";
 import { FiEdit } from "react-icons/fi";
 import { PiTrashSimpleFill } from "react-icons/pi";
 import PrimaryPagination from "../../../components/Pagination/Pagination";
-import type { IProductResponse } from "../types";
+import type { IProduct, IProductResponse } from "../types";
 import ProductFormModel from "../components/ProductFormModel";
 import Button from "../../../components/Button/Button";
 import "./products.css";
+import { useCreateProduct } from "../apis/addProduct";
+import { useEditProduct } from "../apis/editProduct";
 
 export function Products() {
     const [page, setPage] = useState(1);
@@ -24,6 +26,8 @@ export function Products() {
 
     const [selectedProduct, setSelectedProduct] = useState<IProductResponse | null>(null);
     const [openModal, setOpenModal] = useState(false);
+    const { mutateAsync: createProduct } = useCreateProduct({});
+    const { mutateAsync: editProduct } = useEditProduct({});
 
     const Params = {
         limit: rowsPerPage,
@@ -48,8 +52,6 @@ export function Products() {
     const handleOpenEdit = (prod: IProductResponse) => {
         setSelectedProduct(prod);
         setOpenModal(true);
-
-        console.log(prod);
     }
 
     const handleOpenAdd = () => {
@@ -62,9 +64,27 @@ export function Products() {
         setSelectedProduct(null);
     }
 
-    const handleSubmitProduct = () => {
-        console.log("Updated product:");
-    }
+    const handleSubmitProduct = (data: IProduct) => {
+        const payload: IProduct = {
+            product_code: data.product_code,
+            product_name: data.product_name,
+            unit_id: data.unit_id,
+            unit_id_2: data.unit_id_2,
+            norm_id: data.norm_id,
+            description: data.description,
+            is_semi_product: data.is_semi_product,
+            status: data.status,
+        };
+
+        if (selectedProduct) {
+            editProduct({
+                id: data.id!,
+                data: payload,
+            });
+        } else {
+            createProduct(payload);
+        }
+    };
 
     return (
         <Container maxWidth={false} className="primary-container">
@@ -121,25 +141,9 @@ export function Products() {
                 open={openModal}
                 onClose={handleCloseModal}
                 onSubmit={handleSubmitProduct}
-                initialData={selectedProduct ? {
-                    id: selectedProduct.id,
-                    product_code: selectedProduct.product_code,
-                    product_name: selectedProduct.product_name,
-                    unit_id: selectedProduct.unit_id,
-                    unit_id_2: selectedProduct.unit_id_2,
-                    norm_id: selectedProduct.norm_id,
-                    description: selectedProduct.description || '',
-                    is_semi_product: selectedProduct.is_semi_product,
-                    status: selectedProduct.status,
-                    unit_name: selectedProduct.unit_name,
-                    unit_name_2: selectedProduct.unit_name_2,
-                    norm_name: selectedProduct.norm_name,
-                    created_at: selectedProduct.created_at,
-                    updated_at: selectedProduct.updated_at,
-                } : undefined}
+                initialData={selectedProduct || undefined}
                 mode={selectedProduct ? 'edit' : 'add'}
             />
-
         </Container>
     );
 }

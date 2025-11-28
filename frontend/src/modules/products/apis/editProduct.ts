@@ -1,29 +1,29 @@
 import { useMutation, useQueryClient, type UseMutationOptions } from "@tanstack/react-query";
-import { URL_API_CLASS } from "../../../constants/config";
+import { URL_API_PRODUCT } from "../../../constants/config";
 import { apiClient } from "../../../lib/api";
-import type { IClasses } from "../types";
+import type { IProduct } from "../types";
 
-export type ClassEditDto = Partial<IClasses>;
+export type ProductEditDto = Partial<IProduct>;
 
-export type EditClassResponse = IClasses;
+export type EditProductResponse = IProduct;
 
-const editClass = async (
+const editProduct = async (
     id: string,
-    data: ClassEditDto,
-): Promise<EditClassResponse> => {
-    const response = await apiClient.patch(`${URL_API_CLASS}/${id}`, data);
+    data: ProductEditDto,
+): Promise<EditProductResponse> => {
+    const response = await apiClient.patch(`${URL_API_PRODUCT}/${id}`, data);
     return response.data;
 }
 
-export const useEditClass = (
-    config?: UseMutationOptions<EditClassResponse, Error, {id: string; data: ClassEditDto}>
+export const useEditProduct = (
+    config?: UseMutationOptions<EditProductResponse, Error, {id: string; data: ProductEditDto}>
 ) => {
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: ({id, data}) => editClass(id, data),
-        onSuccess: (data, variables, context) => {
-            queryClient.invalidateQueries({ queryKey: ["classes"] });
-            config?.onSuccess?.(data, variables, context);
+        mutationFn: ({id, data}) => editProduct(id, data),
+        onSuccess: (data, variables, context, mutation) => {
+            queryClient.invalidateQueries({ queryKey: ["products"] });
+            config?.onSuccess?.(data, variables, context, mutation);
         },
         ...config,
     });

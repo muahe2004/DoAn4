@@ -1,28 +1,28 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { URL_API_CLASS } from "../../../constants/config";
+import { URL_API_PRODUCT } from "../../../constants/config";
+import type { IProduct } from "../types";
+import type { MutationConfig } from "src/lib/react-query";
 import { apiClient } from "../../../lib/api";
-import type { MutationConfig } from "../../../lib/react-query";
-import type { IClasses } from "../types";
 
-const createClass = async (data: IClasses): Promise<any> => {
-    const response = await apiClient.post(`${URL_API_CLASS}`, data);
+const createProduct = async (data: IProduct): Promise<any> => {
+    const response = await apiClient.post(`${URL_API_PRODUCT}`, data);  
     return response.data;
 }
 
-type UseCreateClassOptions = {
-    config?: MutationConfig<typeof createClass>
+type UseCreateProductOptions = {
+    config?: MutationConfig<typeof createProduct>
 }
 
-export const useCreateClass = ({ config }: UseCreateClassOptions) => {
+export const useCreateProduct = ({ config }: UseCreateProductOptions) => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: createClass,
+        mutationFn: createProduct,
         onMutate: () => {},
         onError: () => {},
         onSuccess: () => {
             queryClient.invalidateQueries({
-                queryKey: ["classes"],
+                queryKey: ["products"],
             })
         },
         ...config
