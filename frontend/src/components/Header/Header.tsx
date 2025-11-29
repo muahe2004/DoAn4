@@ -1,46 +1,25 @@
 import React, { useState, useRef, useEffect } from 'react';
 import './Header.css';
-import { Select, MenuItem } from '@mui/material';
 import { MdHelpOutline } from "react-icons/md";
+
 interface HeaderProps {
-  customerName?: string;
-  fiscalYear?: string;
   userName?: string;
-  userRole?: string;
-  customers?: string[];
-  fiscalYears?: string[];
 }
 
 const Header: React.FC<HeaderProps> = ({ 
-  customerName = 'CONG TY TNHH TX',
-  fiscalYear = '2025',
-  userName = 'demo',
-  customers = [
-    'CONG TY TNHH TX',
-    'CONG TY CP ABC',
-    'CONG TY TNHH XYZ',
-    'DOANH NGHIEP TNHH 123'
-  ],
-  fiscalYears = [
-    '2025',
-    '2024', 
-    '2023',
-    '2022'
-  ]
+  userName = 'demo'
 }) => {
-  const [selectedCustomer, setSelectedCustomer] = useState(customerName);
-  const [selectedFiscalYear, setSelectedFiscalYear] = useState(fiscalYear);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
-  
   const userDropdownRef = useRef<HTMLDivElement>(null);
 
-  // Đóng user menu khi click ra ngoài
+  // Đóng menu khi click ra ngoài
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (userDropdownRef.current && !userDropdownRef.current.contains(event.target as Node)) {
         setIsUserMenuOpen(false);
       }
     };
+
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
@@ -66,9 +45,7 @@ const Header: React.FC<HeaderProps> = ({
           <button className="menu-btn">
             <span className="menu-icon">☰</span>
           </button>
-          
         </div>
-
 
         <div className="header-right">
           <button className="help-link" onClick={handleHelpClick}>
@@ -82,7 +59,9 @@ const Header: React.FC<HeaderProps> = ({
               onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
             >
               <div className="user-avatar">
-                <span className="avatar-text">{userName.charAt(0).toUpperCase()}</span>
+                <span className="avatar-text">
+                  {userName.charAt(0).toUpperCase()}
+                </span>
               </div>
               <span className="user-name">{userName}</span>
             </button>
@@ -92,11 +71,11 @@ const Header: React.FC<HeaderProps> = ({
                 <button className="user-menu-item" onClick={handleProfile}>
                   <span className="menu-item-text">Thông tin cá nhân</span>
                 </button>
-                
+
                 <button className="user-menu-item" onClick={handleChangePassword}>
                   <span className="menu-item-text">Đổi mật khẩu</span>
                 </button>
-                
+
                 <button className="user-menu-item logout-item" onClick={handleLogout}>
                   <span className="menu-item-text">Đăng xuất</span>
                 </button>
