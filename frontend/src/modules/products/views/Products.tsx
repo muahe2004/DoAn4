@@ -12,6 +12,7 @@ import { useState } from "react";
 import { useGetProducts } from "../apis/getProducts";
 import { FiEdit } from "react-icons/fi";
 import { PiTrashSimpleFill } from "react-icons/pi";
+import { useSnackbar } from "../../../components/SnackBar/SnackBar";
 import PrimaryPagination from "../../../components/Pagination/Pagination";
 import type { IProduct, IProductResponse } from "../types";
 import ProductFormModel from "../components/ProductFormModel";
@@ -26,6 +27,7 @@ export function Products() {
 
     const [selectedProduct, setSelectedProduct] = useState<IProductResponse | null>(null);
     const [openModal, setOpenModal] = useState(false);
+    const { showSnackbar } = useSnackbar();
     const { mutateAsync: createProduct } = useCreateProduct({});
     const { mutateAsync: editProduct } = useEditProduct({});
 
@@ -64,7 +66,7 @@ export function Products() {
         setSelectedProduct(null);
     }
 
-    const handleSubmitProduct = (data: IProduct) => {
+    const handleSubmitProduct = async (data: IProduct) => {
         const payload: IProduct = {
             product_code: data.product_code,
             product_name: data.product_name,
@@ -76,13 +78,20 @@ export function Products() {
             status: data.status,
         };
 
-        if (selectedProduct) {
-            editProduct({
-                id: data.id!,
-                data: payload,
-            });
-        } else {
-            createProduct(payload);
+        try {
+            if (selectedProduct) {
+                await editProduct({
+                    id: data.id!,
+                    data: payload,
+                });
+                showSnackbar({ message: "Cập nhật sản phẩm thành công", severity: "success" });
+            } else {
+                await createProduct(payload);
+                showSnackbar({ message: "Thêm sản phẩm thành công", severity: "success" });
+            }
+            handleCloseModal();
+        } catch (error) {
+            showSnackbar({ message: "Có lỗi xảy ra, vui lòng thử lại", severity: "error" });
         }
     };
 
