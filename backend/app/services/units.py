@@ -1,6 +1,13 @@
-from app.models.schemas.units.unit_schemas import UnitDropdownResponse, UnitQueryParams
+from typing import List
+import uuid
+
+from fastapi import HTTPException
+from sqlalchemy import func
+from app.models.schemas.units.unit_schemas import UnitDeleteResponse, UnitDropdownResponse, UnitPublic, UnitQueryParams, UnitUpdate
 from sqlmodel import Session, select
 from app.models.models import Units
+from starlette import status
+from app.enums.status import StatusEnum
 
 class UnitServices:
     @staticmethod
@@ -30,3 +37,82 @@ class UnitServices:
             UnitDropdownResponse(id=row[0], unit_name=row[1])
             for row in raw_results
         ]
+    
+    @staticmethod
+    def create(
+        *,
+        session: Session,
+        unit: Units,
+    ) -> UnitPublic:
+        normalized_name = unit.unit_name.strip().upper()
+
+        existing = session.exec(
+            select(Units).where(func.upper(Units.unit_name) == normalized_name)
+        ).first()
+
+        if existing:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"Unit: '{unit.unit_name}' already exists.",
+            )
+
+        new_unit = Units(**unit.model_dump())
+        session.add(new_unit)
+        session.commit()
+        session.refresh(new_unit)
+
+        return UnitPublic.model_validate(new_unit)
+    
+    @staticmethod
+    def update(
+        *,
+        session: Session,
+        unit_id: uuid.UUID,
+        unit_data: UnitUpdate,
+    ) -> UnitPublic:
+        unit = session.get(Units, unit_id)
+        if not unit:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="Unit not found"
+            )
+
+        update_data = unit_data.model_dump(exclude_unset=True)
+        for field, value in update_data.items():
+            setattr(unit, field, value)
+
+        session.commit()
+        return UnitPublic.model_validate(unit)
+
+    @staticmethod
+    def delete_many(
+        *,
+        session: Session,
+        unit_ids: List[uuid.UUID]
+    ) -> List[UnitDeleteResponse]:
+        results = []
+
+        try:
+            for unit_id in unit_ids:
+                unit = session.get(Units, unit_id)
+
+                if not unit:
+                    results.append(
+                        UnitDeleteResponse(id=str(unit_id), message="unit not found")
+                    )
+                    continue
+
+                if unit.status == StatusEnum.ACTIVE:
+                    unit.status = StatusEnum.INACTIVE
+                    message = "Units set to inactive"
+                else:
+                    message = "Units already inactive"
+
+                results.append(UnitDeleteResponse(id=str(unit_id), message=message))
+
+            session.commit()
+
+        except Exception as e:
+            session.rollback()
+            raise e
+
+        return results

@@ -22,3 +22,17 @@ class UnitQueryParams(BaseQueryParams):
 class UnitDropdownResponse(SQLModel):
     id: UUID
     unit_name: str
+
+class UnitCreate(UnitBase):
+    pass
+
+class UnitUpdate(SQLModel):
+    unit_name: str = Field(sa_column=Column(String(100), nullable=False))
+    description: str = Field(sa_column=Column(String(500), nullable=True))
+    type: str | None = Field(default=None, sa_column=Column(String(50), nullable=True))
+    status: str | None = Field(default=None, sa_column=Column(String(50), nullable=True))
+    updated_at: datetime = Field(default_factory=datetime.now, sa_column=Column(DateTime, nullable=False))
+
+class UnitDeleteResponse(SQLModel):
+    message: str
+    id: UUID
