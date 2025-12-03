@@ -1,6 +1,6 @@
 from typing import List
 import uuid
-from app.models.schemas.units.unit_schemas import UnitCreate, UnitDeleteResponse, UnitPublic, UnitQueryParams, UnitUpdate
+from app.models.schemas.units.unit_schemas import MultiUnitCreate, UnitCreate, UnitDeleteResponse, UnitPublic, UnitQueryParams, UnitUpdate
 from app.services.units import UnitServices
 from fastapi import APIRouter, Depends, Request
 from app.api.deps import SessionDep
@@ -21,6 +21,18 @@ def create_unit(
     request: Request, session: SessionDep, data: UnitCreate
 ) -> UnitPublic:
     return UnitServices.create(session=session, unit=data)
+
+# =========================== create multi unit ===========================
+@router.post(
+    "/multi",
+    response_model=list[UnitPublic],
+)
+def create_units_multi(
+    request: Request,
+    session: SessionDep,
+    data: MultiUnitCreate
+) -> list[UnitPublic]:
+    return UnitServices.create_multi(session=session, data=data)
 
 # =========================== update unit ===========================
 @router.patch(

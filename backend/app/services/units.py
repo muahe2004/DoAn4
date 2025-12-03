@@ -3,7 +3,7 @@ import uuid
 
 from fastapi import HTTPException
 from sqlalchemy import func
-from app.models.schemas.units.unit_schemas import UnitDeleteResponse, UnitDropdownResponse, UnitPublic, UnitQueryParams, UnitUpdate
+from app.models.schemas.units.unit_schemas import MultiUnitCreate, UnitDeleteResponse, UnitDropdownResponse, UnitPublic, UnitQueryParams, UnitUpdate
 from sqlmodel import Session, select
 from app.models.models import Units
 from starlette import status
@@ -62,6 +62,56 @@ class UnitServices:
         session.refresh(new_unit)
 
         return UnitPublic.model_validate(new_unit)
+    
+    def create_multi(
+        *,
+        session: Session,
+        data: MultiUnitCreate
+    ) -> list[UnitPublic]:
+
+        normalized_map = {
+            u.unit_name.strip().upper(): u.unit_name
+            for u in data.units
+        }
+
+        normalized_names = list(normalized_map.keys())
+
+        existing_units = session.exec(
+            select(Units).where(
+                func.upper(Units.unit_name).in_(normalized_names)
+            )
+        ).all()
+
+        existing_normalized = {
+            u.unit_name.strip().upper()
+            for u in existing_units
+        }
+
+        to_create = []
+        for normalized_name, original_name in normalized_map.items():
+            if normalized_name not in existing_normalized:
+                to_create.append(
+                    Units(
+                        unit_name=original_name,
+                        description="",
+                        type="",
+                        status=StatusEnum.ACTIVE
+                    )
+                )
+
+        if not to_create:
+            raise HTTPException(
+                status_code=400,
+                detail="All units already exist."
+            )
+
+        session.add_all(to_create)
+        session.commit()
+
+        for item in to_create:
+            session.refresh(item)
+
+        return [UnitPublic.model_validate(u) for u in to_create]
     
     @staticmethod
     def update(

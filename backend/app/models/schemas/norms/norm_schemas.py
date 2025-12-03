@@ -20,6 +20,9 @@ class NormDropdownResponse(SQLModel):
 class NormCreate(NormBase):
     pass
 
+class MultiNormCreate(SQLModel):
+    norms: list[NormCreate]
+
 class NormUpdate(SQLModel):
     norm_name: str = Field(sa_column=Column(String(100), nullable=False))
     description: str = Field(sa_column=Column(String(500), nullable=True))

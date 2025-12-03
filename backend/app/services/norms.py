@@ -3,7 +3,7 @@ import uuid
 
 from fastapi import HTTPException
 from sqlalchemy import func
-from app.models.schemas.norms.norm_schemas import NormDeleteResponse, NormDropdownResponse, NormPublic, NormUpdate
+from app.models.schemas.norms.norm_schemas import MultiNormCreate, NormDeleteResponse, NormDropdownResponse, NormPublic, NormUpdate
 from app.models.schemas.common.query import BaseQueryParams
 from sqlmodel import Session, select
 from starlette import status
@@ -61,6 +61,55 @@ class NormServices:
         session.refresh(new_norm)
 
         return NormPublic.model_validate(new_norm)
+    
+    def create_multi(
+        *,
+        session: Session,
+        data: MultiNormCreate
+    ) -> list[NormPublic]:
+
+        normalized_map = {
+            n.norm_name.strip().upper(): n.norm_name
+            for n in data.norms
+        }
+
+        normalized_names = list(normalized_map.keys())
+
+        existing_norms = session.exec(
+            select(Norms).where(
+                func.upper(Norms.norm_name).in_(normalized_names)
+            )
+        ).all()
+
+        existing_normalized = {
+            n.norm_name.strip().upper()
+            for n in existing_norms
+        }
+
+        to_create = []
+        for normalized_name, original_name in normalized_map.items():
+            if normalized_name not in existing_normalized:
+                to_create.append(
+                    Norms(
+                        norm_name=original_name,
+                        description="",
+                        status=StatusEnum.ACTIVE
+                    )
+                )
+
+        if not to_create:
+            raise HTTPException(
+                status_code=400,
+                detail="All norms already exist."
+            )
+
+        session.add_all(to_create)
+        session.commit()
+
+        for item in to_create:
+            session.refresh(item)
+
+        return [NormPublic.model_validate(n) for n in to_create]
     
     @staticmethod
     def update(

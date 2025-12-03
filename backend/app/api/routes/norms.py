@@ -4,7 +4,7 @@ from app.services.norms import NormServices
 from app.models.schemas.common.query import BaseQueryParams
 from fastapi import APIRouter, Depends, Request
 from app.api.deps import SessionDep
-from app.models.schemas.norms.norm_schemas import NormCreate, NormDeleteResponse, NormPublic, NormUpdate
+from app.models.schemas.norms.norm_schemas import MultiNormCreate, NormCreate, NormDeleteResponse, NormPublic, NormUpdate
 
 router = APIRouter()
 
@@ -22,6 +22,18 @@ def create_norm(
     request: Request, session: SessionDep, data: NormCreate
 ) -> NormPublic:
     return NormServices.create(session=session, norm=data)
+
+# =========================== create multi unit ===========================
+@router.post(
+    "/multi",
+    response_model=list[NormPublic],
+)
+def create_norms_multi(
+    request: Request,
+    session: SessionDep,
+    data: MultiNormCreate
+) -> list[NormPublic]:
+    return NormServices.create_multi(session=session, data=data)
 
 # =========================== update norm ===========================
 @router.patch(

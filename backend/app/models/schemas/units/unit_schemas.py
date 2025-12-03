@@ -26,6 +26,9 @@ class UnitDropdownResponse(SQLModel):
 class UnitCreate(UnitBase):
     pass
 
+class MultiUnitCreate(SQLModel):
+    units: list[UnitCreate]
+
 class UnitUpdate(SQLModel):
     unit_name: str = Field(sa_column=Column(String(100), nullable=False))
     description: str = Field(sa_column=Column(String(500), nullable=True))
