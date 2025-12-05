@@ -6,13 +6,13 @@ import {
   DialogTitle,
   TextField,
   Grid,
-  Autocomplete,
 } from '@mui/material';
 import type { IProduct, IProductResponse } from '../types';
 import LabelPrimary from '../../../components/Label/Label';
 import Button from '../../../components/Button/Button';
 import { useGetDropdownUnits } from '../../units/apis/dropdown';
 import { useGetDropdownNorms } from '../../norms/apis/dropdown';
+import AutocompletePrimary from '../../..//components/Autocomplete/AutoComplete';
 interface ProductFormModelProps {
   open: boolean;
   onClose: () => void;
@@ -117,26 +117,27 @@ const ProductFormModel: React.FC<ProductFormModelProps> = ({ open, onClose, onSu
 
           {/* NORM ID */}
           <Grid size={6} className="myprofile-form__group">
-            <LabelPrimary value="Định mức" required/>
-            <Autocomplete
-              className='primary-autocomplete'
+            <LabelPrimary value="Định mức" required />
+            <AutocompletePrimary
+              labelKey="norm_name"
+              valueKey="norm_id"
+              freeSolo
               options={dropdownNorms || []}
               value={
-                formData.norm_id
-                  ? { id: formData.norm_id, norm_name: formData.norm_name }
+                formData.norm_name
+                  ? {
+                      norm_id: formData.norm_id,
+                      norm_name: formData.norm_name
+                    }
                   : null
               }
-              getOptionLabel={(option) => option.norm_name || ""}
-              onChange={(e, val) =>
+              onChange={(val) =>
                 setFormData(prev => ({
                   ...prev,
-                  norm_id: val ? String(val.id) : "",
-                  norm_name: val ? val.norm_name : ""
+                  norm_id: val.norm_id,
+                  norm_name: val.norm_name
                 }))
               }
-              renderInput={(params) => (
-                <TextField {...params} variant="outlined" className="primary-text__field" />
-              )}
             />
           </Grid>
 
@@ -155,51 +156,53 @@ const ProductFormModel: React.FC<ProductFormModelProps> = ({ open, onClose, onSu
 
           {/* UNIT */}
           <Grid size={6} className="myprofile-form__group">
-            <LabelPrimary value="Đơn vị tính" required/>
-            <Autocomplete
-              className='primary-autocomplete'
+            <LabelPrimary value="Đơn vị tính" />
+            <AutocompletePrimary
+              labelKey="unit_name"
+              valueKey="unit_id"
+              freeSolo
               options={dropdownUnits || []}
               value={
-                formData.unit_id
-                  ? { id: formData.unit_id, unit_name: formData.unit_name }
+                formData.unit_name
+                  ? {
+                      unit_id: formData.unit_id,
+                      unit_name: formData.unit_name
+                    }
                   : null
               }
-              getOptionLabel={(option) => option.unit_name || ""}
-              onChange={(e, val) =>
+              onChange={(val) =>
                 setFormData(prev => ({
                   ...prev,
-                  unit_id: val ? String(val.id) : "",
-                  unit_name: val ? val.unit_name : ""
+                  unit_id: val.unit_id,
+                  unit_name: val.unit_name
                 }))
               }
-              renderInput={(params) => (
-                <TextField {...params} variant="outlined" className="primary-text__field" />
-              )}
             />
           </Grid>
 
           {/* UNIT 2 */}
           <Grid size={6} className="myprofile-form__group">
             <LabelPrimary value="Đơn vị tính 2" />
-            <Autocomplete
-              className='primary-autocomplete'
+            <AutocompletePrimary
+              labelKey="unit_name"
+              valueKey="unit_id"
+              freeSolo
               options={dropdownUnits || []}
               value={
-                formData.unit_id_2
-                  ? { id: formData.unit_id_2, unit_name: formData.unit_name_2 }
+                formData.unit_name_2
+                  ? {
+                      unit_id_2: formData.unit_id_2,
+                      unit_name_2: formData.unit_name_2
+                    }
                   : null
               }
-              getOptionLabel={(option) => option.unit_name || ""}
-              onChange={(e, val) =>
-                setFormData((prev) => ({
+              onChange={(val) =>
+                setFormData(prev => ({
                   ...prev,
-                  unit_id_2: val ? String(val.id) : "",
-                  unit_name_2: val ? val.unit_name : ""
+                  unit_id_2: val.unit_id_2,
+                  unit_name_2: val.unit_name_2
                 }))
               }
-              renderInput={(params) => (
-                <TextField {...params} variant="outlined" className="primary-text__field" />
-              )}
             />
           </Grid>
 
