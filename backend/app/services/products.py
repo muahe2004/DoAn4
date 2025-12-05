@@ -93,7 +93,7 @@ class ProductServices:
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail=f"Product {product.product_code} already exists.",
             )
-        new_product = Products(**product.dict())
+        new_product = Products(**product.model_dump())
         session.add(new_product)
         session.commit()
         session.refresh(new_product)
