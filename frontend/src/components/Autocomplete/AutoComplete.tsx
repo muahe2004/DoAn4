@@ -8,6 +8,8 @@ interface AutocompletePrimaryProps {
   options: AutoOption[];
   value: AutoOption | null;
   onChange: (value: AutoOption) => void;
+  inputValue?: string;
+  onInputChange?: (value: string) => void;
   placeholder?: string;
   freeSolo?: boolean;
   className?: string;
@@ -19,6 +21,8 @@ export default function AutocompletePrimary({
   options = [],
   value,
   onChange,
+  inputValue,
+  onInputChange,
   placeholder = "",
   freeSolo = false,
   className = "primary-autocomplete",
@@ -32,6 +36,10 @@ export default function AutocompletePrimary({
       getOptionLabel={(option: any) =>
         typeof option === "string" ? option : option?.[labelKey] || ""
       }
+      inputValue={inputValue}
+      onInputChange={(_, newInputValue) => {
+        onInputChange?.(newInputValue);
+      }}
       onChange={(e, val) => {
         if (typeof val === "string") {
           onChange({

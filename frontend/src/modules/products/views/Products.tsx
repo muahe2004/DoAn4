@@ -66,18 +66,19 @@ export function Products() {
         setSelectedProduct(null);
     }
 
-    const handleSubmitProduct = async (data: IProduct) => {
-        const payload: IProduct = {
-            product_code: data.product_code,
-            product_name: data.product_name,
-            unit_id: data.unit_id,
-            unit_id_2: data.unit_id_2,
-            norm_id: data.norm_id,
-            description: data.description,
-            is_semi_product: data.is_semi_product,
-            status: data.status,
-        };
+    const normalizeProductPayload = (data: IProduct): IProduct => {
+        const fix = (v: any) => (v === "" ? null : v);
 
+        return {
+            ...data,
+            unit_id: fix(data.unit_id),
+            unit_id_2: fix(data.unit_id_2),
+            norm_id: fix(data.norm_id),
+        };
+    };
+
+    const handleSubmitProduct = async (data: IProduct) => {
+        const payload = normalizeProductPayload(data);
         try {
             if (selectedProduct) {
                 await editProduct({

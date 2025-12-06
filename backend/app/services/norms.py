@@ -3,7 +3,7 @@ import uuid
 
 from fastapi import HTTPException
 from sqlalchemy import func
-from app.models.schemas.norms.norm_schemas import MultiNormCreate, NormDeleteResponse, NormDropdownResponse, NormPublic, NormUpdate
+from app.models.schemas.norms.norm_schemas import MultiNormCreate, NormCreate, NormDeleteResponse, NormDropdownResponse, NormPublic, NormUpdate
 from app.models.schemas.common.query import BaseQueryParams
 from sqlmodel import Session, select
 from starlette import status
@@ -164,3 +164,31 @@ class NormServices:
             raise e
 
         return results
+    
+    @staticmethod
+    def resolve_norm_generic(session, norm_id, norm_name):
+        if norm_id:
+            return norm_id
+
+        if not norm_name:
+            raise HTTPException(
+                status_code=400,
+                detail="Norm name must be provided."
+            )
+
+        payload = NormCreate(
+            norm_name=norm_name.strip(),
+            description="",
+            status=StatusEnum.ACTIVE,
+        )
+
+        try:
+            new_norm = NormServices.create(session=session, norm=payload)
+            return new_norm.id
+        except HTTPException as e:
+            if e.status_code == 400 and "already exists" in e.detail:
+                existing = session.exec(
+                    select(Norms).where(func.upper(Norms.norm_name) == norm_name.strip().upper())
+                ).first()
+                return existing.id
+            raise

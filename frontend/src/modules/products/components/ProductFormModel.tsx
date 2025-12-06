@@ -96,6 +96,30 @@ const ProductFormModel: React.FC<ProductFormModelProps> = ({ open, onClose, onSu
     onClose();
   };
 
+  const handleUnitInputChange = (value: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      unit_name: value,
+      unit_id: "",
+    }));
+  };
+
+  const handleUnit2InputChange = (value: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      unit_name_2: value,
+      unit_id_2: "",
+    }));
+  };
+
+  const handleNormInputChange = (value: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      norm_name: value,
+      norm_id: "",
+    }));
+  };
+
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
       <DialogTitle className='primary-dialog-title'>{mode === 'edit' ? 'SỬA THÔNG TIN SẢN PHẨM' : 'THÊM SẢN PHẨM'}</DialogTitle>
@@ -120,21 +144,23 @@ const ProductFormModel: React.FC<ProductFormModelProps> = ({ open, onClose, onSu
             <LabelPrimary value="Định mức" required />
             <AutocompletePrimary
               labelKey="norm_name"
-              valueKey="norm_id"
+              valueKey="id"
               freeSolo
               options={dropdownNorms || []}
               value={
                 formData.norm_name
                   ? {
-                      norm_id: formData.norm_id,
+                      id: formData.norm_id,
                       norm_name: formData.norm_name
                     }
                   : null
               }
+              inputValue={formData.norm_name}
+              onInputChange={handleNormInputChange}
               onChange={(val) =>
                 setFormData(prev => ({
                   ...prev,
-                  norm_id: val.norm_id,
+                  norm_id: val.id || "",
                   norm_name: val.norm_name
                 }))
               }
@@ -159,21 +185,23 @@ const ProductFormModel: React.FC<ProductFormModelProps> = ({ open, onClose, onSu
             <LabelPrimary value="Đơn vị tính" />
             <AutocompletePrimary
               labelKey="unit_name"
-              valueKey="unit_id"
+              valueKey="id"
               freeSolo
               options={dropdownUnits || []}
               value={
                 formData.unit_name
                   ? {
-                      unit_id: formData.unit_id,
+                      id: formData.unit_id,
                       unit_name: formData.unit_name
                     }
                   : null
               }
+              inputValue={formData.unit_name}
+              onInputChange={handleUnitInputChange}
               onChange={(val) =>
                 setFormData(prev => ({
                   ...prev,
-                  unit_id: val.unit_id,
+                  unit_id: val.id || "",
                   unit_name: val.unit_name
                 }))
               }
@@ -185,22 +213,24 @@ const ProductFormModel: React.FC<ProductFormModelProps> = ({ open, onClose, onSu
             <LabelPrimary value="Đơn vị tính 2" />
             <AutocompletePrimary
               labelKey="unit_name"
-              valueKey="unit_id"
+              valueKey="id"
               freeSolo
               options={dropdownUnits || []}
               value={
                 formData.unit_name_2
                   ? {
-                      unit_id_2: formData.unit_id_2,
-                      unit_name_2: formData.unit_name_2
+                      id: formData.unit_id_2,
+                      unit_name: formData.unit_name_2
                     }
                   : null
               }
+              inputValue={formData.unit_name_2}
+              onInputChange={handleUnit2InputChange}
               onChange={(val) =>
                 setFormData(prev => ({
                   ...prev,
-                  unit_id_2: val.unit_id_2,
-                  unit_name_2: val.unit_name_2
+                  unit_id_2: val.id || "",
+                  unit_name_2: val.unit_name
                 }))
               }
             />

@@ -1,7 +1,16 @@
 import uuid
 from datetime import datetime
 import json
-from app.models.schemas.products.product_schemas import ProductCreate, ProductDeleteResponse, ProductListResponse, ProductPublic, ProductQueryParams, ProductResponse, ProductUpdate
+from app.models.schemas.products.product_schemas import (
+    ProductCreate,
+    ProductDeleteResponse,
+    ProductListResponse,
+    ProductPublic,
+    ProductQueryParams,
+    ProductResponse,
+    ProductUpdate,
+)
+from app.models.schemas.units.unit_schemas import UnitCreate
 from app.enums.status import StatusEnum
 from fastapi import HTTPException, Request
 from sqlalchemy import or_
@@ -11,6 +20,9 @@ from typing import List, Optional, Tuple
 from sqlalchemy.orm import aliased
 
 from app.models.models import Norms, Products, Units
+from app.services.units import UnitServices
+from app.models.schemas.norms.norm_schemas import NormCreate
+from app.services.norms import NormServices
 
 class ProductServices:
     @staticmethod
@@ -77,22 +89,23 @@ class ProductServices:
 
         results = session.exec(statement).all()
 
-        return results, total
+        return results, total    
 
     @staticmethod
-    def create(
-        *,
-        session: Session,
-        product: ProductCreate,
-    ) -> ProductPublic:
+    def create(*, session: Session, product: ProductCreate) -> ProductPublic:
         existing = session.exec(
             select(Products).where(Products.product_code == product.product_code)
         ).first()
         if existing:
             raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
+                status_code=400,
                 detail=f"Product {product.product_code} already exists.",
             )
+
+        product.unit_id = UnitServices.resolve_unit_generic(session, product.unit_id, product.unit_name)
+        product.unit_id_2 = UnitServices.resolve_unit_generic(session, product.unit_id_2, product.unit_name_2)
+        product.norm_id = NormServices.resolve_norm_generic(session, product.norm_id, product.norm_name)
+
         new_product = Products(**product.model_dump())
         session.add(new_product)
         session.commit()
@@ -101,24 +114,44 @@ class ProductServices:
         return ProductPublic.model_validate(new_product)
 
     @staticmethod
-    def update(
-        *,
-        session: Session,
-        product_id: uuid.UUID,
-        product_data: ProductUpdate,
-    ) -> ProductPublic:
+    def update(*, session: Session, product_id: uuid.UUID, product_data: ProductUpdate) -> ProductPublic:
         product = session.get(Products, product_id)
         if not product:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND, detail="Product not found"
-            )
+            raise HTTPException(status_code=404, detail="Product not found")
 
         update_data = product_data.model_dump(exclude_unset=True)
+
+        if "unit_id" in update_data or "unit_name" in update_data:
+            update_data["unit_id"] = UnitServices.resolve_unit_generic(
+                session,
+                update_data.get("unit_id"),
+                update_data.get("unit_name"),
+            )
+            update_data.pop("unit_name", None)
+
+        if "unit_id_2" in update_data or "unit_name_2" in update_data:
+            update_data["unit_id_2"] = UnitServices.resolve_unit_generic(
+                session,
+                update_data.get("unit_id_2"),
+                update_data.get("unit_name_2"),
+            )
+            update_data.pop("unit_name_2", None)
+
+        if "norm_id" in update_data or "norm_name" in update_data:
+            update_data["norm_id"] = NormServices.resolve_norm_generic(
+                session,
+                update_data.get("norm_id"),
+                update_data.get("norm_name"),
+            )
+            update_data.pop("norm_name", None)
+
         for field, value in update_data.items():
             setattr(product, field, value)
 
         session.commit()
+        session.refresh(product)
         return ProductPublic.model_validate(product)
+
 
     @staticmethod
     def delete_many(

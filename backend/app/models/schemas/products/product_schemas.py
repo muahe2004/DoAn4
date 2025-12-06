@@ -35,15 +35,28 @@ class ProductListResponse(SQLModel):
     total: int
     data: list[ProductResponse]
 
-class ProductCreate(ProductBase):
-    pass
+class ProductCreate(SQLModel):
+    product_code: str
+    product_name: str
+    unit_id: Optional[UUID] = None
+    unit_name: Optional[str] = None
+    unit_id_2: Optional[UUID] = None
+    unit_name_2: Optional[str] = None
+    norm_id: Optional[UUID] = None
+    norm_name: Optional[str] = None
+    description: Optional[str] = None
+    is_semi_product: bool = True
+    status: Optional[str] = None
 
 class ProductUpdate(SQLModel):
     product_code: Optional[str] = Field(sa_column=Column(String(50), nullable=False))
     product_name: Optional[str] = Field(sa_column=Column(String(100), nullable=False))
     unit_id: Optional[UUID] = Field(sa_column=Column(ForeignKey("units.id"), nullable=False))
     unit_id_2: Optional[UUID] = Field(sa_column=Column(ForeignKey("units.id"), nullable=False))
+    unit_name: Optional[str] = None
+    unit_name_2: Optional[str] = None
     norm_id: Optional[UUID] = Field(sa_column=Column(ForeignKey("norms.id"), nullable=False))
+    norm_name: Optional[str] = None
     description: Optional[str] = Field(sa_column=Column(String(500), nullable=True))
     is_semi_product: bool = Field(default=True, sa_column=Column(Boolean, nullable=False))
     status: Optional[str] | None = Field(default=None, sa_column=Column(String(50), nullable=True))
