@@ -1,8 +1,11 @@
 import { createBrowserRouter } from "react-router-dom";
-import { homeUrl, layoutUrl, testURL } from "./urls";
+import { homeUrl, layoutUrl, testURL, signinUrl, registerUrl, productsURL } from "./urls";
 import Layout from "../modules/app/Layout";
 import Test from "../modules/Test/Test";
 import { NotFound } from "../modules/NotFound/NotFound";
+import Login from "../modules/auth/Login";
+import Register from "../modules/auth/Register";
+import { Products } from "../modules/products/views/Products";
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {return <>{children}</>};
 
@@ -24,10 +27,22 @@ export const createRouterConfig = () =>
                     path: testURL, 
                     element: <Test />,
                 },
+                {
+                    path: productsURL,
+                    element: <Products/>
+                }
             ],
         },
         {
             path: "*",
             element: <NotFound />,
+        },
+        {
+            path: signinUrl,
+            element: <Login />
+        },
+        {
+            path: registerUrl,
+            element: <Register />
         }
     ]);

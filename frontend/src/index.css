@@ -62,6 +62,13 @@ body {
   transition: .25s;
 }
 
+/* ================== container ================== */
+.primary-container {
+  padding: 0 !important;
+  margin: 0 !important;
+  width: 100% !important;
+}
+
 /* ================== custom input ================== */
 .MuiInputLabel-root.Mui-focused {
   color: var(--primary-color) !important;
@@ -78,6 +85,10 @@ body {
 .primary-text__field input {
   font-size: var(--font-size-base) !important;
   padding: 12px !important; 
+}
+
+input::-ms-reveal, input::-ms-clear {
+  display: none !important;
 }
 
 /* ================== custom select ================== */
@@ -141,89 +152,73 @@ body {
 
 /* ================== Table ================== */
 .primary-table-container {
-  box-shadow: none !important;
-  border-radius: 0 !important;
-  background: transparent !important;
-}
-
-.sticky-table-container {
-  box-shadow: none !important;
-  border-radius: 0 !important;
-  max-height: 55vh;
-  background: transparent !important;
-  margin-bottom: 10px;
-}
-
-.primary-thead {
-  background: var(--primary-color) !important;
-}
-
-.primary-thead__cell {
-  color: #fff !important;
-  font-weight: var(--font-weight-bold) !important;
-  border-right: 1px solid #fff;
-  padding: 12px !important;
-}
-
-.MuiTableCell-stickyHeader {
-  background: var(--primary-color) !important;
-}
-
-.primary-thead__cell:first-child {
-  border-left: 1px solid var(--primary-color);
-}
-
-.primary-thead__cell:last-child {
-  border-right: 1px solid var(--primary-color);
-}
-
-.sticky-table {
-  border-left: 1px solid var(--primary-color) !important;
-}
-
-.thead-cell__border--right{
-  border-right: 1px solid #fff !important;
-}
-
-.primary-trow {
+  max-height: 90vh;
+  overflow-y: scroll;
+  scrollbar-width: none;
+  background-color: transparent !important;
   border-radius: 4px !important;
+  border: 1px solid var(--primary-color) !important;
+  /* box-shadow: 6px 6px 12px rgba(0, 0, 0, 0.18); */
+
 }
 
-.primary-tbody .primary-trow:nth-child(2n) {
-  background: #f3f3f3;
+.primary-table-container::-webkit-scrollbar {
+  display: none; 
 }
 
-.primary-tcell{
-  border: 1px solid var(--primary-color);
+.primary-thead .MuiTableCell-head {
+  background-color: var(--primary-color) !important;
+  color: white !important; 
+  border-right: 1px solid #fff;
+  font-weight: bold;
+}
+
+.primary-thead .MuiTableCell-head:last-child {
+  border-right: none;
+}
+
+.custom-border-tcell {
+  border-right: 1px solid var(--primary-color);
   border-bottom: 1px solid var(--primary-color) !important;
-  font-size: var(--font-size-base) !important;
-  color: black !important;
+}
+
+.primary-trow:last-child .custom-border-tcell{
+  border-bottom: none !important;
+}
+
+.primary-trow .custom-border-tcell:last-child {
+  border-right: none !important;
+}
+
+.primary-tcell {
   padding: 8px !important;
 }
 
-.sticky-tcell {
-  padding: 8px !important;
+/* ==================================== */
+.primary-button {
+  background-color: var(--primary-color) !important;
+  padding: 0.6rem 0 !important;
+  margin-top: 1rem !important;
+  font-weight: var(--font-weight-bold) !important;
   font-size: var(--font-size-base) !important;
-  border-right: 1px solid var(--primary-color) !important;
-  border-bottom: 1px solid var(--primary-color) !important;
+  border-radius: 5px !important;
+  text-transform: none !important;
+  color: white !important;
 }
 
-.primary-tcell__button--icon {
+.primary-button:hover {
+  background-color: var(--primary-color) !important;
+}
+
+.primary-text__field__title {
+  font-size: var(--font-size-title) !important;
+}
+
+.primary-edit-btn {
   color: var(--primary-color) !important;
-  padding: 0 8px!important;
-  transition: .25s;
 }
 
-.primary-tcell__button--icon:hover {
-  background: transparent !important;
-  transform: scale(1.1);
-}
-
-.primary-tcell__button--icon svg {
-  font-size: 20px;
-}
-
-.primary-tcell__button--delete {
+.primary-delete-btn {
   color: var(--delete-color) !important;
 }
 
@@ -248,9 +243,14 @@ body {
 }
 
 .primary-dialog-actions {
-  padding: 0 16px 16px 16px !important;
+  padding: 0 16px 8px 16px !important;
 }
 
 .primary-dialog-input {
   margin-bottom: 25px !important; 
+}
+
+/* ================== autocomplete ==================*/
+.primary-autocomplete .MuiAutocomplete-inputRoot {
+  padding: 0 !important;
 }

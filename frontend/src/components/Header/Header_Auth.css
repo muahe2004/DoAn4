@@ -1,0 +1,23 @@
+.header-auth__container {
+  text-align: center;
+}
+
+.header-auth__paper {
+  background-color: transparent !important;
+  width: 100%;
+  text-align: center;
+  box-shadow: none; 
+}
+
+.header-auth__logo {
+  max-width: 200px;
+  min-width: 100px;
+  height: auto;
+  object-fit: contain;
+  margin: 0;
+}
+
+.header-auth__title {
+  font-weight: bold;
+  margin-top: 0.5rem;
+}

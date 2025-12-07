@@ -1,0 +1,19 @@
+.primary-pagination {
+    margin-top: 10px !important;
+    display: flex;
+    justify-content: right;
+}
+
+.primary-pagination .MuiPaginationItem-root {
+    color: #000;
+}
+
+.primary-pagination .Mui-selected {
+    background-color: var(--primary-color);
+    color: #fff;
+}
+
+.primary-pagination .MuiPaginationItem-root.Mui-selected {
+    background-color: var(--primary-color) !important;
+    color: #fff !important;
+}
