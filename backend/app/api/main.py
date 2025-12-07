@@ -6,7 +6,8 @@ from app.api.routes import (
     users,
     login
     units,
-    norms
+    norms,
+    materials
 )
 
 api_router = APIRouter()

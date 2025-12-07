@@ -33,11 +33,8 @@ class Settings(BaseSettings):
     )
 
     PROJECT4_SECRET_KEY: str
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = 24 * 60
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 60
     ALGORITHM: str = "HS256"
-    SECRET_KEY: str = secrets.token_urlsafe(32)
-    VERIFY_TOKEN_EXPIRE_HOURS: int = 48
-    SECRET_KEY: str = secrets.token_urlsafe(32)
 
     # General
     PROJECT_NAME: str = "Project4"

@@ -17,7 +17,7 @@ class UserBase(SQLModel):
     address: Optional[str] = Field(sa_column=Column(String(200), nullable=True))  
     department: Optional[str] = Field(sa_column=Column(String(100), nullable=True)) 
 
-    status: Optional[str] = Field(sa_column=Column(String(50), nullable=True))
+    status: Optional[str] = Field(default="Hoạt động", sa_column=Column(String(50), nullable=True))
     created_at: datetime = Field(default_factory=datetime.now, sa_column=Column(DateTime, nullable=False))
     updated_at: datetime = Field(default_factory=datetime.now, sa_column=Column(DateTime, nullable=False, onupdate=datetime.now))
 
