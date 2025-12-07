@@ -65,10 +65,11 @@ class ProductServices:
                 )
             )
         if query.search:
+            search_text = f"%{query.search}%"
             conditions.append(
                 or_(
-                    Products.product_code.ilike(f"%{query.search}%"),
-                    Products.product_name.ilike(f"%{query.search}%"),
+                    func.unaccent(Products.product_code).ilike(func.unaccent(search_text)),
+                    func.unaccent(Products.product_name).ilike(func.unaccent(search_text)),
                 )
             )
         

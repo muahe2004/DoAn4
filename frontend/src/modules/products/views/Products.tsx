@@ -20,10 +20,12 @@ import Button from "../../../components/Button/Button";
 import "./products.css";
 import { useCreateProduct } from "../apis/addProduct";
 import { useEditProduct } from "../apis/editProduct";
+import SearchEngine from "../../../components/SearchEngine/SearchEngine";
 
 export function Products() {
     const [page, setPage] = useState(1);
     const [rowsPerPage, setRowsPerPage] = useState(5);
+    const [search, setSearch] = useState("");
 
     const [selectedProduct, setSelectedProduct] = useState<IProductResponse | null>(null);
     const [openModal, setOpenModal] = useState(false);
@@ -34,6 +36,7 @@ export function Products() {
     const Params = {
         limit: rowsPerPage,
         skip: (page - 1) * rowsPerPage,
+        ...(search && { search }),
     };
 
     const {
@@ -96,9 +99,15 @@ export function Products() {
         }
     };
 
+    const handleSearch = (value: string) => {
+        setSearch(value);
+        setPage(1);
+    }
+
     return (
         <Container maxWidth={false} className="primary-container">
             <div className="product-actions">
+                <SearchEngine placeholder="Tìm kiếm" onSearch={handleSearch}/>
                 <Button onClick={handleOpenAdd}>thêm mới</Button>
             </div>
 
