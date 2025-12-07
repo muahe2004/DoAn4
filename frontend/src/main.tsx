@@ -5,7 +5,7 @@ import { createRouterConfig } from "./routes";
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { CssBaseline } from "@mui/material";
 import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
-// import { SnackbarProvider } from "./components/SnackBar/SnackBar";
+import { SnackbarProvider } from "./components/SnackBar/SnackBar";
 
 import "./index.css";
 
@@ -22,10 +22,10 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
     <React.StrictMode>
       <ThemeProvider theme={theme}>
         <CssBaseline />
-        {/* <SnackbarProvider> */}
+        <SnackbarProvider>
           <RouterProvider router={createRouterConfig()} />
-        {/* </SnackbarProvider> */}
+        </SnackbarProvider>
       </ThemeProvider>
     </React.StrictMode>
-  // </QueryClientProvider>
+  </QueryClientProvider>
 );
