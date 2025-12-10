@@ -170,7 +170,14 @@ class UnitServices:
     @staticmethod
     def resolve_unit_generic(session, unit_id, unit_name):
         if unit_id:
-            return unit_id
+            existing_by_id = session.get(Units, unit_id)
+            if existing_by_id:
+                return existing_by_id.id
+            if not unit_name:
+                raise HTTPException(
+                    status_code=400,
+                    detail="Unit id does not exist."
+                )
         
         if not unit_name:
             raise HTTPException(

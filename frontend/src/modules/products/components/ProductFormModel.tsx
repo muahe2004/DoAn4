@@ -7,16 +7,17 @@ import {
   TextField,
   Grid,
 } from '@mui/material';
-import type { IProduct, IProductResponse } from '../types';
+import type { IProductResponse } from '../types';
 import LabelPrimary from '../../../components/Label/Label';
 import Button from '../../../components/Button/Button';
 import { useGetDropdownUnits } from '../../units/apis/dropdown';
 import { useGetDropdownNorms } from '../../norms/apis/dropdown';
 import AutocompletePrimary from '../../..//components/Autocomplete/AutoComplete';
+import { STATUS } from '../../../constants/status';
 interface ProductFormModelProps {
   open: boolean;
   onClose: () => void;
-  onSubmit: (data: IProduct) => void;
+  onSubmit: (data: IProductResponse) => void;
   initialData?: IProductResponse;
   mode?: 'add' | 'edit';
 }
@@ -30,7 +31,7 @@ const ProductFormModel: React.FC<ProductFormModelProps> = ({ open, onClose, onSu
     norm_id: '',
     description: '',
     is_semi_product: false,
-    status: 'active',
+    status: STATUS.ACTIVE,
     unit_name: "",
     unit_name_2: "",
     norm_name: ""
@@ -78,7 +79,7 @@ const ProductFormModel: React.FC<ProductFormModelProps> = ({ open, onClose, onSu
         norm_id: '',
         description: '',
         is_semi_product: false,
-        status: 'active',
+        status: STATUS.ACTIVE,
         unit_name: "",
         unit_name_2: "",
         norm_name: ""

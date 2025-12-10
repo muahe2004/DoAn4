@@ -168,7 +168,14 @@ class NormServices:
     @staticmethod
     def resolve_norm_generic(session, norm_id, norm_name):
         if norm_id:
-            return norm_id
+            existing_by_id = session.get(Norms, norm_id)
+            if existing_by_id:
+                return existing_by_id.id
+            if not norm_name:
+                raise HTTPException(
+                    status_code=400,
+                    detail="Norm id does not exist."
+                )
 
         if not norm_name:
             raise HTTPException(

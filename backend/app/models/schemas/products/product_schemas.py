@@ -48,6 +48,9 @@ class ProductCreate(SQLModel):
     is_semi_product: bool = True
     status: Optional[str] = None
 
+class MultiProductCreate(SQLModel):
+    products: list[ProductCreate]
+
 class ProductUpdate(SQLModel):
     product_code: Optional[str] = Field(sa_column=Column(String(50), nullable=False))
     product_name: Optional[str] = Field(sa_column=Column(String(100), nullable=False))

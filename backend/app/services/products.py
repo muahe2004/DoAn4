@@ -1,7 +1,6 @@
 import uuid
-from datetime import datetime
-import json
 from app.models.schemas.products.product_schemas import (
+    MultiProductCreate,
     ProductCreate,
     ProductDeleteResponse,
     ProductListResponse,
@@ -113,6 +112,58 @@ class ProductServices:
         session.refresh(new_product)
 
         return ProductPublic.model_validate(new_product)
+    
+    @staticmethod
+    def create_multi(*, session: Session, data: MultiProductCreate) -> List[ProductPublic]:
+        if not data.products:
+            raise HTTPException(status_code=400, detail="No products provided.")
+
+        requested_codes = [p.product_code for p in data.products]
+
+        existing_codes = set(
+            session.exec(
+                select(Products.product_code).where(
+                    Products.product_code.in_(requested_codes)
+                )
+            ).all()
+        )
+
+        to_create: List[Products] = []
+        seen_codes: set[str] = set()
+
+        for product in data.products:
+            if product.product_code in existing_codes or product.product_code in seen_codes:
+                continue
+
+            seen_codes.add(product.product_code)
+
+            resolved_unit_id = UnitServices.resolve_unit_generic(
+                session, product.unit_id, product.unit_name
+            )
+            resolved_unit_id_2 = UnitServices.resolve_unit_generic(
+                session, product.unit_id_2, product.unit_name_2
+            )
+            resolved_norm_id = NormServices.resolve_norm_generic(
+                session, product.norm_id, product.norm_name
+            )
+
+            payload = product.model_dump()
+            payload["unit_id"] = resolved_unit_id
+            payload["unit_id_2"] = resolved_unit_id_2
+            payload["norm_id"] = resolved_norm_id
+
+            to_create.append(Products(**payload))
+
+        if not to_create:
+            raise HTTPException(status_code=400, detail="All products already exist.")
+
+        session.add_all(to_create)
+        session.commit()
+
+        for item in to_create:
+            session.refresh(item)
+
+        return [ProductPublic.model_validate(p) for p in to_create]
 
     @staticmethod
     def update(*, session: Session, product_id: uuid.UUID, product_data: ProductUpdate) -> ProductPublic:
