@@ -29,5 +29,3 @@ backend/venv
 
 # pycache
 **/__pycache__/
-
-frontend/package-lock.json
