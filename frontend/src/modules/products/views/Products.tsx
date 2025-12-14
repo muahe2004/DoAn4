@@ -25,6 +25,7 @@ import * as XLSX from "xlsx";
 import { STATUS } from "../../../constants/status";
 import { STATUS_DISPLAY } from "../../../utils/statusDisplay";
 import { useCreateProductMulti } from "../apis/addProductMulti";
+import { exportExcel } from "../../../utils/exportExcel";
 
 type ImportedProduct = Omit<IProductResponse, "unit_id" | "unit_id_2" | "norm_id"> & {
     unit_id: string | null;
@@ -164,6 +165,34 @@ export function Products() {
         fileInputRef.current?.click();
     }
 
+    const handleExport = () => {
+        const headers = {
+            number: "STT",
+            product_code: "Mã sản phẩm",
+            product_name: "Tên sản phẩm",
+            unit_name: "Đơn vị tính",
+            unit_name_2: "Đơn vị tính 2",
+            norm_name: "Định mức",
+            description: "Mô tả",
+        };
+
+        const templateRow = {
+            number: "",
+            product_code: "",
+            product_name: "",
+            unit_name: "",
+            unit_name_2: "",
+            norm_name: "",
+            description: "",
+        };
+
+        exportExcel([templateRow], "products_template", {
+            sheetName: "Template",
+            headers,
+            title: "DANH MỤC SẢN PHẨM",
+        });
+    };
+
     const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
         if (!file) return;
@@ -234,6 +263,7 @@ export function Products() {
         <Container maxWidth={false} className="primary-container">
             <div className="product-actions">
                 <SearchEngine placeholder="Tìm kiếm" onSearch={handleSearch}/>
+                <Button onClick={handleExport} className="product-upload-button">Xuất mẫu excel</Button>
                 <Button onClick={handleImport} className="product-upload-button">tải lên</Button>
                 <Button onClick={handleOpenAdd}>thêm mới</Button>
             </div>

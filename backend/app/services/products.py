@@ -102,6 +102,7 @@ class ProductServices:
                 detail=f"Product {product.product_code} already exists.",
             )
 
+        # create new if it does not exist
         product.unit_id = UnitServices.resolve_unit_generic(session, product.unit_id, product.unit_name)
         product.unit_id_2 = UnitServices.resolve_unit_generic(session, product.unit_id_2, product.unit_name_2)
         product.norm_id = NormServices.resolve_norm_generic(session, product.norm_id, product.norm_name)
@@ -137,6 +138,7 @@ class ProductServices:
 
             seen_codes.add(product.product_code)
 
+            # create new if it does not exist
             resolved_unit_id = UnitServices.resolve_unit_generic(
                 session, product.unit_id, product.unit_name
             )
@@ -173,6 +175,7 @@ class ProductServices:
 
         update_data = product_data.model_dump(exclude_unset=True)
 
+        # create new if it does not exist
         if "unit_id" in update_data or "unit_name" in update_data:
             update_data["unit_id"] = UnitServices.resolve_unit_generic(
                 session,
@@ -203,7 +206,6 @@ class ProductServices:
         session.commit()
         session.refresh(product)
         return ProductPublic.model_validate(product)
-
 
     @staticmethod
     def delete_many(
