@@ -254,3 +254,35 @@ input::-ms-reveal, input::-ms-clear {
 .primary-autocomplete .MuiAutocomplete-inputRoot {
   padding: 0 !important;
 }
+
+/* ================== display status ==================*/
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 88px;
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-weight: 600;
+  font-size: 12px;
+  text-transform: capitalize;
+  border: 1px solid transparent;
+}
+
+.status-active {
+  color: var(--active-color);
+  background-color: var(--active-bg-color);
+  border-color: var(--active-boder-color);
+}
+
+.status-inactive {
+  color: var(--inactive-color);
+  background-color: var(--inactive-bg-color);
+  border-color: var(--inactive-boder-color);
+}
+
+.status-unknown {
+  color: var(--unknown-color);
+  background-color: var(--unknown-bg-color);
+  border-color: var(--unknown-boder-color);
+}
