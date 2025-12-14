@@ -83,7 +83,7 @@ export function Products() {
     }
 
     const normalizeProductPayload = (data: IProductResponse): IProduct => {
-        const fix = (v: any) => (v === "" ? null : v);
+        const fixId = (v: any) => (v === "" ? null : v);
 
         const {
             id,
@@ -95,6 +95,9 @@ export function Products() {
             unit_id,
             unit_id_2,
             norm_id,
+            unit_name,
+            unit_name_2,
+            norm_name,
         } = data;
 
         return {
@@ -104,9 +107,12 @@ export function Products() {
             description,
             is_semi_product,
             status,
-            unit_id: fix(unit_id),
-            unit_id_2: fix(unit_id_2),
-            norm_id: fix(norm_id),
+            unit_id: fixId(unit_id),
+            unit_id_2: fixId(unit_id_2),
+            norm_id: fixId(norm_id),
+            unit_name,
+            unit_name_2,
+            norm_name,
         };
     };
 
