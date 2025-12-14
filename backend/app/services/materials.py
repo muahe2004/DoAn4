@@ -82,7 +82,7 @@ class MaterialServices:
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail=f"Material {material.material_code} already exists.",
             )
-        new_material = Materials(**material.model_dump())
+        new_material = Materials(**material.dict())
         session.add(new_material)
         session.commit()
         session.refresh(new_material)
