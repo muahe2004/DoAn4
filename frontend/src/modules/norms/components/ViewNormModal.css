@@ -1,0 +1,59 @@
+.view-norm-modal__title {
+  background-color: var(--primary-color);
+  color: white;
+  font-weight: var(--font-weight-bold);
+}
+
+.view-norm-modal__content {
+  padding: 24px !important;
+  background-color: #fafafa;
+}
+
+.view-norm-modal__actions {
+  padding: 16px 24px;
+  background-color: #f5f5f5;
+  border-top: 1px solid #e0e0e0;
+}
+
+.view-norm-modal__info-section {
+  background: white;
+  border-radius: 8px;
+  margin-bottom: 24px;
+}
+
+.view-norm-modal__details-section {
+  background: white;
+  border-radius: 8px;
+}
+
+.view-norm-modal__section-header {
+  background-color: #f5f5f5;
+  border-bottom: 2px solid var(--primary-color);
+}
+
+.view-norm-modal__table-header {
+  background-color: #f8f9fa;
+  font-weight: var(--font-weight-bold);
+}
+
+.view-norm-modal__table-row:hover {
+  background-color: #f0f7ff !important;
+  transition: all 0.2s ease;
+}
+
+.view-norm-modal__status-chip {
+  font-weight: 500;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+}
+
+.view-norm-modal__material-name {
+  color: var(--primary-color);
+  font-weight: 500;
+}
+
+.view-norm-modal__norm-value {
+  color: var(--secondary-color);
+  font-weight: var(--font-weight-bold);
+  font-family: var(--font-family-base);
+}

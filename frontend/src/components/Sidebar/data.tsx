@@ -109,7 +109,7 @@ export const sidebarData: SidebarData = [
       {
         id: "nv",
         label: "Danh mục định mức",
-        path: "/nv",
+        path: "/norms",
         icon: <FiGrid />,
       },
       {
