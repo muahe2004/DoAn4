@@ -6,6 +6,9 @@ import { NotFound } from "../modules/NotFound/NotFound";
 import Login from "../modules/auth/Login";
 import Register from "../modules/auth/Register";
 import { Products } from "../modules/products/views/Products";
+import Material from "../modules/units/views/material";
+import Product from "../modules/units/views/product";
+import UnitConversion from "../modules/units/views/UoM";
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {return <>{children}</>};
 
@@ -30,7 +33,20 @@ export const createRouterConfig = () =>
                 {
                     path: productsURL,
                     element: <Products/>
-                }
+                },
+                /* ================== DATA CONVERSION ================== */
+                {
+                    path: "/data-conversion/material",
+                    element: <Material />,
+                },
+                {
+                    path: "/data-conversion/product",
+                    element: <Product />,
+                },
+                {
+                    path: "/data-conversion/uom",
+                    element: <UnitConversion />,
+                },
             ],
         },
         {

@@ -134,19 +134,19 @@ export const sidebarData: SidebarData = [
       {
         id: "nv",
         label: "Chuyển đổi mã NVL(Nội bộ - Hải quan)",
-        path: "/nv",
+        path: "/data-conversion/material",
         icon: <FiGrid />,
       },
       {
         id: "sp",
         label: "Chuyển đổi mã SP(Nội bộ - Hải quan)",
-        path: "/product",
+        path: "/data-conversion/product",
         icon: <FiFileText />,
       },
       {
         id: "hoadon",
         label: "Bảng quy đổi đơn vị tính",
-        path: "/invoice",
+        path: "/data-conversion/uom",
         icon: <FiFileText />,
       },
     ],
