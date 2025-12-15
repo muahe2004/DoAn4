@@ -15,6 +15,36 @@ from app.models.models import Countries, Materials, Norms, Products, Units
 
 class MaterialServices:
     @staticmethod
+    def dropdown(*, session: Session, query) -> list:
+        statement = select(Materials.id, Materials.material_name)
+        
+        conditions = []
+        
+        if hasattr(query, 'status') and query.status:
+            conditions.append(Materials.status == query.status)
+        else:
+            conditions.append(Materials.status == StatusEnum.ACTIVE)
+            
+        if hasattr(query, 'search') and query.search:
+            conditions.append(Materials.material_name.ilike(f"%{query.search}%"))
+        
+        if conditions:
+            statement = statement.where(*conditions)
+        
+        statement = (
+            statement.order_by(Materials.created_at.desc())
+            .offset(query.skip)
+            .limit(query.limit)
+        )
+        
+        raw_results = session.exec(statement).all()
+        
+        return [
+            {"id": str(row[0]), "material_name": row[1]}
+            for row in raw_results
+        ]
+
+    @staticmethod
     def get_all(*, session: Session, query: MaterialQueryParams) -> MaterialListResponse:
         statement = (
             select(

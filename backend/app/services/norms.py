@@ -3,14 +3,91 @@ import uuid
 
 from fastapi import HTTPException
 from sqlalchemy import func
-from app.models.schemas.norms.norm_schemas import MultiNormCreate, NormDeleteResponse, NormDropdownResponse, NormPublic, NormUpdate
+from app.models.schemas.norms.norm_schemas import MultiNormCreate, NormCreate, NormDeleteResponse, NormDropdownResponse, NormPublic, NormUpdate
+from app.models.schemas.norms.norm_detail_schemas import NormDetailPublic
 from app.models.schemas.common.query import BaseQueryParams
 from sqlmodel import Session, select
 from starlette import status
-from app.models.models import Norms
+from app.models.models import Norms, NormDetails
 from app.enums.status import StatusEnum
 
 class NormServices:
+    @staticmethod
+    def get_all(*, session: Session, query: BaseQueryParams) -> tuple[list[NormPublic], int]:
+        statement = select(Norms)
+        count_statement = select(func.count(Norms.id))
+
+        conditions = []
+        if query.status:
+            conditions.append(Norms.status == query.status)
+        if query.search:
+            conditions.append(Norms.norm_name.ilike(f"%{query.search}%"))
+
+        if conditions:
+            statement = statement.where(*conditions)
+            count_statement = count_statement.where(*conditions)
+
+        total = session.exec(count_statement).one()
+
+        statement = (
+            statement.order_by(Norms.created_at.desc())
+            .offset(query.skip)
+            .limit(query.limit)
+        )
+
+        norms = session.exec(statement).all()
+        
+        # Get norm details for each norm
+        result = []
+        for norm in norms:
+            norm_details = session.exec(
+                select(NormDetails).where(NormDetails.norm_id == norm.id)
+            ).all()
+            
+            # Create response manually to ensure all fields are present
+            response_data = {
+                'id': norm.id,
+                'norm_name': norm.norm_name,
+                'description': norm.description,
+                'status': norm.status,
+                'created_at': norm.created_at,
+                'updated_at': norm.updated_at,
+                'norm_details': [
+                    NormDetailPublic.model_validate(detail) for detail in norm_details
+                ]
+            }
+            result.append(NormPublic.model_validate(response_data))
+        
+        return result, total
+
+    @staticmethod
+    def get_by_id(*, session: Session, norm_id: uuid.UUID) -> NormPublic:
+        norm = session.get(Norms, norm_id)
+        if not norm:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="Norm not found"
+            )
+        
+        # Get norm details
+        norm_details = session.exec(
+            select(NormDetails).where(NormDetails.norm_id == norm_id)
+        ).all()
+        
+        # Create response manually to ensure all fields are present
+        response_data = {
+            'id': norm.id,
+            'norm_name': norm.norm_name,
+            'description': norm.description,
+            'status': norm.status,
+            'created_at': norm.created_at,
+            'updated_at': norm.updated_at,
+            'norm_details': [
+                NormDetailPublic.model_validate(detail) for detail in norm_details
+            ]
+        }
+        
+        return NormPublic.model_validate(response_data)
+
     @staticmethod
     def dropdown(*, session: Session, query: BaseQueryParams) -> list[NormDropdownResponse]:
         statement = select(Norms.id, Norms.norm_name)
@@ -41,26 +118,63 @@ class NormServices:
     def create(
         *,
         session: Session,
-        norm: Norms,
+        norm_data: NormCreate,
     ) -> NormPublic:
-        normalized_name = norm.norm_name.strip().upper()
+        try:
+            normalized_name = norm_data.norm_name.strip().upper()
 
-        existing = session.exec(
-            select(Norms).where(func.upper(Norms.norm_name) == normalized_name)
-        ).first()
+            existing = session.exec(
+                select(Norms).where(func.upper(Norms.norm_name) == normalized_name)
+            ).first()
 
-        if existing:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail=f"Norm: '{norm.norm_name}' already exists.",
-            )
-        
-        new_norm = Norms(**norm.model_dump())
-        session.add(new_norm)
-        session.commit()
-        session.refresh(new_norm)
-
-        return NormPublic.model_validate(new_norm)
+            if existing:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail=f"Norm: '{norm_data.norm_name}' already exists.",
+                )
+            
+            # Create norm without norm_details
+            norm_dict = norm_data.model_dump(exclude={'norm_details'})
+            new_norm = Norms(**norm_dict)
+            session.add(new_norm)
+            session.flush()  # Get the ID without committing
+            
+            # Create norm details
+            norm_details = []
+            for detail_data in norm_data.norm_details:
+                detail_dict = detail_data.model_dump(exclude={'id'})
+                detail_dict['norm_id'] = new_norm.id
+                detail_dict['status'] = detail_dict.get('status', StatusEnum.ACTIVE)
+                
+                norm_detail = NormDetails(**detail_dict)
+                session.add(norm_detail)
+                norm_details.append(norm_detail)
+            
+            session.commit()
+            session.refresh(new_norm)
+            
+            # Refresh all details to get their IDs
+            for detail in norm_details:
+                session.refresh(detail)
+            
+            # Build response manually to ensure all fields are present
+            response_data = {
+                'id': new_norm.id,
+                'norm_name': new_norm.norm_name,
+                'description': new_norm.description,
+                'status': new_norm.status,
+                'created_at': new_norm.created_at,
+                'updated_at': new_norm.updated_at,
+                'norm_details': [
+                    NormDetailPublic.model_validate(detail) for detail in norm_details
+                ]
+            }
+            
+            return NormPublic.model_validate(response_data)
+            
+        except Exception as e:
+            session.rollback()
+            raise e
     
     def create_multi(
         *,
@@ -118,18 +232,92 @@ class NormServices:
         norm_id: uuid.UUID,
         norm_data: NormUpdate,
     ) -> NormPublic:
-        norm = session.get(Norms, norm_id)
-        if not norm:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND, detail="Norm not found"
-            )
+        try:
+            norm = session.get(Norms, norm_id)
+            if not norm:
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND, detail="Norm not found"
+                )
 
-        update_data = norm_data.model_dump(exclude_unset=True)
-        for field, value in update_data.items():
-            setattr(norm, field, value)
-
-        session.commit()
-        return NormPublic.model_validate(norm)
+            # Update norm basic fields
+            update_data = norm_data.model_dump(exclude_unset=True, exclude={'norm_details'})
+            for field, value in update_data.items():
+                setattr(norm, field, value)
+            
+            # Handle norm details if provided
+            if norm_data.norm_details is not None:
+                # Delete existing norm details
+                existing_details = session.exec(
+                    select(NormDetails).where(NormDetails.norm_id == norm_id)
+                ).all()
+                
+                for detail in existing_details:
+                    session.delete(detail)
+                
+                # Create new norm details
+                new_details = []
+                for detail_data in norm_data.norm_details:
+                    detail_dict = detail_data.model_dump(exclude={'id'})
+                    detail_dict['norm_id'] = norm_id
+                    detail_dict['status'] = detail_dict.get('status', StatusEnum.ACTIVE)
+                    
+                    norm_detail = NormDetails(**detail_dict)
+                    session.add(norm_detail)
+                    new_details.append(norm_detail)
+                
+                session.flush()
+                
+                # Refresh details to get IDs
+                for detail in new_details:
+                    session.refresh(detail)
+                
+                session.commit()
+                
+                # Build response with details
+                session.refresh(norm)  # Refresh to get updated data
+                
+                # Create response manually to ensure all fields are present
+                response_data = {
+                    'id': norm.id,
+                    'norm_name': norm.norm_name,
+                    'description': norm.description,
+                    'status': norm.status,
+                    'created_at': norm.created_at,
+                    'updated_at': norm.updated_at,
+                    'norm_details': [
+                        NormDetailPublic.model_validate(detail) for detail in new_details
+                    ]
+                }
+                
+                return NormPublic.model_validate(response_data)
+            else:
+                session.commit()
+                
+                # Get existing details for response
+                existing_details = session.exec(
+                    select(NormDetails).where(NormDetails.norm_id == norm_id)
+                ).all()
+                
+                session.refresh(norm)  # Refresh to get updated data
+                
+                # Create response manually to ensure all fields are present
+                response_data = {
+                    'id': norm.id,
+                    'norm_name': norm.norm_name,
+                    'description': norm.description,
+                    'status': norm.status,
+                    'created_at': norm.created_at,
+                    'updated_at': norm.updated_at,
+                    'norm_details': [
+                        NormDetailPublic.model_validate(detail) for detail in existing_details
+                    ]
+                }
+                
+                return NormPublic.model_validate(response_data)
+                
+        except Exception as e:
+            session.rollback()
+            raise e
 
     @staticmethod
     def delete_many(
