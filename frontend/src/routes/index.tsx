@@ -1,13 +1,23 @@
-import { createBrowserRouter } from "react-router-dom";
+/* eslint-disable react-refresh/only-export-components */
+import { createBrowserRouter, Navigate } from "react-router-dom";
 import { homeUrl, layoutUrl, testURL, signinUrl, registerUrl, productsURL } from "./urls";
 import Layout from "../modules/app/Layout";
 import Test from "../modules/Test/Test";
 import { NotFound } from "../modules/NotFound/NotFound";
-import Login from "../modules/auth/Login";
-import Register from "../modules/auth/Register";
+import Login from "../modules/auth/views/Login";
+import Register from "../modules/auth/views/Register";
 import { Products } from "../modules/products/views/Products";
+import { isAuthenticated } from "../modules/auth/services/authState";
 
-const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {return <>{children}</>};
+const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
+    if (!isAuthenticated()) return <Navigate to={signinUrl} replace />;
+    return <>{children}</>;
+};
+
+const AuthOnlyRoute = ({ children }: { children: React.ReactNode }) => {
+    if (isAuthenticated()) return <Navigate to={homeUrl} replace />;
+    return <>{children}</>;
+};
 
 export const createRouterConfig = () =>
     createBrowserRouter([
@@ -39,10 +49,18 @@ export const createRouterConfig = () =>
         },
         {
             path: signinUrl,
-            element: <Login />
+            element: (
+                <AuthOnlyRoute>
+                    <Login />
+                </AuthOnlyRoute>
+            )
         },
         {
             path: registerUrl,
-            element: <Register />
+            element: (
+                <AuthOnlyRoute>
+                    <Register />
+                </AuthOnlyRoute>
+            )
         }
     ]);
