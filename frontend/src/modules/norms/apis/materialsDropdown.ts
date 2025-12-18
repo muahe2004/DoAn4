@@ -36,7 +36,7 @@ const getDropdownMaterials = async (
 
 export const useGetDropdownMaterials = (params: Params) => {
   return useQuery<MaterialDropdownResponse[], AxiosError<{ detail?: string }>>({
-    queryKey: ["materials-dropdown", params],
+    queryKey: ["materials", params],
     queryFn: () => getDropdownMaterials(params),
   });
 };

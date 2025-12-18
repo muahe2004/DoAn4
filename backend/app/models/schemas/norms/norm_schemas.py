@@ -31,6 +31,7 @@ class NormUpdate(SQLModel):
     norm_name: Optional[str] = None
     description: Optional[str] = None
     status: Optional[str] = None
+    updated_at: datetime = Field(default_factory=datetime.now, sa_column=Column(DateTime, nullable=False))
     norm_details: Optional[List[NormDetailCreate]] = None
 
 class NormDeleteResponse(SQLModel):

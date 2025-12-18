@@ -7,7 +7,6 @@ import {
   TableHead,
   TableRow,
   IconButton,
-  Button,
   Autocomplete,
   TextField,
   Paper,
@@ -17,11 +16,14 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
+  DialogContentText,
 } from "@mui/material";
+import Button from "../../../components/Button/Button";
 import { FiEdit, FiTrash2, FiPlus } from "react-icons/fi";
 import type { INormDetail } from "../types";
 import { useGetDropdownMaterials } from "../apis/materialsDropdown";
 import { useGetDropdownUnits } from "../../units/apis/dropdown";
+import { StatusEnum, DEFAULT_STATUS } from "../../../constants/status";
 
 interface NormDetailsTableProps {
   normDetails: INormDetail[];
@@ -53,7 +55,7 @@ const NormDetailsTable: React.FC<NormDetailsTableProps> = ({
     material_id: "",
     description: "",
     norm_value: 0,
-    status: "active",
+    status: DEFAULT_STATUS,
   });
 
   // Dropdown data
@@ -61,13 +63,13 @@ const NormDetailsTable: React.FC<NormDetailsTableProps> = ({
     data: materials,
     isLoading: materialsLoading,
     error: materialsError,
-  } = useGetDropdownMaterials({ skip: 0, limit: 100, status: "active" });
+  } = useGetDropdownMaterials({ skip: 0, limit: 5, status: StatusEnum.ACTIVE });
 
   const {
     data: units,
     isLoading: unitsLoading,
     error: unitsError,
-  } = useGetDropdownUnits({ skip: 0, limit: 100 });
+  } = useGetDropdownUnits({ skip: 0, limit: 5 });
 
   const handleAddClick = () => {
     if (editingId) return; // Don't allow add when editing
@@ -99,7 +101,7 @@ const NormDetailsTable: React.FC<NormDetailsTableProps> = ({
       material_id: "",
       description: "",
       norm_value: 0,
-      status: "active",
+      status: DEFAULT_STATUS,
     });
     setIsAdding(false);
   };
@@ -111,7 +113,7 @@ const NormDetailsTable: React.FC<NormDetailsTableProps> = ({
       material_id: "",
       description: "",
       norm_value: 0,
-      status: "active",
+      status: DEFAULT_STATUS,
     });
   };
 
@@ -182,9 +184,9 @@ const NormDetailsTable: React.FC<NormDetailsTableProps> = ({
   // Show loading if dropdowns are loading
   if (materialsLoading || unitsLoading) {
     return (
-      <Paper elevation={1} style={{ padding: "32px", textAlign: "center" }}>
+      <Paper elevation={1} className="norm-loading-container">
         <CircularProgress />
-        <div style={{ marginTop: "16px" }}>Đang tải dữ liệu...</div>
+        <div className="norm-loading-text">Đang tải dữ liệu...</div>
       </Paper>
     );
   }
@@ -192,7 +194,7 @@ const NormDetailsTable: React.FC<NormDetailsTableProps> = ({
   // Show error if dropdowns failed to load
   if (materialsError || unitsError) {
     return (
-      <Paper elevation={1} style={{ padding: "16px" }}>
+      <Paper elevation={1} className="norm-error-container">
         <Alert severity="error">
           Không thể tải dữ liệu dropdown. Vui lòng thử lại sau.
           {materialsError && <div>Materials: {materialsError.message}</div>}
@@ -205,36 +207,41 @@ const NormDetailsTable: React.FC<NormDetailsTableProps> = ({
   return (
     <>
       <Paper elevation={1}>
-        <div
-          style={{
-            padding: "16px",
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-          }}
-        >
+        <div className="norm-details-header">
           <h3>Chi tiết định mức</h3>
-          <Button
-            startIcon={<FiPlus />}
-            onClick={handleAddClick}
-            variant="outlined"
-            size="small"
-            disabled={editingId !== null}
-          >
-            Thêm nguyên vật liệu
-          </Button>
+          <div className="norm-actions">
+            <Button
+              startIcon={<FiPlus />}
+              onClick={handleAddClick}
+              disabled={editingId !== null}
+            >
+              Thêm nguyên vật liệu
+            </Button>
+          </div>
         </div>
 
-        <TableContainer>
-          <Table size="small">
-            <TableHead>
+        <TableContainer className="primary-table-container">
+          <Table size="small" stickyHeader aria-label="norms table">
+            <TableHead className="primary-thead">
               <TableRow>
-                <TableCell>STT</TableCell>
-                <TableCell>Nguyên vật liệu</TableCell>
-                <TableCell>Đơn vị tính</TableCell>
-                <TableCell>Định mức</TableCell>
-                <TableCell>Mô tả</TableCell>
-                <TableCell align="center">Thao tác</TableCell>
+                <TableCell className="primary-tcell" align="center">
+                  STT
+                </TableCell>
+                <TableCell className="primary-tcell" align="center">
+                  Nguyên vật liệu
+                </TableCell>
+                <TableCell className="primary-tcell" align="center">
+                  Đơn vị tính
+                </TableCell>
+                <TableCell className="primary-tcell" align="center">
+                  Định mức
+                </TableCell>
+                <TableCell className="primary-tcell" align="center">
+                  Mô tả
+                </TableCell>
+                <TableCell className="primary-tcell" align="center">
+                  Hành động
+                </TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -336,14 +343,10 @@ const NormDetailsTable: React.FC<NormDetailsTableProps> = ({
                     {/* Actions */}
                     <TableCell align="center">
                       {isEditing ? (
-                        <>
-                          <Button size="small" onClick={handleEditSave}>
-                            Lưu
-                          </Button>
-                          <Button size="small" onClick={handleEditCancel}>
-                            Hủy
-                          </Button>
-                        </>
+                        <div className="norm-detail-actions">
+                          <Button onClick={handleEditSave}>Lưu</Button>
+                          <Button onClick={handleEditCancel}>Hủy</Button>
+                        </div>
                       ) : (
                         <>
                           <IconButton
@@ -445,12 +448,10 @@ const NormDetailsTable: React.FC<NormDetailsTableProps> = ({
                     />
                   </TableCell>
                   <TableCell align="center">
-                    <Button size="small" onClick={handleSaveNew}>
-                      Lưu
-                    </Button>
-                    <Button size="small" onClick={handleCancelNew}>
-                      Hủy
-                    </Button>
+                    <div>
+                      <Button onClick={handleSaveNew}>Lưu</Button>
+                      <Button onClick={handleCancelNew}>Hủy</Button>
+                    </div>
                   </TableCell>
                 </TableRow>
               )}
@@ -460,7 +461,7 @@ const NormDetailsTable: React.FC<NormDetailsTableProps> = ({
                   <TableCell
                     colSpan={6}
                     align="center"
-                    style={{ padding: "32px" }}
+                    className="norm-empty-state"
                   >
                     Chưa có chi tiết định mức. Nhấn "Thêm nguyên vật liệu" để
                     bắt đầu.
@@ -478,14 +479,21 @@ const NormDetailsTable: React.FC<NormDetailsTableProps> = ({
         onClose={() =>
           setDeleteDialog({ open: false, id: "", materialName: "" })
         }
+        aria-labelledby="delete-dialog-title"
+        aria-describedby="delete-dialog-description"
       >
-        <DialogTitle>Xác nhận xóa</DialogTitle>
+        <DialogTitle id="delete-dialog-title" className="primary-dialog-title">
+          Xác nhận xóa
+        </DialogTitle>
         <DialogContent>
-          Bạn có chắc chắn muốn xóa chi tiết định mức cho nguyên vật liệu "
-          {deleteDialog.materialName}"?
+          <DialogContentText id="delete-dialog-description">
+            Bạn có chắc chắn muốn xóa chi tiết định mức cho nguyên vật liệu "
+            {deleteDialog.materialName}"? Hành động này không thể hoàn tác.
+          </DialogContentText>
         </DialogContent>
-        <DialogActions>
+        <DialogActions className="primary-dialog-actions">
           <Button
+            className="button-cancel"
             onClick={() =>
               setDeleteDialog({ open: false, id: "", materialName: "" })
             }
@@ -494,8 +502,8 @@ const NormDetailsTable: React.FC<NormDetailsTableProps> = ({
           </Button>
           <Button
             onClick={handleConfirmDelete}
-            color="error"
             variant="contained"
+            color="error"
           >
             Xóa
           </Button>

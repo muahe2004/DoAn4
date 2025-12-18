@@ -10,7 +10,7 @@ const getNorm = async (id: string): Promise<INorm> => {
 
 export const useGetNorm = (id: string) => {
   return useQuery({
-    queryKey: ["norm", id],
+    queryKey: ["norms", id],
     queryFn: () => getNorm(id),
     enabled: !!id,
   });

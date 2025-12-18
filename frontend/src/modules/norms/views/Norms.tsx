@@ -15,13 +15,12 @@ import {
 } from "@mui/material";
 import { useState } from "react";
 import { useGetNorms } from "../apis/getNorms";
-import { FiEdit, FiEye } from "react-icons/fi";
+import { FiEdit } from "react-icons/fi";
 import { PiTrashSimpleFill } from "react-icons/pi";
 import { useSnackbar } from "../../../components/SnackBar/SnackBar";
 import PrimaryPagination from "../../../components/Pagination/Pagination";
 import type { INorm, INormResponse } from "../types";
 import NormFormModel from "../components/NormFormModel";
-import ViewNormModal from "../components/ViewNormModal";
 import Button from "../../../components/Button/Button";
 import "./norms.css";
 import { useCreateNorm } from "../apis/addNorm";
@@ -34,8 +33,6 @@ export function Norms() {
 
   const [selectedNorm, setSelectedNorm] = useState<INormResponse | null>(null);
   const [openModal, setOpenModal] = useState(false);
-  const [openViewModal, setOpenViewModal] = useState(false);
-  const [viewNorm, setViewNorm] = useState<INormResponse | null>(null);
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [normToDelete, setNormToDelete] = useState<string | null>(null);
   const { showSnackbar } = useSnackbar();
@@ -69,19 +66,9 @@ export function Norms() {
     setOpenModal(true);
   };
 
-  const handleOpenView = (norm: INormResponse) => {
-    setViewNorm(norm);
-    setOpenViewModal(true);
-  };
-
   const handleCloseModal = () => {
     setOpenModal(false);
     setSelectedNorm(null);
-  };
-
-  const handleCloseViewModal = () => {
-    setOpenViewModal(false);
-    setViewNorm(null);
   };
 
   const handleDeleteClick = (normId: string) => {
@@ -201,14 +188,6 @@ export function Norms() {
                   className="custom-border-tcell primary-tcell"
                 >
                   <IconButton
-                    className="primary-view-btn"
-                    size="small"
-                    onClick={() => handleOpenView(norm)}
-                    title="Xem chi tiết"
-                  >
-                    <FiEye />
-                  </IconButton>
-                  <IconButton
                     className="primary-edit-btn"
                     size="small"
                     onClick={() => handleOpenEdit(norm)}
@@ -245,12 +224,6 @@ export function Norms() {
         onSubmit={handleSubmitNorm}
         initialData={selectedNorm || undefined}
         mode={selectedNorm ? "edit" : "add"}
-      />
-
-      <ViewNormModal
-        open={openViewModal}
-        onClose={handleCloseViewModal}
-        norm={viewNorm}
       />
 
       {/* Delete Confirmation Dialog */}

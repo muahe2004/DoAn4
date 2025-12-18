@@ -3,3 +3,36 @@
   justify-content: right;
   margin-bottom: 10px;
 }
+.norm-details-header {
+  padding: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.norm-details-header h3 {
+  margin: 0;
+}
+
+.norm-detail-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+/* Loading and Error States */
+.norm-loading-container {
+  padding: 32px;
+  text-align: center;
+}
+
+.norm-loading-text {
+  margin-top: 16px;
+}
+
+.norm-error-container {
+  padding: 16px;
+}
+
+.norm-empty-state {
+  padding: 32px;
+}
