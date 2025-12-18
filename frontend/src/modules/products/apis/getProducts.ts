@@ -11,6 +11,7 @@ export interface ProductListResponse {
 export interface Params {
   skip: number;
   limit: number;
+  search?: string;
 }
 
 const getProducts = async (params: Params): Promise<ProductListResponse> => {

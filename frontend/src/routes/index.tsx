@@ -1,4 +1,5 @@
-import { createBrowserRouter } from "react-router-dom";
+/* eslint-disable react-refresh/only-export-components */
+import { createBrowserRouter, Navigate } from "react-router-dom";
 import {
   homeUrl,
   layoutUrl,
@@ -8,14 +9,28 @@ import {
   productsURL,
   normsURL,
 } from "./urls";
+
 import Layout from "../modules/app/Layout";
 import Test from "../modules/Test/Test";
 import { NotFound } from "../modules/NotFound/NotFound";
-import Login from "../modules/auth/Login";
-import Register from "../modules/auth/Register";
+import Login from "../modules/auth/views/Login";
+import Register from "../modules/auth/views/Register";
 import { Products } from "../modules/products/views/Products";
 import { Norms } from "../modules/norms/views/Norms";
+import { isAuthenticated } from "../modules/auth/services/authState";
 
+/* ===== Route Guards ===== */
+const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
+  if (!isAuthenticated()) return <Navigate to={signinUrl} replace />;
+  return <>{children}</>;
+};
+
+const AuthOnlyRoute = ({ children }: { children: React.ReactNode }) => {
+  if (isAuthenticated()) return <Navigate to={homeUrl} replace />;
+  return <>{children}</>;
+};
+
+/* ===== Router ===== */
 export const createRouterConfig = () =>
   createBrowserRouter([
     {
@@ -32,24 +47,40 @@ export const createRouterConfig = () =>
         },
         {
           path: productsURL,
-          element: <Products />,
+          element: (
+            <ProtectedRoute>
+              <Products />
+            </ProtectedRoute>
+          ),
         },
         {
           path: normsURL,
-          element: <Norms />,
+          element: (
+            <ProtectedRoute>
+              <Norms />
+            </ProtectedRoute>
+          ),
         },
       ],
     },
     {
-      path: "*",
-      element: <NotFound />,
-    },
-    {
       path: signinUrl,
-      element: <Login />,
+      element: (
+        <AuthOnlyRoute>
+          <Login />
+        </AuthOnlyRoute>
+      ),
     },
     {
       path: registerUrl,
-      element: <Register />,
+      element: (
+        <AuthOnlyRoute>
+          <Register />
+        </AuthOnlyRoute>
+      ),
+    },
+    {
+      path: "*",
+      element: <NotFound />,
     },
   ]);

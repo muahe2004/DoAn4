@@ -352,3 +352,38 @@ class NormServices:
             raise e
 
         return results
+    
+    @staticmethod
+    def resolve_norm_generic(session, norm_id, norm_name):
+        if norm_id:
+            existing_by_id = session.get(Norms, norm_id)
+            if existing_by_id:
+                return existing_by_id.id
+            if not norm_name:
+                raise HTTPException(
+                    status_code=400,
+                    detail="Norm id does not exist."
+                )
+
+        if not norm_name:
+            raise HTTPException(
+                status_code=400,
+                detail="Norm name must be provided."
+            )
+
+        payload = NormCreate(
+            norm_name=norm_name.strip(),
+            description="",
+            status=StatusEnum.ACTIVE,
+        )
+
+        try:
+            new_norm = NormServices.create(session=session, norm=payload)
+            return new_norm.id
+        except HTTPException as e:
+            if e.status_code == 400 and "already exists" in e.detail:
+                existing = session.exec(
+                    select(Norms).where(func.upper(Norms.norm_name) == norm_name.strip().upper())
+                ).first()
+                return existing.id
+            raise

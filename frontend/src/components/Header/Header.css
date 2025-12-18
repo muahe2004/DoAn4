@@ -238,6 +238,19 @@
   color: var(--delete-color);
 }
 
+.logout-message {
+  position: absolute;
+  top: 70px;
+  right: 24px;
+  background: #fffaf0;
+  color: #c05621;
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid #f6ad55;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  font-size: 13px;
+}
+
 .dropdown-menu {
   position: absolute;
   top: 100%;

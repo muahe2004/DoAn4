@@ -1,7 +1,15 @@
 import uuid
-from datetime import datetime
-import json
-from app.models.schemas.products.product_schemas import ProductCreate, ProductDeleteResponse, ProductListResponse, ProductPublic, ProductQueryParams, ProductResponse, ProductUpdate
+from app.models.schemas.products.product_schemas import (
+    MultiProductCreate,
+    ProductCreate,
+    ProductDeleteResponse,
+    ProductListResponse,
+    ProductPublic,
+    ProductQueryParams,
+    ProductResponse,
+    ProductUpdate,
+)
+from app.models.schemas.units.unit_schemas import UnitCreate
 from app.enums.status import StatusEnum
 from fastapi import HTTPException, Request
 from sqlalchemy import or_
@@ -11,6 +19,9 @@ from typing import List, Optional, Tuple
 from sqlalchemy.orm import aliased
 
 from app.models.models import Norms, Products, Units
+from app.services.units import UnitServices
+from app.models.schemas.norms.norm_schemas import NormCreate
+from app.services.norms import NormServices
 
 class ProductServices:
     @staticmethod
@@ -53,10 +64,11 @@ class ProductServices:
                 )
             )
         if query.search:
+            search_text = f"%{query.search}%"
             conditions.append(
                 or_(
-                    Products.product_code.ilike(f"%{query.search}%"),
-                    Products.product_name.ilike(f"%{query.search}%"),
+                    func.unaccent(Products.product_code).ilike(func.unaccent(search_text)),
+                    func.unaccent(Products.product_name).ilike(func.unaccent(search_text)),
                 )
             )
         
@@ -77,47 +89,122 @@ class ProductServices:
 
         results = session.exec(statement).all()
 
-        return results, total
+        return results, total    
 
     @staticmethod
-    def create(
-        *,
-        session: Session,
-        product: ProductCreate,
-    ) -> ProductPublic:
+    def create(*, session: Session, product: ProductCreate) -> ProductPublic:
         existing = session.exec(
             select(Products).where(Products.product_code == product.product_code)
         ).first()
         if existing:
             raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
+                status_code=400,
                 detail=f"Product {product.product_code} already exists.",
             )
+
+        # create new if it does not exist
+        product.unit_id = UnitServices.resolve_unit_generic(session, product.unit_id, product.unit_name)
+        product.unit_id_2 = UnitServices.resolve_unit_generic(session, product.unit_id_2, product.unit_name_2)
+        product.norm_id = NormServices.resolve_norm_generic(session, product.norm_id, product.norm_name)
+
         new_product = Products(**product.model_dump())
         session.add(new_product)
         session.commit()
         session.refresh(new_product)
 
         return ProductPublic.model_validate(new_product)
-
+    
     @staticmethod
-    def update(
-        *,
-        session: Session,
-        product_id: uuid.UUID,
-        product_data: ProductUpdate,
-    ) -> ProductPublic:
-        product = session.get(Products, product_id)
-        if not product:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND, detail="Product not found"
+    def create_multi(*, session: Session, data: MultiProductCreate) -> List[ProductPublic]:
+        if not data.products:
+            raise HTTPException(status_code=400, detail="No products provided.")
+
+        requested_codes = [p.product_code for p in data.products]
+
+        existing_codes = set(
+            session.exec(
+                select(Products.product_code).where(
+                    Products.product_code.in_(requested_codes)
+                )
+            ).all()
+        )
+
+        to_create: List[Products] = []
+        seen_codes: set[str] = set()
+
+        for product in data.products:
+            if product.product_code in existing_codes or product.product_code in seen_codes:
+                continue
+
+            seen_codes.add(product.product_code)
+
+            # create new if it does not exist
+            resolved_unit_id = UnitServices.resolve_unit_generic(
+                session, product.unit_id, product.unit_name
+            )
+            resolved_unit_id_2 = UnitServices.resolve_unit_generic(
+                session, product.unit_id_2, product.unit_name_2
+            )
+            resolved_norm_id = NormServices.resolve_norm_generic(
+                session, product.norm_id, product.norm_name
             )
 
+            payload = product.model_dump()
+            payload["unit_id"] = resolved_unit_id
+            payload["unit_id_2"] = resolved_unit_id_2
+            payload["norm_id"] = resolved_norm_id
+
+            to_create.append(Products(**payload))
+
+        if not to_create:
+            raise HTTPException(status_code=400, detail="All products already exist.")
+
+        session.add_all(to_create)
+        session.commit()
+
+        for item in to_create:
+            session.refresh(item)
+
+        return [ProductPublic.model_validate(p) for p in to_create]
+
+    @staticmethod
+    def update(*, session: Session, product_id: uuid.UUID, product_data: ProductUpdate) -> ProductPublic:
+        product = session.get(Products, product_id)
+        if not product:
+            raise HTTPException(status_code=404, detail="Product not found")
+
         update_data = product_data.model_dump(exclude_unset=True)
+
+        # create new if it does not exist
+        if "unit_id" in update_data or "unit_name" in update_data:
+            update_data["unit_id"] = UnitServices.resolve_unit_generic(
+                session,
+                update_data.get("unit_id"),
+                update_data.get("unit_name"),
+            )
+            update_data.pop("unit_name", None)
+
+        if "unit_id_2" in update_data or "unit_name_2" in update_data:
+            update_data["unit_id_2"] = UnitServices.resolve_unit_generic(
+                session,
+                update_data.get("unit_id_2"),
+                update_data.get("unit_name_2"),
+            )
+            update_data.pop("unit_name_2", None)
+
+        if "norm_id" in update_data or "norm_name" in update_data:
+            update_data["norm_id"] = NormServices.resolve_norm_generic(
+                session,
+                update_data.get("norm_id"),
+                update_data.get("norm_name"),
+            )
+            update_data.pop("norm_name", None)
+
         for field, value in update_data.items():
             setattr(product, field, value)
 
         session.commit()
+        session.refresh(product)
         return ProductPublic.model_validate(product)
 
     @staticmethod

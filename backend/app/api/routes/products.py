@@ -1,6 +1,6 @@
 import uuid
 
-from app.models.schemas.products.product_schemas import ProductCreate, ProductDeleteResponse, ProductListResponse, ProductPublic, ProductQueryParams, ProductUpdate
+from app.models.schemas.products.product_schemas import MultiProductCreate, ProductCreate, ProductDeleteResponse, ProductListResponse, ProductPublic, ProductQueryParams, ProductUpdate
 from fastapi import APIRouter, Depends, Request
 from app.api.deps import SessionDep
 from app.services.products import ProductServices
@@ -23,6 +23,18 @@ def create_product(
     request: Request, session: SessionDep, data: ProductCreate
 ) -> ProductPublic:
     return ProductServices.create(session=session, product=data)
+
+# =========================== create multi product ===========================
+@router.post(
+    "/multi",
+    response_model=list[ProductPublic],
+)
+def create_units_multi(
+    request: Request,
+    session: SessionDep,
+    data: MultiProductCreate
+) -> list[ProductPublic]:
+    return ProductServices.create_multi(session=session, data=data)
 
 # =========================== update product ===========================
 @router.patch(
