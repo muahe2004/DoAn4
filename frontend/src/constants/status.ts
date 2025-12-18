@@ -1,8 +1,9 @@
-export const StatusEnum = {
+export const STATUS = {
   ACTIVE: "active",
   INACTIVE: "inactive",
-} as const;
+};
 
-export type StatusEnum = (typeof StatusEnum)[keyof typeof StatusEnum];
-
-export const DEFAULT_STATUS = StatusEnum.ACTIVE;
+export const STATUS_OPTIONS = [
+  { value: STATUS.ACTIVE, label: "Active" },
+  { value: STATUS.INACTIVE, label: "Inactive" },
+];

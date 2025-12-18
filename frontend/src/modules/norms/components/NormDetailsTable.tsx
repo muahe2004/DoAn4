@@ -23,7 +23,7 @@ import { FiEdit, FiTrash2, FiPlus } from "react-icons/fi";
 import type { INormDetail } from "../types";
 import { useGetDropdownMaterials } from "../apis/materialsDropdown";
 import { useGetDropdownUnits } from "../../units/apis/dropdown";
-import { StatusEnum, DEFAULT_STATUS } from "../../../constants/status";
+import { STATUS } from "../../../constants/status";
 
 interface NormDetailsTableProps {
   normDetails: INormDetail[];
@@ -55,7 +55,7 @@ const NormDetailsTable: React.FC<NormDetailsTableProps> = ({
     material_id: "",
     description: "",
     norm_value: 0,
-    status: DEFAULT_STATUS,
+    status: STATUS.ACTIVE,
   });
 
   // Dropdown data
@@ -63,7 +63,7 @@ const NormDetailsTable: React.FC<NormDetailsTableProps> = ({
     data: materials,
     isLoading: materialsLoading,
     error: materialsError,
-  } = useGetDropdownMaterials({ skip: 0, limit: 5, status: StatusEnum.ACTIVE });
+  } = useGetDropdownMaterials({ skip: 0, limit: 5, status: STATUS.ACTIVE });
 
   const {
     data: units,
@@ -101,7 +101,7 @@ const NormDetailsTable: React.FC<NormDetailsTableProps> = ({
       material_id: "",
       description: "",
       norm_value: 0,
-      status: DEFAULT_STATUS,
+      status: STATUS.ACTIVE,
     });
     setIsAdding(false);
   };
@@ -113,7 +113,7 @@ const NormDetailsTable: React.FC<NormDetailsTableProps> = ({
       material_id: "",
       description: "",
       norm_value: 0,
-      status: DEFAULT_STATUS,
+      status: STATUS.ACTIVE,
     });
   };
 

@@ -3,7 +3,7 @@ import uuid
 
 from fastapi import HTTPException
 from sqlalchemy import func
-from app.models.schemas.units.unit_schemas import MultiUnitCreate, UnitDeleteResponse, UnitDropdownResponse, UnitPublic, UnitQueryParams, UnitUpdate
+from app.models.schemas.units.unit_schemas import MultiUnitCreate, UnitCreate, UnitDeleteResponse, UnitDropdownResponse, UnitPublic, UnitQueryParams, UnitUpdate
 from sqlmodel import Session, select
 from app.models.models import Units
 from starlette import status
@@ -42,7 +42,7 @@ class UnitServices:
     def create(
         *,
         session: Session,
-        unit: Units,
+        unit: UnitCreate,
     ) -> UnitPublic:
         normalized_name = unit.unit_name.strip().upper()
 
@@ -166,3 +166,39 @@ class UnitServices:
             raise e
 
         return results
+    
+    @staticmethod
+    def resolve_unit_generic(session, unit_id, unit_name):
+        if unit_id:
+            existing_by_id = session.get(Units, unit_id)
+            if existing_by_id:
+                return existing_by_id.id
+            if not unit_name:
+                raise HTTPException(
+                    status_code=400,
+                    detail="Unit id does not exist."
+                )
+        
+        if not unit_name:
+            raise HTTPException(
+                status_code=400,
+                detail="Unit name must be provided."
+            )
+
+        payload = UnitCreate(
+            unit_name=unit_name.strip(),
+            description="",
+            type="",
+            status=StatusEnum.ACTIVE,
+        )
+
+        try:
+            new_unit = UnitServices.create(session=session, unit=payload)
+            return new_unit.id
+        except HTTPException as e:
+            if e.status_code == 400 and "already exists" in e.detail:
+                existing = session.exec(
+                    select(Units).where(func.upper(Units.unit_name) == unit_name.strip().upper())
+                ).first()
+                return existing.id
+            raise

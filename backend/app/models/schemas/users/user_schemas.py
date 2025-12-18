@@ -1,7 +1,10 @@
 from datetime import datetime
 from typing import Optional
 from uuid import UUID
-from sqlmodel import SQLModel, Field, Column, String, DateTime
+
+from pydantic import BaseModel, ConfigDict, EmailStr, Field as PydanticField
+from sqlmodel import Column, DateTime, Field, SQLModel, String
+
 
 class UserBase(SQLModel):
     name: str = Field(sa_column=Column(String(100), nullable=False))  
@@ -21,5 +24,43 @@ class UserBase(SQLModel):
     created_at: datetime = Field(default_factory=datetime.now, sa_column=Column(DateTime, nullable=False))
     updated_at: datetime = Field(default_factory=datetime.now, sa_column=Column(DateTime, nullable=False, onupdate=datetime.now))
 
-class UserPublic(UserBase):
+
+class UserCreate(BaseModel):
+    name: str
+    code: str
+    phone_number: Optional[str] = None
+    email: EmailStr
+    password: str = PydanticField(min_length=8)
+    role: str
+
+    tax_code: Optional[str] = None
+    representative: Optional[str] = None
+    position: Optional[str] = None
+    address: Optional[str] = None
+    department: Optional[str] = None
+
+
+class UserPublic(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
     id: UUID
+    name: str
+    code: str
+    phone_number: Optional[str] = None
+    email: EmailStr
+    role: str
+    status: Optional[str] = None
+    tax_code: Optional[str] = None
+    representative: Optional[str] = None
+    position: Optional[str] = None
+    address: Optional[str] = None
+    department: Optional[str] = None
+    created_at: datetime
+    updated_at: datetime
+
+
+class UserLoginResponse(BaseModel):
+    message: str
+    code: str
+    status: str
+    role: str
