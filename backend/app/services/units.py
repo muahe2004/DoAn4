@@ -3,13 +3,49 @@ import uuid
 
 from fastapi import HTTPException
 from sqlalchemy import func
-from app.models.schemas.units.unit_schemas import MultiUnitCreate, UnitDeleteResponse, UnitDropdownResponse, UnitPublic, UnitQueryParams, UnitUpdate
+from app.models.schemas.units.unit_schemas import MultiUnitCreate, UnitCreate, UnitDeleteResponse, UnitDropdownResponse, UnitPublic, UnitQueryParams, UnitUpdate
 from sqlmodel import Session, select
 from app.models.models import Units
 from starlette import status
 from app.enums.status import StatusEnum
 
 class UnitServices:
+    @staticmethod
+    def get_list(*, session: Session, query: UnitQueryParams):
+        # Count total items
+        count_statement = select(func.count(Units.id))
+        conditions = []
+        
+        if query.status:
+            conditions.append(Units.status == query.status)
+        if query.type:
+            conditions.append(Units.type == query.type)
+        if query.search:
+            conditions.append(Units.unit_name.ilike(f"%{query.search}%"))
+
+        if conditions:
+            count_statement = count_statement.where(*conditions)
+        
+        total = session.exec(count_statement).one()
+
+        # Get data
+        statement = select(Units)
+        if conditions:
+            statement = statement.where(*conditions)
+
+        statement = (
+            statement.order_by(Units.created_at.desc())
+            .offset(query.skip)
+            .limit(query.limit)
+        )
+
+        units = session.exec(statement).all()
+        
+        return {
+            "data": [UnitPublic.model_validate(unit) for unit in units],
+            "total": total
+        }
+
     @staticmethod
     def dropdown(*, session: Session, query: UnitQueryParams) -> list[UnitDropdownResponse]:
         statement = select(Units.id, Units.unit_name)
@@ -42,7 +78,7 @@ class UnitServices:
     def create(
         *,
         session: Session,
-        unit: Units,
+        unit: UnitCreate,
     ) -> UnitPublic:
         normalized_name = unit.unit_name.strip().upper()
 
@@ -166,3 +202,39 @@ class UnitServices:
             raise e
 
         return results
+    
+    @staticmethod
+    def resolve_unit_generic(session, unit_id, unit_name):
+        if unit_id:
+            existing_by_id = session.get(Units, unit_id)
+            if existing_by_id:
+                return existing_by_id.id
+            if not unit_name:
+                raise HTTPException(
+                    status_code=400,
+                    detail="Unit id does not exist."
+                )
+        
+        if not unit_name:
+            raise HTTPException(
+                status_code=400,
+                detail="Unit name must be provided."
+            )
+
+        payload = UnitCreate(
+            unit_name=unit_name.strip(),
+            description="",
+            type="",
+            status=StatusEnum.ACTIVE,
+        )
+
+        try:
+            new_unit = UnitServices.create(session=session, unit=payload)
+            return new_unit.id
+        except HTTPException as e:
+            if e.status_code == 400 and "already exists" in e.detail:
+                existing = session.exec(
+                    select(Units).where(func.upper(Units.unit_name) == unit_name.strip().upper())
+                ).first()
+                return existing.id
+            raise

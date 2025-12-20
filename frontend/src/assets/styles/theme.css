@@ -9,4 +9,15 @@
   --font-size-title: 24px;
   --font-weight-bold: 700;
   --font-family-base: 'Montserrat', sans-serif;
+
+  /* STATUS */
+  --active-color: #166534;
+  --inactive-color: #9a3412;
+  --active-bg-color: #ecfdf3;
+  --inactive-bg-color: #fff7ed;
+  --active-boder-color: #bbf7d0;
+  --inactive-boder-color: #fed7aa;
+  --unknown-color: #475569;
+  --unknown-bg-color: #e5e6e8;
+  --unknown-boder-color: #e2e8f0;
 }

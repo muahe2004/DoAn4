@@ -1,5 +1,6 @@
 import axios from "axios";
 import { BASE_API_URL } from "../constants/config";
+import { clearAuthenticated } from "../modules/auth/services/authState";
 
 export const apiClient = axios.create({
   baseURL: BASE_API_URL,
@@ -13,6 +14,7 @@ apiClient.interceptors.response.use(
         const status = error?.response?.status;
 
         if (status === 401) {
+        clearAuthenticated();
         window.location.href = "/sign-in";
         return Promise.reject({
             message: "Unauthorized: Invalid or expired token",

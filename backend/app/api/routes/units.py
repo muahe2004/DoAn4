@@ -7,6 +7,11 @@ from app.api.deps import SessionDep
 
 router = APIRouter()
 
+# =========================== get units list ===========================
+@router.get("")
+def get_units(session: SessionDep, query: UnitQueryParams = Depends()):
+    return UnitServices.get_list(session=session, query=query)
+
 # =========================== dropdown units ===========================
 @router.get("/drop-down")
 def dropdown_unit(session: SessionDep, query: UnitQueryParams = Depends()):
