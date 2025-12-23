@@ -6,8 +6,8 @@ import {
     testURL,
     signinUrl,
     registerUrl,
-    seaManagementProductsURL,
     warehouseMaterialsURL,
+    warehouseProductsURL,
 } from "./urls";
 import Layout from "../modules/app/Layout";
 import Test from "../modules/Test/Test";
@@ -47,7 +47,7 @@ export const createRouterConfig = () =>
                     element: <Test />,
                 },
                 {
-                    path: seaManagementProductsURL,
+                    path: warehouseProductsURL,
                     element: <Products />,
                 },
                 {
