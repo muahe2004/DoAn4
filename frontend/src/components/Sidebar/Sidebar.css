@@ -72,6 +72,10 @@
   margin: 0 auto;
 }
 
+.sidebar--collapsed .sidebar__button--active .sidebar__icon {
+  background-color: rgba(255, 255, 255, 0.35);
+}
+
 .sidebar--collapsed .sidebar__button:hover {
   background-color: rgba(255, 255, 255, 0.1);
   transform: none;
@@ -116,6 +120,16 @@
   border-radius: 5px;
   width: 100%;
   cursor: pointer;
+}
+
+.sidebar__button--active {
+  background-color: rgba(255, 255, 255, 0.25);
+}
+
+.sidebar__button--active .sidebar__label,
+.sidebar__button--active .sidebar__icon {
+  color: #fff !important;
+  font-weight: 700;
 }
 
 /* Hover only full-width when expanded */
@@ -188,9 +202,10 @@
   color: white;
 }
 
-.sidebar__link--active {
+.sidebar__link.active {
   background-color: var(--secondary-color, #f3961a);
   font-weight: 700;
+  color: white;
 }
 
 /* Popover */

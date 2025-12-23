@@ -1,25 +1,25 @@
-.product-header {
+.material-header {
     margin-bottom: 20px;
 }
 
-.product-title {
+.material-title {
     display: flex;
     flex-direction: column;
 }
 
-.product-title__label {
+.material-title__label {
     font-size: 24px;
     font-weight: 700;
     color: var(--primary-color);
     margin-bottom: 4px;
 }
 
-.product-title__subtitle {
+.material-title__subtitle {
     font-size: 14px;
     color: var(--secondary-color);
 }
 
-.product-actions {
+.material-actions {
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
@@ -28,18 +28,12 @@
     width: 100%;
 }
 
-.product-actions .search-engine__input {
-    flex: 1;
-    min-width: 220px;
-    max-width: 420px;
-}
-
-.product-actions__buttons {
+.material-actions__buttons {
     display: flex;
     gap: 8px;
     flex-wrap: wrap;
 }
 
-.product-action-btn {
+.material-action-btn {
     min-width: 150px !important;
 }
