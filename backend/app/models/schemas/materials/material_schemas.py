@@ -24,7 +24,7 @@ class MaterialQueryParams(BaseQueryParams):
 
 class MaterialResponse(MaterialPublic):
     unit_name: str
-    country_name: str
+    country_name: str | None = None
 
 class MaterialListResponse(SQLModel):
     total: int
