@@ -20,3 +20,6 @@ class ImportDeclarationDetailsBase(SQLModel):
 
 class ImportDeclarationDetailsPublic(ImportDeclarationDetailsBase):
     id: UUID
+
+class ImportDeclarationDetailCreate(ImportDeclarationDetailsBase):
+    pass

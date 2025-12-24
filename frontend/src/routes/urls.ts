@@ -7,3 +7,4 @@ export const registerUrl = "/register";
 
 export const testURL = "/test";
 export const productsURL = "/products";
+export const importDeclarationsURL = "/import-declarations";

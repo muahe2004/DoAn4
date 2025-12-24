@@ -3,7 +3,7 @@ from datetime import datetime
 import json
 from app.models.schemas.products.product_schemas import ProductCreate, ProductDeleteResponse, ProductListResponse, ProductPublic, ProductQueryParams, ProductResponse, ProductUpdate
 from app.enums.status import StatusEnum
-from app.models.schemas.materials.material_schemas import MaterialDeleteResponse, MaterialListResponse, MaterialPublic, MaterialQueryParams, MaterialUpdate
+from app.models.schemas.materials.material_schemas import MaterialCreate, MaterialDeleteResponse, MaterialListResponse, MaterialPublic, MaterialQueryParams, MaterialUpdate
 from fastapi import HTTPException, Request
 from sqlalchemy import or_
 from sqlmodel import Session, select, func
@@ -11,7 +11,7 @@ from starlette import status
 from typing import List, Optional, Tuple
 from sqlalchemy.orm import aliased
 
-from app.models.models import Countries, Materials, Norms, Products, Units
+from app.models.models import CompareMaterialCodes, Countries, Materials, Norms, Products, Units
 
 class MaterialServices:
     @staticmethod
@@ -142,3 +142,51 @@ class MaterialServices:
             raise e
 
         return results
+    
+    @staticmethod
+    def resolve_material_generic(session, maerial_id, material_code, material_name, unit_id, description, country_id):
+        if maerial_id:
+            existing_by_id = session.get(Materials, maerial_id)
+            if existing_by_id:
+                return existing_by_id.id
+            if not material_code:
+                raise HTTPException(
+                    status_code=400,
+                    detail="Material id does not exist."
+                )
+        
+        if not material_code or not material_code.strip():
+            raise HTTPException(
+                status_code=400,
+                detail="Material code must be provided."
+            )
+
+        existing_compare = session.exec(
+            select(CompareMaterialCodes).where(
+                func.upper(CompareMaterialCodes.external_code) == material_code.strip().upper()
+            )
+        ).first()
+        if existing_compare:
+            return existing_compare.material_id
+
+        payload = MaterialCreate(
+            material_code=material_code.strip(),
+            material_name=material_name.strip(),
+            description=(description or "").strip(),
+            unit_id=unit_id,
+            country_id=country_id,
+            status=StatusEnum.ACTIVE,
+        )
+
+        try:
+            new_material = MaterialServices.create(session=session, material=payload)
+            return new_material.id
+        except HTTPException as e:
+            if e.status_code == 400 and "already exists" in e.detail:
+                existing = session.exec(
+                    select(Materials).where(
+                        func.upper(Materials.material_code) == material_code.strip().upper()
+                    )
+                ).first()
+                return existing.id
+            raise

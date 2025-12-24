@@ -15,3 +15,4 @@ class CompareMaterialCodeBase(SQLModel):
 
 class CompareMaterialCodePublic(CompareMaterialCodeBase):
     id: UUID
+
