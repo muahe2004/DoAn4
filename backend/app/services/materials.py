@@ -31,7 +31,7 @@ class MaterialServices:
                 Countries.country_name
             )
             .join(Units, Units.id == Materials.unit_id)
-            .join(Countries, Countries.id == Materials.country_id)
+            .outerjoin(Countries, Countries.id == Materials.country_id)
         )
 
         conditions = []
