@@ -1,4 +1,4 @@
-import { productsURL } from "../../routes/urls";
+import { exportDeclarationsURL, productsURL } from "../../routes/urls";
 import type { SidebarData } from "./types";
 import { FiBox, FiGrid, FiFileText, FiHome } from "react-icons/fi";
 
@@ -35,7 +35,7 @@ export const sidebarData: SidebarData = [
       {
         id: "hoadon-export",
         label: "Quản lý tờ khai xuất",
-        path: "/invoice",
+        path: exportDeclarationsURL,
         icon: <FiFileText />,
       },
     ],

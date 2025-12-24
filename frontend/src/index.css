@@ -83,8 +83,9 @@ body {
 }
 
 .primary-text__field input {
-  font-size: var(--font-size-base) !important;
-  padding: 12px !important; 
+  font-size: calc(var(--font-size-base) - 1px) !important;
+  padding: 8px 10px !important;
+  min-height: 34px;
 }
 
 input::-ms-reveal, input::-ms-clear {
@@ -95,7 +96,8 @@ input::-ms-reveal, input::-ms-clear {
 .MuiSelect-select {
   height: 1.4375em !important;
   line-height: 1.4375em !important;
-  padding: 12px !important;
+  padding: 8px 10px !important;
+  font-size: calc(var(--font-size-base) - 1px);
 }
 
 .MuiMenu-paper {
@@ -115,8 +117,8 @@ input::-ms-reveal, input::-ms-clear {
 }
 
 .primary-text__field .MuiSelect-select {
-  padding: 12px !important;
-  font-size: var(--font-size-base) !important;
+  padding: 8px 10px !important;
+  font-size: calc(var(--font-size-base) - 1px) !important;
 }
 
 /* ================== datetime picker ==================*/
