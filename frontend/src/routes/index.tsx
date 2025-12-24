@@ -8,6 +8,7 @@ import {
     registerUrl,
     warehouseMaterialsURL,
     warehouseProductsURL,
+    seaManagementInvoiceExportURL,
 } from "./urls";
 import Layout from "../modules/app/Layout";
 import Test from "../modules/Test/Test";
@@ -55,6 +56,10 @@ export const createRouterConfig = () =>
                     path: warehouseMaterialsURL,
                     element: <Materials />,
                 },
+                {
+                    path: seaManagementInvoiceExportURL,
+                    element: <Exports />,
+                }
             ],
         },
         {
