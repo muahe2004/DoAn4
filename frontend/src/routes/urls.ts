@@ -9,3 +9,6 @@ export const testURL = "/test";
 export const productsURL = "/products";
 
 export const unitsURL = "/units";
+
+export const FiscalImportDeclarationsURL = "/setup-data-fiscal-years/fiscal-import-declarations";
+export const FiscalExportDeclarationsURL = "/setup-data-fiscal-years/fiscal-export-declarations";

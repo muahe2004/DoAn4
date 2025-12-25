@@ -1,6 +1,6 @@
 /* eslint-disable react-refresh/only-export-components */
 import { createBrowserRouter, Navigate } from "react-router-dom";
-import { homeUrl, layoutUrl, testURL, signinUrl, registerUrl, productsURL, unitsURL } from "./urls";
+import { homeUrl, layoutUrl, testURL, signinUrl, registerUrl, productsURL, unitsURL, FiscalImportDeclarationsURL, FiscalExportDeclarationsURL } from "./urls";
 import Layout from "../modules/app/Layout";
 import Test from "../modules/Test/Test";
 import { NotFound } from "../modules/NotFound/NotFound";
@@ -9,6 +9,8 @@ import Register from "../modules/auth/views/Register";
 import { Products } from "../modules/products/views/Products";
 import { isAuthenticated } from "../modules/auth/services/authState";
 import { Units } from "../modules/units/views/units";
+import SetupFiscalImportDeclarations from "../modules/setup-data-fiscal-years/fiscal-import-declarations/views/import";
+import SetupFiscalExportDeclarations from "../modules/setup-data-fiscal-years/fiscal-export-declarations/views/export";
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
     if (!isAuthenticated()) return <Navigate to={signinUrl} replace />;
@@ -46,7 +48,14 @@ export const createRouterConfig = () =>
                     path: unitsURL,
                     element: <Units/>
                 },
-                
+                {
+                    path: FiscalImportDeclarationsURL,
+                    element: <SetupFiscalImportDeclarations/>
+                },
+                {
+                    path: FiscalExportDeclarationsURL,
+                    element: <SetupFiscalExportDeclarations/>
+                },
             ],
         },
         {

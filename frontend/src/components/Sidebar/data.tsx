@@ -1,4 +1,4 @@
-import { productsURL } from "../../routes/urls";
+import { productsURL, FiscalImportDeclarationsURL, FiscalExportDeclarationsURL } from "../../routes/urls";
 import type { SidebarData } from "./types";
 import { FiBox, FiGrid, FiFileText, FiHome } from "react-icons/fi";
 
@@ -163,15 +163,16 @@ export const sidebarData: SidebarData = [
     icon: <FiFileText />,
     children: [
       {
-        id: "user",
+        id: "apply-import",
         label: "Áp dữ liệu tờ khai nhập",
-        path: "/settings/users",
+        path: FiscalImportDeclarationsURL, 
         icon: <FiFileText />,
       },
+
       {
         id: "apply-export",
         label: "Áp dữ liệu tờ khai xuất",
-        path: "/settings/roles",
+        path: FiscalExportDeclarationsURL,
         icon: <FiFileText />,
       },
       {
