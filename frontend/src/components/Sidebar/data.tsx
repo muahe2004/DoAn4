@@ -1,4 +1,4 @@
-import { productsURL } from "../../routes/urls";
+import { productsURL, normProductInventorysURL } from "../../routes/urls";
 import type { SidebarData } from "./types";
 import { FiBox, FiGrid, FiFileText, FiHome } from "react-icons/fi";
 
@@ -189,7 +189,7 @@ export const sidebarData: SidebarData = [
       {
         id: "apply-product-norm",
         label: "Áp định mức sản phẩm",
-        path: "/settings/roles",
+        path: normProductInventorysURL,
         icon: <FiFileText />,
       },
       {

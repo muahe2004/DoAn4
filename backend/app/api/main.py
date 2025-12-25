@@ -7,7 +7,7 @@ from app.api.routes import (
     login,
     units,
     norms,
-    materials
+    norm_product_inventorys
 )
 
 api_router = APIRouter()
@@ -19,3 +19,4 @@ api_router.include_router(users.router, prefix="/users", tags=["users"])
 api_router.include_router(login.router, prefix="/login", tags=["login"])
 api_router.include_router(units.router, prefix="/units", tags=["units"])
 api_router.include_router(norms.router, prefix="/norms", tags=["norms"])
+api_router.include_router(norm_product_inventorys.router, prefix="/norm-product-inventorys", tags=["norm-product-inventorys"])

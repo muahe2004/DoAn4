@@ -8,3 +8,5 @@ export const registerUrl = "/register";
 export const testURL = "/test";
 export const productsURL = "/products";
 export const normsURL = "/norms";
+export const normProductInventorysURL =
+  "/setup-data-fiscal-years/norm-product-inventorys";
