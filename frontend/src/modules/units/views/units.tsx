@@ -38,7 +38,7 @@ type ImportedUnit = Omit<IUnitResponse, "id"> & {
 
 export function Units() {
   const [page, setPage] = useState(1);
-  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
   const [search, setSearch] = useState("");
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
