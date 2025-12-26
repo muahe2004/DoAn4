@@ -35,7 +35,7 @@ type ImportedProduct = Omit<IProductResponse, "unit_id" | "unit_id_2" | "norm_id
 
 export function Products() {
     const [page, setPage] = useState(1);
-    const [rowsPerPage, setRowsPerPage] = useState(5);
+    const [rowsPerPage, setRowsPerPage] = useState(10);
     const [search, setSearch] = useState("");
     const fileInputRef = useRef<HTMLInputElement | null>(null);
 
@@ -308,7 +308,7 @@ export function Products() {
                         </TableRow>
                     </TableHead>
 
-                    <TableBody>
+                    <TableBody  className="primary-tbody">
                         {products?.data.map((prod) => {
                             const statusKey = prod.status?.toLowerCase?.() ?? "";
                             const badgeClass = STATUS_DISPLAY[statusKey] ? `status-${statusKey}` : "status-unknown";
@@ -325,7 +325,7 @@ export function Products() {
                                             {STATUS_DISPLAY[statusKey] ?? prod.status ?? "Unknown"}
                                         </span>
                                     </TableCell>
-                                    <TableCell align="center" className="custom-border-tcell primary-tcell">
+                                    <TableCell align="center" className="custom-border-tcell primary-tcell"  width={150}>
                                         <IconButton className="primary-edit-btn" size="small" onClick={() => handleOpenEdit(prod)}>
                                             <FiEdit />
                                         </IconButton>

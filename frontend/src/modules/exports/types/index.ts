@@ -38,32 +38,7 @@ export interface IExportDetailView {
   details: IExportDeclarationDetail[];
 }
 
-export interface IExportDeclarationListItem {
-  export_detail_id: string;
-  export_declaration_id: string;
-  export_declaration_number: string;
-  bill_number?: string;
-  licence_date?: string;
-  importer?: string;
-  type_declaration: string;
-  type_inventory: string;
-  shipping_term?: string;
-  status?: string;
-  usd_exchange_rate?: number;
-  currency_id?: string;
-  hs_code: string;
-  product_code: string;
-  product_name: string;
-  origin_country_name?: string;
-  quantity?: number;
-  quantity2?: number;
-  unit_price?: number;
-  unit_price_transport?: number;
-  invoice_value?: number;
-  taxable_price?: number;
-  unit_name?: string;
-  unit_name_2?: string;
-}
+export type IExportDeclarationListItem = IExportDeclarationHeader;
 
 export interface IExportDeclarationListResponse {
   total: number;

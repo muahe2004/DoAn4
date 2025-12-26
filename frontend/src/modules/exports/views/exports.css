@@ -1,29 +1,34 @@
-.export-header {
+.exports-header {
+  margin-bottom: 20px;
+}
+
+.exports-title {
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  margin-bottom: 16px;
 }
 
-.export-heading {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.export-heading__title {
-  font-size: 18px;
+.exports-title__label {
+  font-size: 24px;
   font-weight: 700;
-  margin: 0;
+  color: var(--primary-color);
+  margin-bottom: 4px;
 }
 
-.export-controls {
+.exports-title__subtitle {
+  font-size: 14px;
+  color: var(--secondary-color);
+}
+
+.exports-actions {
   display: flex;
-  flex-direction: column;
+  margin-top: 10px;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
   gap: 12px;
 }
 
-.export-actions {
+.exports-actions__buttons {
   display: flex;
   gap: 8px;
   flex-wrap: wrap;
@@ -77,6 +82,11 @@
   margin: 16px 0 8px;
 }
 
+.export-actions .search-engine__input {
+  min-width: 240px;
+  max-width: 320px;
+}
+
 .export-detail-form-row {
   margin-bottom: 12px;
 }
@@ -87,7 +97,7 @@
   justify-content: center;
 }
 
-.status-draft {
+.status-pending {
   color: #1f78ff;
   background-color: rgba(20, 125, 255, 0.1);
   border-color: rgba(20, 125, 255, 0.4);

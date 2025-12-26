@@ -175,18 +175,18 @@ export const sidebarData: SidebarData = [
     label: "Chuyển đổi dữ liệu",
     icon: <FiBox />,
     children: [
-      {
-        id: "convert-material",
-        label: "Chuyển đổi mã NVL(Nội bộ - Hải quan)",
-        path: convertMaterialsURL,
-        icon: <FiGrid />,
-      },
-      {
-        id: "convert-product",
-        label: "Chuyển đổi mã SP(Nội bộ - Hải quan)",
-        path: convertProductsURL,
-        icon: <FiFileText />,
-      },
+      // {
+      //   id: "convert-material",
+      //   label: "Chuyển đổi mã NVL(Nội bộ - Hải quan)",
+      //   path: convertMaterialsURL,
+      //   icon: <FiGrid />,
+      // },
+      // {
+      //   id: "convert-product",
+      //   label: "Chuyển đổi mã SP(Nội bộ - Hải quan)",
+      //   path: convertProductsURL,
+      //   icon: <FiFileText />,
+      // },
       {
         id: "unit-conversion",
         label: "Bảng quy đổi đơn vị tính",
@@ -212,42 +212,42 @@ export const sidebarData: SidebarData = [
         path: applyExportURL,
         icon: <FiFileText />,
       },
-      {
-        id: "apply-vat",
-        label: "Áp dữ liệu hóa đơn VAT",
-        path: applyVatURL,
-        icon: <FiFileText />,
-      },
-      {
-        id: "apply-purchase",
-        label: "Áp dữ liệu sổ mua hàng",
-        path: applyPurchaseURL,
-        icon: <FiFileText />,
-      },
-      {
-        id: "apply-sales",
-        label: "Áp dữ liệu sổ bán hàng",
-        path: applySalesURL,
-        icon: <FiFileText />,
-      },
+      // {
+      //   id: "apply-vat",
+      //   label: "Áp dữ liệu hóa đơn VAT",
+      //   path: applyVatURL,
+      //   icon: <FiFileText />,
+      // },
+      // {
+      //   id: "apply-purchase",
+      //   label: "Áp dữ liệu sổ mua hàng",
+      //   path: applyPurchaseURL,
+      //   icon: <FiFileText />,
+      // },
+      // {
+      //   id: "apply-sales",
+      //   label: "Áp dữ liệu sổ bán hàng",
+      //   path: applySalesURL,
+      //   icon: <FiFileText />,
+      // },
       {
         id: "apply-product-norm",
         label: "Áp định mức sản phẩm",
         path: applyProductNormURL,
         icon: <FiFileText />,
       },
-      {
-        id: "inventory-material",
-        label: "Tổng hợp tồn kho nvl/sổ kế toán 152",
-        path: applyInventoryMaterialURL,
-        icon: <FiFileText />,
-      },
-      {
-        id: "inventory-product",
-        label: "Tổng hợp tồn kho sp/sổ kế toán 155",
-        path: applyInventoryProductURL,
-        icon: <FiFileText />,
-      },
+      // {
+      //   id: "inventory-material",
+      //   label: "Tổng hợp tồn kho nvl/sổ kế toán 152",
+      //   path: applyInventoryMaterialURL,
+      //   icon: <FiFileText />,
+      // },
+      // {
+      //   id: "inventory-product",
+      //   label: "Tổng hợp tồn kho sp/sổ kế toán 155",
+      //   path: applyInventoryProductURL,
+      //   icon: <FiFileText />,
+      // },
       {
         id: "inventory-from-semi-product",
         label: "Tổng hợp tồn nvl từ bán thành phẩm",

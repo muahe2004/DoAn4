@@ -101,36 +101,9 @@ class ExportDeclarationDetailView(SQLModel):
     details: List[ExportDeclarationDetailResponse]
 
 
-class ExportDeclarationListItem(SQLModel):
-    export_detail_id: UUID
-    export_declaration_id: UUID
-    export_declaration_number: str
-    bill_number: Optional[str] = None
-    licence_date: Optional[datetime] = None
-    importer: Optional[str] = None
-    type_declaration: str
-    type_inventory: str
-    shipping_term: Optional[str] = None
-    status: Optional[str] = None
-    usd_exchange_rate: Optional[float] = None
-    currency_id: Optional[UUID] = None
-    hs_code: str
-    product_code: str
-    product_name: str
-    origin_country_name: Optional[str] = None
-    quantity: Optional[float] = None
-    quantity2: Optional[float] = None
-    unit_price: Optional[float] = None
-    unit_price_transport: Optional[float] = None
-    invoice_value: Optional[float] = None
-    taxable_price: Optional[float] = None
-    unit_name: Optional[str] = None
-    unit_name_2: Optional[str] = None
-
-
 class ExportDeclarationListResponse(SQLModel):
     total: int
-    data: List[ExportDeclarationListItem]
+    data: List[ExportDeclarationHeaderResponse]
 
 
 class ExportDeclarationImportRequest(SQLModel):

@@ -3,7 +3,7 @@ from typing import List, Optional
 from uuid import UUID
 
 from fastapi import HTTPException
-from sqlalchemy import delete, func, or_
+from sqlalchemy import delete, exists, func, or_
 from sqlalchemy.orm import aliased
 from sqlmodel import Session, select
 from starlette import status
@@ -24,7 +24,6 @@ from app.models.schemas.exports.export_declaration_requests_schemas import (
     ExportDeclarationDetailView,
     ExportDeclarationHeaderResponse,
     ExportDeclarationImportRequest,
-    ExportDeclarationListItem,
     ExportDeclarationListResponse,
     ExportDeclarationQueryParams,
     ExportDeclarationUpdate,
@@ -45,42 +44,8 @@ class ExportDeclarationServices:
     def list(
         session: Session, query: ExportDeclarationQueryParams
     ) -> ExportDeclarationListResponse:
-        UnitPrimary = Units
-        UnitSecondary = aliased(Units)
-
-        statement = (
-            select(
-                ExportDeclarationDetails.id.label("export_detail_id"),
-                ExportDeclarations.id.label("export_declaration_id"),
-                ExportDeclarations.export_declaration_number,
-                ExportDeclarations.bill_number,
-                ExportDeclarations.licence_date,
-                ExportDeclarations.importer,
-                ExportDeclarations.type_declaration,
-                ExportDeclarations.type_inventory,
-                ExportDeclarations.shipping_term,
-                ExportDeclarations.status,
-                ExportDeclarations.usd_exchange_rate,
-                ExportDeclarations.currency_id,
-                ExportDeclarationDetails.hs_code,
-                Products.product_code,
-                Products.product_name,
-                Countries.country_name.label("origin_country_name"),
-                ExportDeclarationDetails.quantity,
-                ExportDeclarationDetails.quantity2,
-                ExportDeclarationDetails.unit_price,
-                ExportDeclarationDetails.unit_price_transport,
-                ExportDeclarationDetails.invoice_value,
-                ExportDeclarationDetails.taxable_price,
-                UnitPrimary.unit_name.label("unit_name"),
-                UnitSecondary.unit_name.label("unit_name_2"),
-            )
-            .join(ExportDeclarations, ExportDeclarationDetails.export_declaration_id == ExportDeclarations.id)
-            .join(Products, Products.id == ExportDeclarationDetails.product_id)
-            .join(Countries, Countries.id == ExportDeclarationDetails.origin_country_id)
-            .join(UnitPrimary, UnitPrimary.id == ExportDeclarationDetails.unit_id)
-            .outerjoin(UnitSecondary, UnitSecondary.id == ExportDeclarationDetails.unit_id_2)
-        )
+        statement = select(ExportDeclarations)
+        count_stmt = select(func.count()).select_from(ExportDeclarations)
 
         conditions = []
         if query.start_date:
@@ -93,41 +58,50 @@ class ExportDeclarationServices:
                     f"%{query.export_declaration_number.strip().upper()}%"
                 )
             )
+
         if query.product_code:
-            conditions.append(
-                func.upper(Products.product_code).ilike(f"%{query.product_code.strip().upper()}%")
+            normalized = f"%{query.product_code.strip().upper()}%"
+            product_filter_exists = exists(
+                select(ExportDeclarationDetails.id)
+                .join(Products)
+                .where(
+                    ExportDeclarationDetails.export_declaration_id == ExportDeclarations.id,
+                    func.upper(Products.product_code).ilike(normalized),
+                )
             )
+            conditions.append(product_filter_exists)
+
         if query.search:
             search_term = f"%{query.search.strip().upper()}%"
+            product_search_exists = exists(
+                select(ExportDeclarationDetails.id)
+                .join(Products)
+                .where(
+                    ExportDeclarationDetails.export_declaration_id == ExportDeclarations.id,
+                    func.upper(Products.product_code).ilike(search_term),
+                )
+            )
             conditions.append(
                 or_(
                     func.upper(ExportDeclarations.export_declaration_number).ilike(search_term),
-                    func.upper(Products.product_code).ilike(search_term),
+                    product_search_exists,
                 )
             )
 
         if conditions:
             statement = statement.where(*conditions)
-
-        count_stmt = (
-            select(func.count())
-            .select_from(ExportDeclarationDetails)
-            .join(ExportDeclarations, ExportDeclarationDetails.export_declaration_id == ExportDeclarations.id)
-            .join(Products, Products.id == ExportDeclarationDetails.product_id)
-        )
-        if conditions:
             count_stmt = count_stmt.where(*conditions)
 
         total = session.exec(count_stmt).one()
 
         statement = (
-            statement.order_by(ExportDeclarations.licence_date.desc(), ExportDeclarationDetails.created_at.desc())
+            statement.order_by(ExportDeclarations.licence_date.desc(), ExportDeclarations.updated_at.desc())
             .offset(query.skip)
             .limit(query.limit)
         )
 
         rows = session.exec(statement).all()
-        data = [ExportDeclarationListItem(**row._mapping) for row in rows]
+        data = [ExportDeclarationHeaderResponse(**row.model_dump()) for row in rows]
 
         return ExportDeclarationListResponse(total=total, data=data)
 

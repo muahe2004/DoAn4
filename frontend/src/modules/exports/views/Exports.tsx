@@ -1,14 +1,13 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, type FocusEvent, type MouseEvent } from "react";
 import {
   CircularProgress,
+  Container,
   Grid,
-  Paper,
   Table,
   TableBody,
   TableCell,
   TableContainer,
   TableHead,
-  TablePagination,
   TableRow,
   TextField,
   Typography,
@@ -16,14 +15,20 @@ import {
 import LabelPrimary from "../../../components/Label/Label";
 import Button from "../../../components/Button/Button";
 import { useSnackbar } from "../../../components/SnackBar/SnackBar";
-import ExportDeclarationCreateModal from "../components/ExportDeclarationCreateModal";
-import ExportDetailModal from "../components/ExportDetailModal";
+import ExportDeclarationModal from "../components/ExportDeclarationModal";
 import { useCreateExportDeclaration } from "../apis/createExportDeclaration";
 import { useGetExportDeclarationDetail } from "../apis/getExportDeclarationDetail";
 import { useGetExportDeclarations } from "../apis/getExportDeclarations";
-import { usePostExportDeclaration } from "../apis/postExportDeclaration";
-import type { IExportCreateDetailPayload, IExportCreatePayload } from "../types";
+import type {
+  IExportCreateDetailPayload,
+  IExportCreatePayload,
+} from "../types";
 import "./exports.css";
+import { STATUS_EXPORT_DECLARATION } from "../../../utils/statusDisplay";
+import PrimaryPagination from "../../../components/Pagination/Pagination";
+import OpenInNewIcon from '@mui/icons-material/OpenInNew';
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 
 const formatDate = (value?: string) => (value ? value.split("T")[0] : "-");
 
@@ -33,6 +38,9 @@ const parseExchangeRate = (value?: string) => {
   const parsed = Number(normalized);
   return Number.isNaN(parsed) ? undefined : parsed;
 };
+
+const formatFilterDate = (value?: Date | null) =>
+  value ? value.toISOString().split("T")[0] : undefined;
 
 interface CreateModalHeader {
   export_declaration_number: string;
@@ -49,31 +57,35 @@ export function Exports() {
   const { showSnackbar } = useSnackbar();
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
+  const [dateRange, setDateRange] = useState<[Date | null, Date | null]>([null, null]);
   const [declarationNumber, setDeclarationNumber] = useState("");
   const [productCode, setProductCode] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
   const [createOpen, setCreateOpen] = useState(false);
   const [selectedExportId, setSelectedExportId] = useState<string | null>(null);
 
-  const queryParams = useMemo(
-    () => ({
+  const queryParams = useMemo(() => {
+    const start = formatFilterDate(dateRange[0]);
+    const end = formatFilterDate(dateRange[1]);
+    return {
       skip: page * rowsPerPage,
       limit: rowsPerPage,
-      start_date: startDate || undefined,
-      end_date: endDate || undefined,
+      start_date: start,
+      end_date: end,
       export_declaration_number: declarationNumber || undefined,
       product_code: productCode || undefined,
-    }),
-    [page, rowsPerPage, startDate, endDate, declarationNumber, productCode],
-  );
+      search: searchTerm || undefined,
+    };
+  }, [page, rowsPerPage, dateRange, declarationNumber, productCode, searchTerm]);
 
   const { data, isFetching, refetch } = useGetExportDeclarations(queryParams);
   const detailQuery = useGetExportDeclarationDetail(selectedExportId);
   const createMutation = useCreateExportDeclaration();
-  const postMutation = usePostExportDeclaration();
 
-  const handleCreateSubmit = (header: CreateModalHeader, details: IExportCreateDetailPayload[]) => {
+  const handleCreateSubmit = (
+    header: CreateModalHeader,
+    details: IExportCreateDetailPayload[]
+  ) => {
     const payload: IExportCreatePayload = {
       export_declaration_number: header.export_declaration_number.trim(),
       bill_number: header.bill_number || undefined,
@@ -98,85 +110,35 @@ export function Exports() {
         setSelectedExportId(result.header.id);
       },
       onError: (error: any) => {
-        const message = error?.response?.data?.detail ?? error?.message ?? String(error);
+        const message =
+          error?.response?.data?.detail ?? error?.message ?? String(error);
         showSnackbar({ message, severity: "error" });
       },
     });
   };
 
-  const handlePost = () => {
-    if (!selectedExportId) return;
-    postMutation.mutate(selectedExportId, {
-      onSuccess: () => {
-        showSnackbar({
-          message: "Đã tạo phát sinh xuất kho cho tờ khai",
-          severity: "success",
-        });
-        detailQuery.refetch();
-        refetch();
-      },
-      onError: (error: any) => {
-        const message = error?.response?.data?.detail ?? error?.message ?? String(error);
-        showSnackbar({ message, severity: "error" });
-      },
-    });
+  const ClearFilter = () => {
+    setDateRange([null, null]);
+    setDeclarationNumber("");
+    setProductCode("");
+    setPage(0);
   };
 
   const rows = data?.data ?? [];
 
   return (
-    <div>
-      <div className="export-header">
-        <div className="export-heading">
-          <div>
-            <Typography variant="h5" className="export-heading__title">
-              Danh sách tờ khai xuất
-            </Typography>
-            <Typography variant="body2" color="textSecondary">
-              Chỉ số tờ khai và hàng hóa xuất được hiển thị theo dòng hàng với khả năng truy vết về chi tiết.
-            </Typography>
-          </div>
-          <div className="export-actions">
-            <Button label="Tạo tờ khai" onClick={() => setCreateOpen(true)} />
-            <Button
-              label="Làm mới"
-              variant="text"
-              className="button-variant__text"
-              onClick={() => refetch()}
-            />
-          </div>
+    <Container className="primary-container" maxWidth={false}>
+      <div className="exports-header">
+        <div className="exports-title">
+          <p className="exports-title__label">DANH SÁCH TỜ KHAI XUẤT</p>
         </div>
-
-        <div className="export-controls">
+        <div className="exports-actions">
           <Grid container spacing={2}>
-            <Grid item xs={12} sm={6} md={3}>
-              <LabelPrimary value="Ngày bắt đầu" />
-              <TextField
-                type="date"
-                size="small"
-                className="primary-text__field"
-                fullWidth
-                value={startDate}
-                onChange={(event) => {
-                  setStartDate(event.target.value);
-                  setPage(0);
-                }}
-              />
-            </Grid>
-            <Grid item xs={12} sm={6} md={3}>
-              <LabelPrimary value="Ngày kết thúc" />
-              <TextField
-                type="date"
-                size="small"
-                className="primary-text__field"
-                fullWidth
-                value={endDate}
-                onChange={(event) => {
-                  setEndDate(event.target.value);
-                  setPage(0);
-                }}
-              />
-            </Grid>
+            {/* <Grid item xs={12} sm={6} md={3}>
+              <LabelPrimary value="Ngày" />
+              <LocalizationProvider dateAdapter={AdapterDateFns}>
+              </LocalizationProvider>
+            </Grid> */}
             <Grid item xs={12} sm={6} md={3}>
               <LabelPrimary value="Số tờ khai" />
               <TextField
@@ -192,12 +154,12 @@ export function Exports() {
               />
             </Grid>
             <Grid item xs={12} sm={6} md={3}>
-              <LabelPrimary value="Mã hàng" />
+              <LabelPrimary value="Mã sản phẩm" />
               <TextField
                 size="small"
                 className="primary-text__field"
                 fullWidth
-                placeholder="Nhập mã hàng"
+                placeholder="Nhập mã sản phẩm"
                 value={productCode}
                 onChange={(event) => {
                   setProductCode(event.target.value);
@@ -205,53 +167,122 @@ export function Exports() {
                 }}
               />
             </Grid>
+            <Button
+              label="Làm mới"
+              variant="text"
+              sx={{ backgroundColor: "#000" }}
+              className="button-variant__text"
+              onClick={() => ClearFilter()}
+            />
           </Grid>
+          <div className="exports-actions__buttons">
+            <Button label="Tạo tờ khai" onClick={() => setCreateOpen(true)} />
+          </div>
         </div>
       </div>
 
-      <TableContainer component={Paper} className="primary-table-container">
-        <Table size="small">
+      <TableContainer className="primary-table-container">
+        <Table stickyHeader aria-label="materials table">
           <TableHead className="primary-thead">
             <TableRow>
-              <TableCell className="primary-tcell">STT</TableCell>
-              <TableCell className="primary-tcell">Số tờ khai</TableCell>
-              <TableCell className="primary-tcell">Ngày</TableCell>
-              <TableCell className="primary-tcell">ĐKVC</TableCell>
-              <TableCell className="primary-tcell">Mã HS</TableCell>
-              <TableCell className="primary-tcell">Mã hàng</TableCell>
-              <TableCell className="primary-tcell">Tên hàng</TableCell>
-              <TableCell className="primary-tcell">Đơn vị</TableCell>
-              <TableCell className="primary-tcell">SL</TableCell>
-              <TableCell className="primary-tcell">Trạng thái</TableCell>
+              <TableCell className="primary-tcell" align="center">
+                Số tờ khai
+              </TableCell>
+              <TableCell className="primary-tcell" align="center">
+                Ngày
+              </TableCell>
+              <TableCell className="primary-tcell" align="center">
+                ĐKVC
+              </TableCell>
+              <TableCell className="primary-tcell" align="center">
+                Mã loại hình
+              </TableCell>
+              <TableCell className="primary-tcell" align="center">
+                Loại tồn
+              </TableCell>
+              <TableCell className="primary-tcell" align="center">
+                Trạng thái
+              </TableCell>
             </TableRow>
           </TableHead>
-          <TableBody>
+          <TableBody className="primary-tbody">
             {rows.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={10} align="center">
-                  {isFetching ? "Đang tải dữ liệu..." : "Không có dữ liệu phù hợp"}
+                <TableCell colSpan={6} align="center">
+                  {isFetching
+                    ? "Đang tải dữ liệu..." : "Không có dữ liệu phù hợp"}
                 </TableCell>
               </TableRow>
             ) : (
-              rows.map((row, index) => (
-                <TableRow
-                  key={row.export_detail_id}
-                  hover
-                  onClick={() => setSelectedExportId(row.export_declaration_id)}
-                  sx={{ cursor: "pointer" }}
-                >
-                  <TableCell>{page * rowsPerPage + index + 1}</TableCell>
-                  <TableCell>{row.export_declaration_number}</TableCell>
-                  <TableCell>{formatDate(row.licence_date)}</TableCell>
-                  <TableCell>{row.shipping_term ?? "-"}</TableCell>
-                  <TableCell>{row.hs_code}</TableCell>
-                  <TableCell>{row.product_code}</TableCell>
-                  <TableCell>{row.product_name}</TableCell>
-                  <TableCell>{row.unit_name}</TableCell>
-                  <TableCell>{row.quantity ?? "-"}</TableCell>
-                  <TableCell>{row.status ?? "-"}</TableCell>
-                </TableRow>
-              ))
+              rows.map((row) => {
+                const statusKey = row.status?.toLowerCase?.() ?? "";
+                const badgeClass = STATUS_EXPORT_DECLARATION[statusKey]
+                  ? `status-${statusKey}`
+                  : "status-unknown";
+                const badgeLabel =
+                  STATUS_EXPORT_DECLARATION[statusKey] ??
+                  row.status ??
+                  "-";
+                return (
+                  <TableRow
+                    key={row.id}
+                    hover
+                    sx={{ cursor: "pointer" }}
+                  >
+                    <TableCell
+                      className="custom-border-tcell primary-tcell"
+                      width={150}
+                    >
+                      <Typography
+                        onClick={() => setSelectedExportId(row.id)}
+                        sx={{
+                          textDecoration: "underline",
+                          color: "#1976d2",
+                          cursor: "pointer",
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "2px",
+                        }}
+                      >
+                        {row.export_declaration_number}
+                        <OpenInNewIcon sx={{ fontSize: 16 }} />
+                      </Typography>
+                    </TableCell>
+                    <TableCell
+                      className="custom-border-tcell primary-tcell"
+                      width={100}
+                    >
+                      {formatDate(row.licence_date)}
+                    </TableCell>
+                    <TableCell
+                      className="custom-border-tcell primary-tcell"
+                      width={150}
+                    >
+                      {row.shipping_term ?? "-"}
+                    </TableCell>
+                    <TableCell
+                      className="custom-border-tcell primary-tcell"
+                      width={150}
+                    >
+                      {row.type_declaration}
+                    </TableCell>
+                    <TableCell
+                      className="custom-border-tcell primary-tcell"
+                      width={150}
+                    >
+                      {row.type_inventory}
+                    </TableCell>
+                    <TableCell
+                      className="custom-border-tcell primary-tcell"
+                      width={150}
+                    >
+                      <span className={`status-badge ${badgeClass}`}>
+                        {badgeLabel}
+                      </span>
+                    </TableCell>
+                  </TableRow>
+                );
+              })
             )}
           </TableBody>
         </Table>
@@ -262,34 +293,32 @@ export function Exports() {
         )}
       </TableContainer>
 
-      <TablePagination
-        component="div"
-        count={data?.total ?? 0}
-        page={page}
-        onPageChange={(event, newPage) => setPage(newPage)}
-        rowsPerPage={rowsPerPage}
-        onRowsPerPageChange={(event) => {
-          setRowsPerPage(parseInt(event.target.value, 10));
-          setPage(0);
-        }}
-        rowsPerPageOptions={[10, 20, 50]}
+      <PrimaryPagination
+          totalItems={data?.total || 0}
+          page={page}
+          rowsPerPage={rowsPerPage}
+          onPageChange={(value) => setPage(value)}
+          onRowsPerPageChange={(value) => {
+              setRowsPerPage(value);
+              setPage(1);
+          }}
       />
 
-      <ExportDeclarationCreateModal
+      <ExportDeclarationModal
         open={createOpen}
+        mode="create"
         onClose={() => setCreateOpen(false)}
         onSubmit={handleCreateSubmit}
         loading={createMutation.isPending}
       />
 
-      <ExportDetailModal
+      <ExportDeclarationModal
         open={Boolean(selectedExportId)}
+        mode="detail"
         loading={detailQuery.isFetching}
-        posting={postMutation.isPending}
         data={detailQuery.data ?? null}
         onClose={() => setSelectedExportId(null)}
-        onPost={handlePost}
       />
-    </div>
+    </Container>
   );
 }

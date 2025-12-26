@@ -18,7 +18,7 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: var(--font-family-base);
+  font-family: var(--font-size-base) !important;
 }
 
 body {
@@ -40,7 +40,7 @@ body {
 }
 
 * {
-  font-family: var(--font-family-base);
+  font-family: "SF Pro Display", "Roboto", sans-serif !important;
 }
 
 body {
@@ -154,18 +154,32 @@ input::-ms-reveal, input::-ms-clear {
 
 /* ================== Table ================== */
 .primary-table-container {
-  max-height: 90vh;
+  max-height: 100vh;
   overflow-y: scroll;
   scrollbar-width: none;
   background-color: transparent !important;
   border-radius: 4px !important;
-  border: 1px solid var(--primary-color) !important;
-  /* box-shadow: 6px 6px 12px rgba(0, 0, 0, 0.18); */
+  min-height: 500px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
 
+.table-modal {
+  min-height: 300px !important;
 }
 
 .primary-table-container::-webkit-scrollbar {
   display: none; 
+}
+
+.primary-table-container table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.primary-table-container .primary-tbody {
+  border: 1px solid var(--primary-color) !important;
 }
 
 .primary-thead .MuiTableCell-head {
@@ -179,8 +193,12 @@ input::-ms-reveal, input::-ms-clear {
   border-right: none;
 }
 
+.primary-thead .MuiTableCell-head:first-child {
+  border-left: 1px solid var(--primary-color);
+}
+
 .custom-border-tcell {
-  border-right: 1px solid var(--primary-color);
+  border-right: 1px solid var(--primary-color) !important;
   border-bottom: 1px solid var(--primary-color) !important;
 }
 
