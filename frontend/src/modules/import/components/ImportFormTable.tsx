@@ -93,7 +93,7 @@ export default function ImportFormTable({
                         <TableCell className="primary-tcell" align="center" sx={colSx.action}></TableCell>
                     </TableRow>
                 </TableHead>
-                <TableBody>
+                <TableBody className="primary-tbody">
                     {rows.length === 0 && (
                         <TableRow className="primary-trow">
                                 <TableCell

@@ -23,7 +23,7 @@ export default function PrimaryPagination({
     onPageChange,
     onRowsPerPageChange,
 }: PrimaryPaginationProps) {
-    const totalPages = Math.ceil(totalItems / rowsPerPage);
+    const totalPages = Math.max(1, Math.ceil(totalItems / rowsPerPage));
 
     const handleChangePage = (event: React.ChangeEvent<unknown>, value: number) => {
         onPageChange(value);

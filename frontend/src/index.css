@@ -88,6 +88,10 @@ body {
   min-height: 34px;
 }
 
+.exports-actions__filter-item {
+  cursor: not-allowed !important;
+}
+
 input::-ms-reveal, input::-ms-clear {
   display: none !important;
 }
@@ -166,7 +170,7 @@ input::-ms-reveal, input::-ms-clear {
 }
 
 .table-modal {
-  min-height: 300px !important;
+  min-height: 330px !important;
 }
 
 .primary-table-container::-webkit-scrollbar {

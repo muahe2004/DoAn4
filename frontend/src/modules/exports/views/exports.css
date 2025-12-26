@@ -21,17 +21,16 @@
 
 .exports-actions {
   display: flex;
-  margin-top: 10px;
-  align-items: center;
   justify-content: space-between;
   flex-wrap: wrap;
   gap: 12px;
+  width: auto;
 }
 
-.exports-actions__buttons {
+.exports-actions__filters {
   display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
+  gap: 5px;
+  width: auto;
 }
 
 .export-action-btn {

@@ -1,16 +1,15 @@
 import {
-    IconButton,
     Table,
     TableBody,
     TableCell,
     TableContainer,
     TableHead,
     TableRow,
+    Typography,
 } from "@mui/material";
-import { FiEdit } from "react-icons/fi";
-import { PiTrashSimpleFill } from "react-icons/pi";
 import { STATUS_DISPLAY } from "../../../utils/statusDisplay";
 import type { ImportDeclarationResponse } from "../types";
+import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 
 interface ImportDeclarationTableProps {
     data: ImportDeclarationResponse[];
@@ -21,7 +20,6 @@ interface ImportDeclarationTableProps {
 export default function ImportDeclarationTable({
     data,
     onEdit,
-    onDelete,
 }: ImportDeclarationTableProps) {
     return (
         <TableContainer className="primary-table-container">
@@ -46,10 +44,9 @@ export default function ImportDeclarationTable({
                         <TableCell className="primary-tcell" align="center">
                             Trạng thái
                         </TableCell>
-                        <TableCell className="primary-tcell" align="center"></TableCell>
                     </TableRow>
                 </TableHead>
-                <TableBody>
+                <TableBody className="primary-tbody">
                     {data.length === 0 && (
                         <TableRow className="primary-trow">
                             <TableCell
@@ -71,7 +68,10 @@ export default function ImportDeclarationTable({
                         return (
                             <TableRow className="primary-trow" key={row.id}>
                                 <TableCell className="custom-border-tcell primary-tcell" align="center">
-                                    {row.import_declaration_number}
+                                    <Typography onClick={() => onEdit?.(row)} sx={{ textDecoration: "underline", color: "#1976d2", cursor: "pointer", display: "flex", alignItems: "center", gap: "2px",}} >
+                                        {row.import_declaration_number}
+                                        <OpenInNewIcon sx={{ fontSize: 16 }} />
+                                    </Typography>
                                 </TableCell>
                                 <TableCell className="custom-border-tcell primary-tcell" align="center">
                                     {row.licence_number}
@@ -89,22 +89,6 @@ export default function ImportDeclarationTable({
                                     <span className={`status-badge ${badgeClass}`}>
                                         {STATUS_DISPLAY[statusKey] ?? row.status ?? "Unknown"}
                                     </span>
-                                </TableCell>
-                                <TableCell align="center" className="custom-border-tcell primary-tcell">
-                                    <IconButton
-                                        className="primary-edit-btn"
-                                        size="small"
-                                        onClick={() => onEdit?.(row)}
-                                    >
-                                        <FiEdit />
-                                    </IconButton>
-                                    <IconButton
-                                        className="primary-delete-btn"
-                                        size="small"
-                                        onClick={() => onDelete?.(row)}
-                                    >
-                                        <PiTrashSimpleFill />
-                                    </IconButton>
                                 </TableCell>
                             </TableRow>
                         );

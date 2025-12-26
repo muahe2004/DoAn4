@@ -37,6 +37,7 @@ class CountryServices:
         DEFAULT_COUNTRY_CODE = "DEFAULT"
         
     DEFAULT_COUNTRY_NAME = "Không xác định"
+    DEFAULT_COUNTRY_CODE = "DEFAULT"
     @staticmethod
     def resolve_country_generic(
         session: Session,
@@ -71,7 +72,7 @@ class CountryServices:
 
     @staticmethod
     def ensure_default_country(session: Session) -> Countries:
-        normalized_code = CountryServices.DEFAULT_COUNTRY_CODE
+        normalized_code = CountryServices.DEFAULT_COUNTRY_NAME
         existing = session.exec(
             select(Countries).where(func.upper(Countries.country_code) == normalized_code)
         ).first()

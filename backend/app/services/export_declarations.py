@@ -254,7 +254,12 @@ class ExportDeclarationServices:
                     status_code=status.HTTP_400_BAD_REQUEST,
                     detail="Cần ít nhất một dòng hàng hóa",
                 )
-            ExportDeclarationServices._create_details(session, export_declaration_id, details_payload)
+            normalized_details = ExportDeclarationServices._normalize_detail_payloads(
+                details_payload
+            )
+            ExportDeclarationServices._create_details(
+                session, export_declaration_id, normalized_details
+            )
 
         session.commit()
         session.refresh(declaration)
@@ -422,3 +427,15 @@ class ExportDeclarationServices:
 
         session.add_all(created_details)
         session.flush()
+
+    @staticmethod
+    def _normalize_detail_payloads(
+        raw_payloads: List[ExportDeclarationDetailPayload | dict],
+    ) -> List[ExportDeclarationDetailPayload]:
+        normalized = []
+        for payload in raw_payloads:
+            if isinstance(payload, ExportDeclarationDetailPayload):
+                normalized.append(payload)
+            else:
+                normalized.append(ExportDeclarationDetailPayload(**payload))
+        return normalized

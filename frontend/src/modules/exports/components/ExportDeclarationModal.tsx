@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type ChangeEvent } from "react";
+import { useEffect, useMemo, useRef, useState, type ChangeEvent } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -14,9 +14,9 @@ import {
   TableRow,
   Button as MuiButton,
   CircularProgress,
+  Button,
 } from "@mui/material";
 import LabelPrimary from "../../../components/Label/Label";
-import Button from "../../../components/Button/Button";
 import PrimaryPagination from "../../../components/Pagination/Pagination";
 import type {
   IExportCreateDetailPayload,
@@ -205,6 +205,8 @@ interface ExportDeclarationModalProps {
     header: HeaderState,
     details: IExportCreateDetailPayload[]
   ) => void;
+  onSave?: (header: HeaderState, details: IExportCreateDetailPayload[]) => void;
+  saving?: boolean;
   title?: string;
   loading?: boolean;
   data?: IExportDetailView | null;
@@ -232,22 +234,73 @@ export default function ExportDeclarationModal({
   data,
   posting,
   onPost,
+  onSave,
+  saving = false,
 }: ExportDeclarationModalProps) {
   const isCreateMode = mode === "create";
   const status = data?.header?.status || "draft";
   const [headerData, setHeaderData] = useState<HeaderState>(defaultHeader);
   const [details, setDetails] = useState<IExportCreateDetailPayload[]>([]);
+  const [editableDetails, setEditableDetails] = useState<IExportCreateDetailPayload[]>([]);
+  const [baseDetails, setBaseDetails] = useState<IExportCreateDetailPayload[]>([]);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const handleEditableDetailChange = (
+    index: number,
+    field: keyof IExportCreateDetailPayload,
+    value: string
+  ) => {
+    setEditableDetails((prev) =>
+      prev.map((detail, idx) =>
+        idx === index
+          ? {
+              ...detail,
+              [field]:
+                field === "quantity"
+                  ? value === ""
+                    ? undefined
+                    : Number(value)
+                  : value,
+            }
+          : detail
+      )
+    );
+  };
   const detailRows = data?.details || [];
   const detailHeader = data?.header;
-  const usdExchangeRate = data?.header?.usd_exchange_rate ?? 0;
+  const usdExchangeRate = detailHeader?.usd_exchange_rate ?? 0;
   const calculateVndPrice = (value: number) => value * (usdExchangeRate || 0);
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(5);
-  const paginatedDetailRows = detailRows.slice(
+  const paginatedDetailRows = editableDetails.slice(
     (page - 1) * rowsPerPage,
     (page - 1) * rowsPerPage + rowsPerPage
   );
+  const detailHeaderState: HeaderState = {
+    export_declaration_number: detailHeader?.export_declaration_number ?? "",
+    bill_number: detailHeader?.bill_number ?? "",
+    licence_date: detailHeader?.licence_date?.split("T")[0] ?? "",
+    importer: detailHeader?.importer ?? "",
+    shipping_term: detailHeader?.shipping_term ?? "",
+    type_declaration: detailHeader?.type_declaration ?? "",
+    type_inventory: detailHeader?.type_inventory ?? "",
+    usd_exchange_rate: detailHeader?.usd_exchange_rate?.toString() ?? "",
+  };
+  useEffect(() => {
+    if (!isCreateMode && data?.details) {
+      const mappedDetails = data.details.map((detail) => ({
+        hs_code: detail.hs_code,
+        product_code: detail.product_code,
+        product_name: detail.product_name,
+        origin_country_name: detail.origin_country_name,
+        unit_name: detail.unit_name,
+        quantity: detail.quantity,
+        unit_price: detail.unit_price,
+        status: detail.status ?? "draft",
+      }));
+      setEditableDetails(mappedDetails);
+      setBaseDetails(mappedDetails.map((detail) => ({ ...detail })));
+    }
+  }, [data?.details, isCreateMode]);
 
   useEffect(() => {
     if (isCreateMode && open) {
@@ -298,6 +351,22 @@ export default function ExportDeclarationModal({
     if (!isCreateMode || !onSubmit) return;
     if (!headerData.export_declaration_number || !details.length) return;
     onSubmit(headerData, details);
+  };
+
+  const hasChanges = useMemo(() => {
+    if (editableDetails.length !== baseDetails.length) return true;
+    return editableDetails.some((detail, idx) => {
+      const base = baseDetails[idx];
+      return (
+        detail.product_code !== base?.product_code ||
+        detail.quantity !== base?.quantity
+      );
+    });
+  }, [editableDetails, baseDetails]);
+
+  const handleSave = () => {
+    if (isCreateMode || !onSave || !editableDetails.length || !hasChanges) return;
+    onSave(detailHeaderState, editableDetails);
   };
 
   const getHeaderValue = (field: keyof HeaderState) => {
@@ -378,16 +447,16 @@ export default function ExportDeclarationModal({
             Mã HS
           </TableCell>
           <TableCell className="primary-tcell" align="center">
-            Mã hàng hóa
+            Mã sẩn phẩm
           </TableCell>
           <TableCell className="primary-tcell" align="center">
-            Tên hàng hóa
+            Tên sản phẩm
           </TableCell>
           <TableCell className="primary-tcell" align="center">
             Đơn vị
           </TableCell>
           <TableCell className="primary-tcell" align="center">
-            SL
+            Số lượng
           </TableCell>
           <TableCell className="primary-tcell" align="center">
             Đơn giá
@@ -407,7 +476,10 @@ export default function ExportDeclarationModal({
         </TableRow>
       </TableHead>
       <TableBody className="primary-tbody">
-        {paginatedDetailRows.map((detail) => {
+        {paginatedDetailRows.map((detail, idx) => {
+          const globalIndex = (page - 1) * rowsPerPage + idx;
+          const rowKey =
+            detailRows[globalIndex]?.id ?? `detail-${globalIndex}`;
           const quantity = detail.quantity ?? 0;
           const unitPrice = detail.unit_price ?? 0;
           const dgCifUsd = unitPrice;
@@ -415,7 +487,7 @@ export default function ExportDeclarationModal({
           const tgCifUsd = dgCifUsd * quantity;
           const tgTinhThueVnd = dgTinhThueVnd * quantity;
           return (
-            <TableRow key={detail.id}>
+            <TableRow key={rowKey}>
               <TableCell className="custom-border-tcell primary-tcell">
                 <TextField
                   fullWidth
@@ -425,25 +497,35 @@ export default function ExportDeclarationModal({
                   InputProps={{ readOnly: true, disableUnderline: true }}
                 />
               </TableCell>
-              <TableCell className="custom-border-tcell primary-tcell">
+              <TableCell className="custom-border-tcell primary-tcell" width={180}>
                 <TextField
                   fullWidth
                   value={detail.product_code ?? ""}
-                  variant="standard"
                   size="small"
-                  InputProps={{ readOnly: true, disableUnderline: true }}
+                  onChange={(event) =>
+                    handleEditableDetailChange(
+                      (page - 1) * rowsPerPage + idx,
+                      "product_code",
+                      event.target.value
+                    )
+                  }
                 />
               </TableCell>
-              <TableCell className="custom-border-tcell primary-tcell">
+              <TableCell className="custom-border-tcell primary-tcell" width={250}>
                 <TextField
                   fullWidth
                   value={detail.product_name ?? ""}
                   variant="standard"
+                  sx={{
+                    overflow: "hidden",
+                    maxWidth: 250,
+                    flexWrap: "wrap"
+                  }}
                   size="small"
                   InputProps={{ readOnly: true, disableUnderline: true }}
                 />
               </TableCell>
-              <TableCell className="custom-border-tcell primary-tcell">
+              <TableCell className="custom-border-tcell primary-tcell" width={120}>
                 <TextField
                   fullWidth
                   value={detail.unit_name ?? ""}
@@ -452,13 +534,19 @@ export default function ExportDeclarationModal({
                   InputProps={{ readOnly: true, disableUnderline: true }}
                 />
               </TableCell>
-              <TableCell className="custom-border-tcell primary-tcell">
+              <TableCell className="custom-border-tcell primary-tcell" width={100}>
                 <TextField
                   fullWidth
+                  type="number"
                   value={detail.quantity?.toString() ?? ""}
-                  variant="standard"
                   size="small"
-                  InputProps={{ readOnly: true, disableUnderline: true }}
+                  onChange={(event) =>
+                    handleEditableDetailChange(
+                      (page - 1) * rowsPerPage + idx,
+                      "quantity",
+                      event.target.value
+                    )
+                  }
                 />
               </TableCell>
               <TableCell className="custom-border-tcell primary-tcell">
@@ -522,7 +610,7 @@ export default function ExportDeclarationModal({
     >
       <DialogTitle className="primary-dialog-title">
         {title ??
-          (isCreateMode ? "Tạo tờ khai xuất" : "Chi tiết tờ khai xuất khẩu")}
+          (isCreateMode ? "TẠO TỜ KHAI XUẤT" : "CHI TIẾT TỜ KHAI XUẤT")}
       </DialogTitle>
       <DialogContent className="primary-dialog-content">
         {loading && !data ? (
@@ -569,9 +657,9 @@ export default function ExportDeclarationModal({
                 {isCreateMode ? "DANH SÁCH SẢN PHẨM" : "DANH SÁCH SẢN PHẨM (ĐƠN GIÁ CIF/THUẾ)"}
               </span>
               {isCreateMode && (
-                <MuiButton variant="outlined" onClick={handleImportClick}>
-                  Import sản phẩm
-                </MuiButton>
+                <Button variant="outlined" sx={{ color: "#FFFF"}} onClick={handleImportClick}>
+                  Tải lên Excel sản phẩm
+                </Button>
               )}
             </div>
 
@@ -594,7 +682,7 @@ export default function ExportDeclarationModal({
                           Đơn vị
                         </TableCell>
                         <TableCell className="primary-tcell" align="center">
-                          SL
+                          Số lượng
                         </TableCell>
                         <TableCell className="primary-tcell" align="center">
                           Đơn giá
@@ -644,24 +732,33 @@ export default function ExportDeclarationModal({
           </>
         )}
       </DialogContent>
-      <DialogActions className="primary-dialog-actions export-detail-actions">
+      <DialogActions className="primary-dialog-actions">
         {isCreateMode ? (
           <>
-            <MuiButton onClick={onClose} disabled={loading}>
-              Hủy
-            </MuiButton>
-            <MuiButton
+            <Button onClick={onClose} className="button-cancel" disabled={loading}>
+              HUỶ
+            </Button>
+            <Button
               variant="contained"
               onClick={handleSubmit}
               disabled={loading || !details.length}
             >
-              {loading ? "Đang lưu..." : "Lưu tờ khai"}
-            </MuiButton>
+              {loading ? "ĐANG LƯU..." : "LƯU TỜ KHAI"}
+            </Button>
           </>
         ) : (
-          <Button onClick={onClose} className="button-cancel">
-            Đóng
-          </Button>
+          <>
+            <Button onClick={onClose} className="button-cancel" disabled={saving}>
+              HUỶ
+            </Button>
+            <Button
+              variant="contained"
+              onClick={handleSave}
+              disabled={saving || !editableDetails.length || !hasChanges}
+            >
+            {saving ? "ĐANG LƯU..." : "LƯU"}
+            </Button>
+          </>
         )}
       </DialogActions>
     </Dialog>

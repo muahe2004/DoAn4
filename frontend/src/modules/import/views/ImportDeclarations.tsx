@@ -18,7 +18,7 @@ export function ImportDeclarations() {
     const [openModal, setOpenModal] = useState(false);
     const [selectedDeclaration, setSelectedDeclaration] = useState<ImportDeclarationResponse | null>(null);
     const [page, setPage] = useState(1);
-    const [rowsPerPage, setRowsPerPage] = useState(5);
+    const [rowsPerPage, setRowsPerPage] = useState(10);
     const [search, setSearch] = useState("");
     const { showSnackbar } = useSnackbar();
 
@@ -140,7 +140,7 @@ export function ImportDeclarations() {
         <Container maxWidth={false} className="primary-container">
             <div className="product-header">
                 <div className="product-title">
-                    <p className="product-title__label">TỜ KHAI NHẬP KHẨU</p>
+                    <p className="product-title__label">DANH SÁCH TỜ KHAI NHẬP KHẨU</p>
                 </div>
                 <div className="product-actions">
                     <SearchEngine placeholder="Số tờ khai..." onSearch={handleSearch} />

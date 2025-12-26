@@ -1,4 +1,4 @@
-import { useMemo, useState, type FocusEvent, type MouseEvent } from "react";
+import { useMemo, useState, useCallback } from "react";
 import {
   CircularProgress,
   Container,
@@ -9,26 +9,25 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  TextField,
   Typography,
 } from "@mui/material";
-import LabelPrimary from "../../../components/Label/Label";
 import Button from "../../../components/Button/Button";
+import LabelPrimary from "../../../components/Label/Label";
+import SearchEngine from "../../../components/SearchEngine/SearchEngine";
 import { useSnackbar } from "../../../components/SnackBar/SnackBar";
 import ExportDeclarationModal from "../components/ExportDeclarationModal";
 import { useCreateExportDeclaration } from "../apis/createExportDeclaration";
 import { useGetExportDeclarationDetail } from "../apis/getExportDeclarationDetail";
 import { useGetExportDeclarations } from "../apis/getExportDeclarations";
+import { useUpdateExportDeclaration } from "../apis/updateExportDeclaration";
 import type {
   IExportCreateDetailPayload,
   IExportCreatePayload,
 } from "../types";
 import "./exports.css";
-import { STATUS_EXPORT_DECLARATION } from "../../../utils/statusDisplay";
+import { STATUS_DISPLAY } from "../../../utils/statusDisplay";
 import PrimaryPagination from "../../../components/Pagination/Pagination";
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 
 const formatDate = (value?: string) => (value ? value.split("T")[0] : "-");
 
@@ -53,9 +52,9 @@ interface CreateModalHeader {
   usd_exchange_rate?: string;
 }
 
-export function Exports() {
+export function ExportDeclaration() {
   const { showSnackbar } = useSnackbar();
-  const [page, setPage] = useState(0);
+  const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [dateRange, setDateRange] = useState<[Date | null, Date | null]>([null, null]);
   const [declarationNumber, setDeclarationNumber] = useState("");
@@ -68,7 +67,7 @@ export function Exports() {
     const start = formatFilterDate(dateRange[0]);
     const end = formatFilterDate(dateRange[1]);
     return {
-      skip: page * rowsPerPage,
+      skip: (page - 1) * rowsPerPage,
       limit: rowsPerPage,
       start_date: start,
       end_date: end,
@@ -81,6 +80,7 @@ export function Exports() {
   const { data, isFetching, refetch } = useGetExportDeclarations(queryParams);
   const detailQuery = useGetExportDeclarationDetail(selectedExportId);
   const createMutation = useCreateExportDeclaration();
+  const updateMutation = useUpdateExportDeclaration();
 
   const handleCreateSubmit = (
     header: CreateModalHeader,
@@ -117,11 +117,60 @@ export function Exports() {
     });
   };
 
+  const handleDetailSave = (
+    header: CreateModalHeader,
+    details: IExportCreateDetailPayload[]
+  ) => {
+    if (!selectedExportId) return;
+    const payload: IExportCreatePayload = {
+      export_declaration_number: header.export_declaration_number.trim(),
+      bill_number: header.bill_number || undefined,
+      licence_date: header.licence_date || undefined,
+      importer: header.importer || undefined,
+      shipping_term: header.shipping_term || undefined,
+      type_declaration: header.type_declaration,
+      type_inventory: header.type_inventory,
+      usd_exchange_rate: parseExchangeRate(header.usd_exchange_rate),
+      status: "draft",
+      details,
+    };
+
+    updateMutation.mutate(
+      { id: selectedExportId, data: payload },
+      {
+        onSuccess: (result) => {
+          showSnackbar({
+            message: `Cập nhật tờ khai ${result.header.export_declaration_number} thành công`,
+            severity: "success",
+          });
+          detailQuery.refetch();
+          refetch();
+          setSelectedExportId(result.header.id);
+        },
+        onError: (error: any) => {
+          const message =
+            error?.response?.data?.detail ?? error?.message ?? String(error);
+          showSnackbar({ message, severity: "error" });
+        },
+      }
+    );
+  };
+
+  const handleDeclarationSearch = useCallback((value: string) => {
+    setDeclarationNumber(value);
+    setPage(1);
+  }, []);
+
+  const handleProductSearch = useCallback((value: string) => {
+    setProductCode(value);
+    setPage(1);
+  }, []);
+
   const ClearFilter = () => {
     setDateRange([null, null]);
     setDeclarationNumber("");
     setProductCode("");
-    setPage(0);
+    setPage(1);
   };
 
   const rows = data?.data ?? [];
@@ -130,53 +179,32 @@ export function Exports() {
     <Container className="primary-container" maxWidth={false}>
       <div className="exports-header">
         <div className="exports-title">
-          <p className="exports-title__label">DANH SÁCH TỜ KHAI XUẤT</p>
+          <p className="exports-title__label">DANH SÁCH TỜ KHAI XUẤT KHẨU</p>
         </div>
         <div className="exports-actions">
-          <Grid container spacing={2}>
-            {/* <Grid item xs={12} sm={6} md={3}>
-              <LabelPrimary value="Ngày" />
-              <LocalizationProvider dateAdapter={AdapterDateFns}>
-              </LocalizationProvider>
-            </Grid> */}
-            <Grid item xs={12} sm={6} md={3}>
-              <LabelPrimary value="Số tờ khai" />
-              <TextField
-                size="small"
-                className="primary-text__field"
-                fullWidth
+          <Grid container spacing={1} className="exports-actions__filters">
+            <Grid size={5} className="exports-actions__filter-item">
+              <SearchEngine
                 placeholder="Nhập số tờ khai"
-                value={declarationNumber}
-                onChange={(event) => {
-                  setDeclarationNumber(event.target.value);
-                  setPage(0);
-                }}
+                onSearch={handleDeclarationSearch}
               />
             </Grid>
-            <Grid item xs={12} sm={6} md={3}>
-              <LabelPrimary value="Mã sản phẩm" />
-              <TextField
-                size="small"
-                className="primary-text__field"
-                fullWidth
+            <Grid size={5}>
+              <SearchEngine
                 placeholder="Nhập mã sản phẩm"
-                value={productCode}
-                onChange={(event) => {
-                  setProductCode(event.target.value);
-                  setPage(0);
-                }}
+                onSearch={handleProductSearch}
               />
             </Grid>
-            <Button
-              label="Làm mới"
-              variant="text"
-              sx={{ backgroundColor: "#000" }}
-              className="button-variant__text"
-              onClick={() => ClearFilter()}
-            />
+            <Grid size={2}>
+              <Button
+                label="Làm mới"
+                className="button-variant__text"
+                onClick={() => ClearFilter()}
+              />
+            </ Grid>
           </Grid>
           <div className="exports-actions__buttons">
-            <Button label="Tạo tờ khai" onClick={() => setCreateOpen(true)} />
+            <Button className="product-action-btn" label="Tạo tờ khai" onClick={() => setCreateOpen(true)} />
           </div>
         </div>
       </div>
@@ -189,7 +217,7 @@ export function Exports() {
                 Số tờ khai
               </TableCell>
               <TableCell className="primary-tcell" align="center">
-                Ngày
+                Ngày cấp phép
               </TableCell>
               <TableCell className="primary-tcell" align="center">
                 ĐKVC
@@ -216,11 +244,11 @@ export function Exports() {
             ) : (
               rows.map((row) => {
                 const statusKey = row.status?.toLowerCase?.() ?? "";
-                const badgeClass = STATUS_EXPORT_DECLARATION[statusKey]
+                const badgeClass = STATUS_DISPLAY[statusKey]
                   ? `status-${statusKey}`
                   : "status-unknown";
                 const badgeLabel =
-                  STATUS_EXPORT_DECLARATION[statusKey] ??
+                  STATUS_DISPLAY[statusKey] ??
                   row.status ??
                   "-";
                 return (
@@ -275,6 +303,7 @@ export function Exports() {
                     <TableCell
                       className="custom-border-tcell primary-tcell"
                       width={150}
+                      align="center"
                     >
                       <span className={`status-badge ${badgeClass}`}>
                         {badgeLabel}
@@ -318,6 +347,8 @@ export function Exports() {
         loading={detailQuery.isFetching}
         data={detailQuery.data ?? null}
         onClose={() => setSelectedExportId(null)}
+        onSave={handleDetailSave}
+        saving={updateMutation.isPending}
       />
     </Container>
   );
