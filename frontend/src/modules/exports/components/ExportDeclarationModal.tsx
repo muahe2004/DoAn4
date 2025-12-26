@@ -657,7 +657,7 @@ export default function ExportDeclarationModal({
                 {isCreateMode ? "DANH SÁCH SẢN PHẨM" : "DANH SÁCH SẢN PHẨM (ĐƠN GIÁ CIF/THUẾ)"}
               </span>
               {isCreateMode && (
-                <Button variant="outlined" sx={{ color: "#FFFF"}} onClick={handleImportClick}>
+                <Button variant="outlined" onClick={handleImportClick}>
                   Tải lên Excel sản phẩm
                 </Button>
               )}

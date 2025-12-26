@@ -13,7 +13,6 @@ from app.models.schemas.countries.country_schemas import (
     CountryDropdownResponse,
     CountryQueryParams,
 )
-from app.enums.status import StatusEnum
 
 class CountryServices:
     @staticmethod
@@ -43,7 +42,32 @@ class CountryServices:
         ]
 
     @staticmethod
+    def ensure_default_country(session: Session) -> Countries:
+        DEFAULT_CODE = "VN"
+        DEFAULT_NAME = "Việt Nam"
+        existing = session.exec(
+            select(Countries).where(func.upper(Countries.country_code) == DEFAULT_CODE.upper())
+        ).first()
+        if existing:
+            return existing
+
+        payload = CountryCreate(
+            country_code=DEFAULT_CODE,
+            country_name=DEFAULT_NAME,
+            description="Đơn vị móc định",
+            status=StatusEnum.ACTIVE,
+        )
+        country = Countries(**payload.model_dump())
+        session.add(country)
+        session.commit()
+        session.refresh(country)
+        return country
+
+    @staticmethod
     def resolve_country_generic(session, country_id, country_code, country_name):
+        if not country_id and not country_code and not country_name:
+            default_country = CountryServices.ensure_default_country(session)
+            return default_country.id
         if country_id:
             existing_by_id = session.get(Countries, country_id)
             if existing_by_id:

@@ -196,7 +196,7 @@ class ExportDeclarationServices:
             type_declaration=payload.type_declaration,
             type_inventory=payload.type_inventory,
             shipping_term=payload.shipping_term,
-            status=payload.status or "draft",
+            status=payload.status or "active",
         )
 
         session.add(declaration)
