@@ -2,6 +2,7 @@ import uuid
 
 from app.models.schemas.products.product_schemas import ProductCreate, ProductDeleteResponse, ProductListResponse, ProductPublic, ProductQueryParams, ProductUpdate
 from app.models.schemas.materials.material_schemas import MaterialCreate, MaterialDeleteResponse, MaterialListResponse, MaterialPublic, MaterialQueryParams, MaterialUpdate
+from app.models.schemas.common.query import BaseQueryParams
 from app.services.materials import MaterialServices
 from fastapi import APIRouter, Depends, Request
 from app.api.deps import SessionDep
@@ -9,6 +10,11 @@ from app.services.products import ProductServices
 from typing import List
 
 router = APIRouter()
+
+# =========================== dropdown materials ===========================
+@router.get("/drop-down")
+def dropdown_materials(session: SessionDep, query: BaseQueryParams = Depends()):
+    return MaterialServices.dropdown(session=session, query=query)
 
 # =========================== get all materials ===========================
 @router.get("")

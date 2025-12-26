@@ -1,6 +1,6 @@
-import axios, {AxiosError} from "axios";
+import axios, { AxiosError } from "axios";
 import { useQuery } from "@tanstack/react-query";
-import { URL_API_NORM } from "../../../constants/config";
+import { URL_API_NORM } from "../../../../constants/config";
 import type { NormDropdownResponse } from "../types/index";
 
 export interface Params {
@@ -8,7 +8,9 @@ export interface Params {
   limit: number;
 }
 
-const getDropdownNorms = async (params: Params): Promise<NormDropdownResponse[]> => {
+const getDropdownNorms = async (
+  params: Params
+): Promise<NormDropdownResponse[]> => {
   try {
     const res = await axios.get<NormDropdownResponse[]>(
       `${URL_API_NORM}/drop-down`,
@@ -22,13 +24,13 @@ const getDropdownNorms = async (params: Params): Promise<NormDropdownResponse[]>
     if (axios.isAxiosError(error)) {
       throw error;
     }
-    throw new Error('Unexpected error');
+    throw new Error("Unexpected error");
   }
 };
 
 export const useGetDropdownNorms = (params: Params) => {
   return useQuery<NormDropdownResponse[], AxiosError<{ detail?: string }>>({
-    queryKey: ['norms', params],
+    queryKey: ["norms", params],
     queryFn: () => getDropdownNorms(params),
   });
 };
