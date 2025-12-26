@@ -11,6 +11,42 @@ from app.enums.status import StatusEnum
 
 class UnitServices:
     @staticmethod
+    def get_list(*, session: Session, query: UnitQueryParams):
+        # Count total items
+        count_statement = select(func.count(Units.id))
+        conditions = []
+        
+        if query.status:
+            conditions.append(Units.status == query.status)
+        if query.type:
+            conditions.append(Units.type == query.type)
+        if query.search:
+            conditions.append(Units.unit_name.ilike(f"%{query.search}%"))
+
+        if conditions:
+            count_statement = count_statement.where(*conditions)
+        
+        total = session.exec(count_statement).one()
+
+        # Get data
+        statement = select(Units)
+        if conditions:
+            statement = statement.where(*conditions)
+
+        statement = (
+            statement.order_by(Units.created_at.desc())
+            .offset(query.skip)
+            .limit(query.limit)
+        )
+
+        units = session.exec(statement).all()
+        
+        return {
+            "data": [UnitPublic.model_validate(unit) for unit in units],
+            "total": total
+        }
+
+    @staticmethod
     def dropdown(*, session: Session, query: UnitQueryParams) -> list[UnitDropdownResponse]:
         statement = select(Units.id, Units.unit_name)
 
@@ -132,6 +168,31 @@ class UnitServices:
 
         session.commit()
         return UnitPublic.model_validate(unit)
+
+    @staticmethod
+    def delete(
+        *,
+        session: Session,
+        unit_id: uuid.UUID
+    ) -> UnitDeleteResponse:
+        try:
+            unit = session.get(Units, unit_id)
+
+            if not unit:
+                return UnitDeleteResponse(id=str(unit_id), message="Unit not found")
+
+            if unit.status == StatusEnum.ACTIVE:
+                unit.status = StatusEnum.INACTIVE
+                session.commit()
+                message = "Unit set to inactive successfully"
+            else:
+                message = "Unit already inactive"
+
+            return UnitDeleteResponse(id=str(unit_id), message=message)
+
+        except Exception as e:
+            session.rollback()
+            return UnitDeleteResponse(id=str(unit_id), message=f"Error deleting unit: {str(e)}")
 
     @staticmethod
     def delete_many(

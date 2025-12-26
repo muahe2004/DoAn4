@@ -11,6 +11,8 @@ import {
     seaManagementInvoiceImportURL,
     standardNormsURL,
     seaManagementInvoiceExportURL,
+    unitsURL,
+    unitConversionURL
 } from "./urls";
 import Layout from "../modules/app/Layout";
 import Test from "../modules/Test/Test";
@@ -23,6 +25,8 @@ import { isAuthenticated } from "../modules/auth/services/authState";
 import { ExportDeclaration } from "../modules/exports/views/Exports";
 import { ImportDeclarations } from "../modules/import/views/ImportDeclarations";
 import { Norms } from "../modules/standard-management/norms/views/Norms";
+import { Units } from "../modules/units/views/units";
+import  UoM  from "../modules/units/views/UoM";
 
 /* ===== Route Guards ===== */
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
@@ -77,6 +81,14 @@ export const createRouterConfig = () =>
                 {
                     path: standardNormsURL,
                     element: <Norms />,
+                },
+                {
+                    path: unitsURL,
+                    element: <Units />,
+                },
+                {
+                    path: unitConversionURL,
+                    element: <UoM />,
                 },
             ],
         },
