@@ -21,9 +21,9 @@
 }
 
 .button-variant__text {
-    background: transparent !important;
-    padding: 0 !important; 
-    color: var(--primary-color) !important;
+    background-color: var(--primary-color) !important;
+    padding: 3 !important; 
+    color: #FFF !important;
 }
 
 .button-secondary {

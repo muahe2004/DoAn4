@@ -1,6 +1,12 @@
+import uuid
+from typing import Optional
+
 from fastapi import HTTPException
 from sqlmodel import Session, select
 from sqlalchemy import func
+from sqlmodel import Session, select
+
+from app.enums.status import StatusEnum
 from app.models.models import Countries
 from app.models.schemas.countries.country_schemas import (
     CountryCreate,

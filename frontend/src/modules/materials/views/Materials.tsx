@@ -123,9 +123,6 @@ export function Materials() {
                     <TableHead className="primary-thead">
                         <TableRow>
                             <TableCell className="primary-tcell" align="center">
-                                STT
-                            </TableCell>
-                            <TableCell className="primary-tcell" align="center">
                                 Mã nguyên vật liệu
                             </TableCell>
                             <TableCell className="primary-tcell" align="center">
@@ -140,16 +137,26 @@ export function Materials() {
                             <TableCell className="primary-tcell" align="center"></TableCell>
                         </TableRow>
                     </TableHead>
-                    <TableBody>
+                    <TableBody className="primary-tbody">
                         {materials?.data?.map((material, index) => {
                             const statusKey = material.status?.toLowerCase?.() ?? "";
                             const badgeClass = STATUS_DISPLAY[statusKey] ? `status-${statusKey}` : "status-unknown";
+                            if (materials.data.length === 0) {
+                                return (
+                                    <TableRow key="no-data">
+                                        <TableCell
+                                            className="custom-border-tcell primary-tcell"
+                                            align="center"
+                                            colSpan={6}
+                                        >
+                                            Không có dữ liệu
+                                        </TableCell>
+                                    </TableRow>
+                                );
+                            }
 
                             return (
                                 <TableRow className="primary-trow" key={material.id ?? index}>
-                                    <TableCell className="custom-border-tcell primary-tcell" align="center">
-                                        {(page - 1) * rowsPerPage + index + 1}
-                                    </TableCell>
                                     <TableCell className="custom-border-tcell primary-tcell">
                                         {material.material_code}
                                     </TableCell>
@@ -164,7 +171,7 @@ export function Materials() {
                                             {STATUS_DISPLAY[statusKey] ?? material.status ?? "Unknown"}
                                         </span>
                                     </TableCell>
-                                    <TableCell className="custom-border-tcell primary-tcell" align="center">
+                                    <TableCell className="custom-border-tcell primary-tcell" align="center" width={150}>
                                         <IconButton
                                             className="primary-edit-btn"
                                             size="small"
