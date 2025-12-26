@@ -163,14 +163,14 @@ input::-ms-reveal, input::-ms-clear {
   scrollbar-width: none;
   background-color: transparent !important;
   border-radius: 4px !important;
-  min-height: 500px;
+  min-height: 620px;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
 }
 
 .table-modal {
-  min-height: 330px !important;
+  min-height: 350px !important;
 }
 
 .primary-table-container::-webkit-scrollbar {

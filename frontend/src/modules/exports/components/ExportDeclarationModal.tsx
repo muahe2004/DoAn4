@@ -50,6 +50,15 @@ const defaultHeader: HeaderState = {
   usd_exchange_rate: "",
 };
 
+const detailInputNoUnderlineSx = {
+  "& .MuiInput-root:before, & .MuiInput-root:after": {
+    borderBottom: "none",
+  },
+  "& .MuiInput-root:hover:not(.Mui-disabled):before": {
+    borderBottom: "none",
+  },
+};
+
 const HEADER_ALIASES: Record<string, string[]> = {
   export_declaration_number: ["số_tờ_khai", "số tk", "số tờ khai", "số tk"],
   licence_date: ["ngày khai", "ngày đk", "ngày đăng ký"],
@@ -59,11 +68,14 @@ const HEADER_ALIASES: Record<string, string[]> = {
   type_declaration: ["mã loại hình"],
   type_inventory: ["loại tồn"],
   usd_exchange_rate: ["tỷ giá"],
-  hs_code: ["mã hs"],
-  product_code: ["mã hàng hóa", "mã sp", "mã npl", "mã npl/sp"],
+  origin_country_code: ["mã qg", "mã quốc gia", "country code", "origin country"],
+  origin_country_name: ["quốc gia", "tên quốc gia"],
+  hs_code: ["HS Code"],
+  product_code: ["Product Code"],
+  product_name: ["Product Name"],
   unit_name: ["đơn vị tính"],
   quantity: ["số lượng", "sl"],
-  unit_price: ["đơn giá"],
+  unit_price: ["Unit Price"],
 };
 
 const normalizeHeaderCell = (cell: unknown) =>
@@ -129,6 +141,8 @@ const extractDetailsFromSheet = (
   const typeDeclarationColumn = columnIndex(HEADER_ALIASES.type_declaration);
   const typeInventoryColumn = columnIndex(HEADER_ALIASES.type_inventory);
   const usdColumn = columnIndex(HEADER_ALIASES.usd_exchange_rate);
+  const originCountryCodeColumn = columnIndex(HEADER_ALIASES.origin_country_code);
+  const originCountryNameColumn = columnIndex(HEADER_ALIASES.origin_country_name);
   const normalizeNumber = (row: unknown[], col: number) =>
     col >= 0 ? parseNumber(row[col]) : undefined;
   const readValue = (row: unknown[], col: number) =>
@@ -146,7 +160,12 @@ const extractDetailsFromSheet = (
         row,
         productNameColumn >= 0 ? productNameColumn : productColumn
       ),
-      origin_country_name: undefined,
+      origin_country_name: originCountryNameColumn >= 0
+        ? readValue(row, originCountryNameColumn)
+        : originCountryCodeColumn >= 0
+          ? readValue(row, originCountryCodeColumn)
+          : undefined,
+      origin_country_code: readValue(row, originCountryCodeColumn),
       unit_name: readValue(row, unitColumn),
       quantity: normalizeNumber(row, quantityColumn),
       unit_price: normalizeNumber(row, unitPriceColumn),
@@ -423,6 +442,9 @@ export default function ExportDeclarationModal({
               {detail.product_name}
             </TableCell>
             <TableCell className="custom-border-tcell primary-tcell">
+              {detail.origin_country_code ?? detail.origin_country_name ?? "-"}
+            </TableCell>
+            <TableCell className="custom-border-tcell primary-tcell">
               {detail.unit_name}
             </TableCell>
             <TableCell
@@ -451,6 +473,9 @@ export default function ExportDeclarationModal({
           </TableCell>
           <TableCell className="primary-tcell" align="center">
             Tên sản phẩm
+          </TableCell>
+          <TableCell className="primary-tcell" align="center">
+            Mã quốc gia
           </TableCell>
           <TableCell className="primary-tcell" align="center">
             Đơn vị
@@ -494,6 +519,7 @@ export default function ExportDeclarationModal({
                   value={detail.hs_code ?? ""}
                   variant="standard"
                   size="small"
+                  sx={detailInputNoUnderlineSx}
                   InputProps={{ readOnly: true, disableUnderline: true }}
                 />
               </TableCell>
@@ -502,6 +528,7 @@ export default function ExportDeclarationModal({
                   fullWidth
                   value={detail.product_code ?? ""}
                   size="small"
+                  sx={detailInputNoUnderlineSx}
                   onChange={(event) =>
                     handleEditableDetailChange(
                       (page - 1) * rowsPerPage + idx,
@@ -517,11 +544,22 @@ export default function ExportDeclarationModal({
                   value={detail.product_name ?? ""}
                   variant="standard"
                   sx={{
+                    ...detailInputNoUnderlineSx,
                     overflow: "hidden",
                     maxWidth: 250,
-                    flexWrap: "wrap"
+                    flexWrap: "wrap",
                   }}
                   size="small"
+                  InputProps={{ readOnly: true, disableUnderline: true }}
+                />
+              </TableCell>
+              <TableCell className="custom-border-tcell primary-tcell" width={150}>
+                <TextField
+                  fullWidth
+                  value={detail.origin_country_code ?? detail.origin_country_name ?? ""}
+                  variant="standard"
+                  size="small"
+                  sx={detailInputNoUnderlineSx}
                   InputProps={{ readOnly: true, disableUnderline: true }}
                 />
               </TableCell>
@@ -531,7 +569,8 @@ export default function ExportDeclarationModal({
                   value={detail.unit_name ?? ""}
                   variant="standard"
                   size="small"
-                  InputProps={{ readOnly: true, disableUnderline: true }}
+                  sx={detailInputNoUnderlineSx}
+                  InputProps={{ readOnly: true, disableUnderline: true  }}
                 />
               </TableCell>
               <TableCell className="custom-border-tcell primary-tcell" width={100}>
@@ -540,6 +579,7 @@ export default function ExportDeclarationModal({
                   type="number"
                   value={detail.quantity?.toString() ?? ""}
                   size="small"
+                  sx={detailInputNoUnderlineSx}
                   onChange={(event) =>
                     handleEditableDetailChange(
                       (page - 1) * rowsPerPage + idx,
@@ -555,6 +595,7 @@ export default function ExportDeclarationModal({
                   value={detail.unit_price?.toString() ?? ""}
                   variant="standard"
                   size="small"
+                  sx={detailInputNoUnderlineSx}
                   InputProps={{ readOnly: true, disableUnderline: true }}
                 />
               </TableCell>
@@ -564,6 +605,7 @@ export default function ExportDeclarationModal({
                   value={formatUsd(dgCifUsd)}
                   variant="standard"
                   size="small"
+                  sx={detailInputNoUnderlineSx}
                   InputProps={{ readOnly: true, disableUnderline: true }}
                 />
               </TableCell>
@@ -573,6 +615,7 @@ export default function ExportDeclarationModal({
                   value={formatVnd(dgTinhThueVnd)}
                   variant="standard"
                   size="small"
+                  sx={detailInputNoUnderlineSx}
                   InputProps={{ readOnly: true, disableUnderline: true }}
                 />
               </TableCell>
@@ -582,6 +625,7 @@ export default function ExportDeclarationModal({
                   value={formatUsd(tgCifUsd)}
                   variant="standard"
                   size="small"
+                  sx={detailInputNoUnderlineSx}
                   InputProps={{ readOnly: true, disableUnderline: true }}
                 />
               </TableCell>
@@ -591,6 +635,7 @@ export default function ExportDeclarationModal({
                   value={formatVnd(tgTinhThueVnd)}
                   variant="standard"
                   size="small"
+                  sx={detailInputNoUnderlineSx}
                   InputProps={{ readOnly: true, disableUnderline: true }}
                 />
               </TableCell>
@@ -675,24 +720,27 @@ export default function ExportDeclarationModal({
                         <TableCell className="primary-tcell" align="center">
                           Mã sản phẩm
                         </TableCell>
-                        <TableCell className="primary-tcell" align="center">
-                          Tên sản phẩm
-                        </TableCell>
-                        <TableCell className="primary-tcell" align="center">
-                          Đơn vị
-                        </TableCell>
-                        <TableCell className="primary-tcell" align="center">
-                          Số lượng
-                        </TableCell>
-                        <TableCell className="primary-tcell" align="center">
-                          Đơn giá
-                        </TableCell>
-                      </TableRow>
-                    </TableHead>
+                      <TableCell className="primary-tcell" align="center">
+                        Tên sản phẩm
+                      </TableCell>
+                      <TableCell className="primary-tcell" align="center">
+                        Mã QG
+                      </TableCell>
+                      <TableCell className="primary-tcell" align="center">
+                        Đơn vị
+                      </TableCell>
+                      <TableCell className="primary-tcell" align="center">
+                        Số lượng
+                      </TableCell>
+                      <TableCell className="primary-tcell" align="center">
+                        Đơn giá
+                      </TableCell>
+                    </TableRow>
+                  </TableHead>
                     {details.length === 0 ? (
                       <TableBody className="primary-tbody">
                         <TableRow>
-                          <TableCell colSpan={6} align="center">
+                        <TableCell colSpan={7} align="center">
                             Chưa có sản phẩm nào
                           </TableCell>
                         </TableRow>

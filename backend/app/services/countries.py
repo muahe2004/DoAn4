@@ -79,16 +79,13 @@ class CountryServices:
                 )
         
         if not country_code or not country_code.strip():
-            raise HTTPException(
-                status_code=400,
-                detail="Country code must be provided."
-            )
-
-        if not country_name or not country_name.strip():
-            raise HTTPException(
-                status_code=400,
-                detail="Country name must be provided."
-            )
+            if country_name and country_name.strip():
+                country_code = country_name.strip()
+            else:
+                raise HTTPException(
+                    status_code=400,
+                    detail="Country code must be provided."
+                )
 
         existing_by_code = session.exec(
             select(Countries).where(
@@ -98,9 +95,12 @@ class CountryServices:
         if existing_by_code:
             return existing_by_code.id
 
+        effective_name = (country_name or country_code).strip()
+        trimmed_code = country_code.strip()[:10]
+
         payload = CountryCreate(
-            country_name=country_name.strip(),
-            country_code=country_code.strip(),
+            country_name=effective_name,
+            country_code=trimmed_code,
             description="",
             status=StatusEnum.ACTIVE,
         )
