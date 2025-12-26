@@ -170,7 +170,7 @@ input::-ms-reveal, input::-ms-clear {
 }
 
 .table-modal {
-  min-height: 350px !important;
+  min-height: 360px !important;
 }
 
 .primary-table-container::-webkit-scrollbar {

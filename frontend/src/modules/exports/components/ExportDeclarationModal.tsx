@@ -12,7 +12,6 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  Button as MuiButton,
   CircularProgress,
   Button,
 } from "@mui/material";
@@ -257,7 +256,7 @@ export default function ExportDeclarationModal({
   saving = false,
 }: ExportDeclarationModalProps) {
   const isCreateMode = mode === "create";
-  const status = data?.header?.status || "draft";
+  const status = data?.header?.status || "active";
   const [headerData, setHeaderData] = useState<HeaderState>(defaultHeader);
   const [details, setDetails] = useState<IExportCreateDetailPayload[]>([]);
   const [editableDetails, setEditableDetails] = useState<IExportCreateDetailPayload[]>([]);
@@ -314,7 +313,7 @@ export default function ExportDeclarationModal({
         unit_name: detail.unit_name,
         quantity: detail.quantity,
         unit_price: detail.unit_price,
-        status: detail.status ?? "draft",
+        status: detail.status ?? "active",
       }));
       setEditableDetails(mappedDetails);
       setBaseDetails(mappedDetails.map((detail) => ({ ...detail })));

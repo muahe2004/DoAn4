@@ -58,8 +58,7 @@ export default function ImportFormTable({
 
     return (
         <TableContainer
-            className="primary-table-container"
-            sx={{ maxHeight: "45vh" }}
+            className="primary-table-container table-modal"
         >
             <Table stickyHeader aria-label="import materials table">
                 <TableHead className="primary-thead">
