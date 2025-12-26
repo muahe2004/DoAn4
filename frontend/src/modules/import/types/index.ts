@@ -54,6 +54,8 @@ export interface ImportDeclarationMaterialPayload {
     unit_name_2?: string | null;
     description?: string | null;
     country_id?: string | null;
+    country_code?: string | null;
+    country_name?: string | null;
     status?: string | null;
     quantity?: number | null;
     quantity2?: number | null;
