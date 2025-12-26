@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import {
   Dialog,
   DialogActions,
@@ -6,52 +6,54 @@ import {
   DialogTitle,
   TextField,
   Grid,
-} from '@mui/material';
-import type { IUnitResponse } from '../types';
-import LabelPrimary from '../../../components/Label/Label';
-import Button from '../../../components/Button/Button';
-import { STATUS } from '../../../constants/status';
+} from "@mui/material";
+import type { IUnitResponse } from "../types";
+import LabelPrimary from "../../../components/Label/Label";
+import Button from "../../../components/Button/Button";
+import { STATUS } from "../../../constants/status";
 
 interface UnitFormModelProps {
   open: boolean;
   onClose: () => void;
   onSubmit: (data: IUnitResponse) => void;
   initialData?: IUnitResponse;
-  mode?: 'add' | 'edit';
+  mode?: "add" | "edit";
 }
 
-const UnitFormModel: React.FC<UnitFormModelProps> = ({ 
-  open, 
-  onClose, 
-  onSubmit, 
-  initialData, 
-  mode = 'add' 
+const UnitFormModel: React.FC<UnitFormModelProps> = ({
+  open,
+  onClose,
+  onSubmit,
+  initialData,
+  mode = "add",
 }) => {
   const [formData, setFormData] = useState<IUnitResponse>({
-    unit_code: '',
-    unit_name: '',
-    description: '',
+    unit_name: "",
+    description: "",
+    type: "",
     status: STATUS.ACTIVE,
   });
 
   useEffect(() => {
-    if (mode === 'edit' && initialData) {
+    if (mode === "edit" && initialData) {
       setFormData({
         ...initialData,
       });
-    } else if (mode === 'add') {
+    } else if (mode === "add") {
       setFormData({
-        unit_code: '',
-        unit_name: '',
-        description: '',
+        unit_name: "",
+        description: "",
+        type: "",
         status: STATUS.ACTIVE,
       });
     }
   }, [initialData, mode, open]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({...prev, [name]: value}));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = () => {
@@ -61,18 +63,17 @@ const UnitFormModel: React.FC<UnitFormModelProps> = ({
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
-      <DialogTitle className='primary-dialog-title'>
-        {mode === 'edit' ? 'SỬA THÔNG TIN ĐƠN VỊ TÍNH' : 'THÊM ĐƠN VỊ TÍNH'}
+      <DialogTitle className="primary-dialog-title">
+        {mode === "edit" ? "SỬA THÔNG TIN ĐƠN VỊ TÍNH" : "THÊM ĐƠN VỊ TÍNH"}
       </DialogTitle>
-      <DialogContent className='primary-dialog-content'>
+      <DialogContent className="primary-dialog-content">
         <Grid container spacing={2} className="myprofile-form">
-
-          {/* UNIT CODE */}
+          {/* UNIT NAME */}
           <Grid size={6} className="myprofile-form__group">
-            <LabelPrimary value="Mã đơn vị tính" required />
+            <LabelPrimary value="Tên đơn vị tính" required />
             <TextField
-              value={formData.unit_code}
-              name="unit_code"
+              value={formData.unit_name}
+              name="unit_name"
               onChange={handleChange}
               fullWidth
               variant="outlined"
@@ -80,12 +81,12 @@ const UnitFormModel: React.FC<UnitFormModelProps> = ({
             />
           </Grid>
 
-          {/* UNIT NAME */}
+          {/* TYPE */}
           <Grid size={6} className="myprofile-form__group">
-            <LabelPrimary value="Tên đơn vị tính" required />
+            <LabelPrimary value="Loại" />
             <TextField
-              value={formData.unit_name}
-              name="unit_name"
+              value={formData.type || ""}
+              name="type"
               onChange={handleChange}
               fullWidth
               variant="outlined"
@@ -110,9 +111,15 @@ const UnitFormModel: React.FC<UnitFormModelProps> = ({
         </Grid>
       </DialogContent>
 
-      <DialogActions className='primary-dialog-actions'>
-        <Button className='button-cancel' onClick={onClose}> HUỶ </Button>
-        <Button onClick={handleSubmit} variant="contained"> LƯU </Button>
+      <DialogActions className="primary-dialog-actions">
+        <Button className="button-cancel" onClick={onClose}>
+          {" "}
+          HUỶ{" "}
+        </Button>
+        <Button onClick={handleSubmit} variant="contained">
+          {" "}
+          LƯU{" "}
+        </Button>
       </DialogActions>
     </Dialog>
   );

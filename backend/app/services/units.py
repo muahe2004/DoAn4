@@ -170,6 +170,31 @@ class UnitServices:
         return UnitPublic.model_validate(unit)
 
     @staticmethod
+    def delete(
+        *,
+        session: Session,
+        unit_id: uuid.UUID
+    ) -> UnitDeleteResponse:
+        try:
+            unit = session.get(Units, unit_id)
+
+            if not unit:
+                return UnitDeleteResponse(id=str(unit_id), message="Unit not found")
+
+            if unit.status == StatusEnum.ACTIVE:
+                unit.status = StatusEnum.INACTIVE
+                session.commit()
+                message = "Unit set to inactive successfully"
+            else:
+                message = "Unit already inactive"
+
+            return UnitDeleteResponse(id=str(unit_id), message=message)
+
+        except Exception as e:
+            session.rollback()
+            return UnitDeleteResponse(id=str(unit_id), message=f"Error deleting unit: {str(e)}")
+
+    @staticmethod
     def delete_many(
         *,
         session: Session,
