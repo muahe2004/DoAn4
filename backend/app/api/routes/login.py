@@ -40,6 +40,7 @@ def login_access_token(
         max_age=int(access_token_expires.total_seconds()),
     )
     return UserLoginResponse(
+        id=user.id,
         message=f"logged in successfully",
         code=user.code,
         status=user.status,

@@ -1,4 +1,5 @@
 from datetime import datetime
+from app.models.schemas.common.query import BaseQueryParams
 from sqlmodel import SQLModel, Field, Column, String, DateTime
 from sqlalchemy import Column, String, DateTime 
 from uuid import UUID
@@ -12,3 +13,10 @@ class CurrencyBase(SQLModel):
 
 class CurrencyPublic(CurrencyBase):
     id: UUID
+
+class CurrencyQueryParams(BaseQueryParams):
+    pass
+
+class CurrencyDropdownResponse(SQLModel):
+    id: UUID
+    currency_name: str
