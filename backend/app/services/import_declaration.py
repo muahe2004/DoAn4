@@ -15,6 +15,7 @@ from app.models.models import Countries, Currencies, ImportDeclarations, Materia
 from app.models.schemas.imports.import_declaration_schemas import ImportDeclarationCreate, ImportDeclarationListResponse, ImportDeclarationPublic, ImportDeclarationQueryParams
 from app.models.schemas.imports.import_declaration_details_schemas import ImportDeclarationDetailCreate
 from app.services.units import UnitServices
+from app.services.countries import CountryServices
 from app.services.materials import MaterialServices
 from app.services.import_declaration_details import ImportDeclarationDetailServices
 
@@ -131,6 +132,12 @@ class ImportDeclarationServices:
                     material.unit_id,
                     material.description,
                     material.country_id,
+                )
+                material.country_id = CountryServices.resolve_country_generic(
+                    session,
+                    material.country_id,
+                    getattr(material, "country_code", None),
+                    getattr(material, "country_name", None),
                 )
                 if not material.country_id:
                     raise HTTPException(

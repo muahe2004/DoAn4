@@ -39,6 +39,12 @@ class ImportDeclarationMaterialCreate(SQLModel):
     unit_name_2: Optional[str] = Field(default=None, max_length=50)
     description: Optional[str] = Field(default=None, max_length=500)
     country_id: Optional[UUID] = Field(default=None, foreign_key="countries.id")
+    country_code: Optional[str] = Field(default=None, max_length=10)
+    country_name: Optional[str] = Field(default=None, max_length=100)
+    quantity: Optional[float] = Field(default=None)
+    quantity2: Optional[float] = Field(default=None)
+    unit_price: Optional[float] = Field(default=None)
+    unit_price_transport: Optional[float] = Field(default=None)
     status: Optional[str] = Field(default="active", max_length=50)
 
 class ImportDeclarationCreate(SQLModel):
