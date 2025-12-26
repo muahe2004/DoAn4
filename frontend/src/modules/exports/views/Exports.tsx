@@ -12,7 +12,6 @@ import {
   Typography,
 } from "@mui/material";
 import Button from "../../../components/Button/Button";
-import LabelPrimary from "../../../components/Label/Label";
 import SearchEngine from "../../../components/SearchEngine/SearchEngine";
 import { useSnackbar } from "../../../components/SnackBar/SnackBar";
 import ExportDeclarationModal from "../components/ExportDeclarationModal";
@@ -46,10 +45,13 @@ interface CreateModalHeader {
   bill_number?: string;
   licence_date?: string;
   importer?: string;
+  importer_id?: string;
   shipping_term?: string;
   type_declaration: string;
   type_inventory: string;
   usd_exchange_rate?: string;
+  currency_id?: string;
+  currency_name?: string;
 }
 
 export function ExportDeclaration() {
@@ -91,11 +93,13 @@ export function ExportDeclaration() {
       bill_number: header.bill_number || undefined,
       licence_date: header.licence_date || undefined,
       importer: header.importer || undefined,
+      importer_id: header.importer_id || undefined,
       shipping_term: header.shipping_term || undefined,
       type_declaration: header.type_declaration,
       type_inventory: header.type_inventory,
       usd_exchange_rate: parseExchangeRate(header.usd_exchange_rate),
-      status: "draft",
+      currency_id: header.currency_id || undefined,
+      status: "active",
       details,
     };
 
@@ -127,11 +131,13 @@ export function ExportDeclaration() {
       bill_number: header.bill_number || undefined,
       licence_date: header.licence_date || undefined,
       importer: header.importer || undefined,
+      importer_id: header.importer_id || undefined,
       shipping_term: header.shipping_term || undefined,
       type_declaration: header.type_declaration,
       type_inventory: header.type_inventory,
       usd_exchange_rate: parseExchangeRate(header.usd_exchange_rate),
-      status: "draft",
+      currency_id: header.currency_id || undefined,
+      status: "active",
       details,
     };
 

@@ -11,6 +11,13 @@ import {
   seaManagementInvoiceImportURL,
   standardNormsURL,
   seaManagementInvoiceExportURL,
+  unitsURL,
+  unitConversionURL,
+  warehouseClosingProductsURL,
+  warehouseClosingMaterialsURL,
+  prepareSettlementReportUserURL,
+  prepareSettlementReportInventoryProductURL,
+  prepareSettlementReportInventorySummaryURL,
   applyProductNormURL,
 } from "./urls";
 import Layout from "../modules/app/Layout";
@@ -24,6 +31,13 @@ import { isAuthenticated } from "../modules/auth/services/authState";
 import { ExportDeclaration } from "../modules/exports/views/Exports";
 import { ImportDeclarations } from "../modules/import/views/ImportDeclarations";
 import { Norms } from "../modules/standard-management/norms/views/Norms";
+import { Units } from "../modules/units/views/units";
+import UoM from "../modules/units/views/UoM";
+import ProductStore from "../modules/product-store/views/ProductStore";
+import MaterialStore from "../modules/material-store/views/MaterialStore";
+import { MaterialSettlementReport } from "../modules/reports/views/MaterialSettlementReport";
+import { ProductSettlementReport } from "../modules/reports/views/ProductSettlementReport";
+import { MaterialInventorySummary } from "../modules/reports/views/MaterialInventorySummary";
 import NormProductInventorys from "../modules/setup-data-fiscal-years/norm-product-inventorys/views/NormProductInventorys";
 
 /* ===== Route Guards ===== */
@@ -79,6 +93,34 @@ export const createRouterConfig = () =>
             {
               path: standardNormsURL,
               element: <Norms />,
+            },
+            {
+              path: unitsURL,
+              element: <Units />,
+            },
+            {
+              path: unitConversionURL,
+              element: <UoM />,
+            },
+            {
+              path: warehouseClosingProductsURL,
+              element: <ProductStore />,
+            },
+            {
+              path: warehouseClosingMaterialsURL,
+              element: <MaterialStore />,
+            },
+            {
+              path: prepareSettlementReportUserURL,
+              element: <MaterialSettlementReport />,
+            },
+            {
+              path: prepareSettlementReportInventoryProductURL,
+              element: <ProductSettlementReport />,
+            },
+            {
+              path: prepareSettlementReportInventorySummaryURL,
+              element: <MaterialInventorySummary />,
             },
             {
               path: applyProductNormURL,

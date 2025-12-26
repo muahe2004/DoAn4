@@ -15,19 +15,20 @@ import {
 } from "@mui/material";
 import { Visibility } from "@mui/icons-material";
 import NormDetailModal from "../components/NormProductDetailModal";
+import PrimaryPagination from "../../../../components/Pagination/Pagination";
 
 const NormProductInventorys: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
   const [selectedNormId, setSelectedNormId] = useState<string | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
-  const pageSize = 10;
 
   // API call
   const { data: normProductsData, isLoading } = useGetNormProducts({
     page: currentPage,
-    limit: pageSize,
+    limit: rowsPerPage,
     search: searchTerm,
     status: filterStatus === "all" ? undefined : filterStatus,
   });
@@ -47,7 +48,7 @@ const NormProductInventorys: React.FC = () => {
     },
     onError: (error) => {
       console.error("Export failed:", error);
-      alert("Xuấất bại. Vui lòng thử lại.");
+      alert("Xuất bại. Vui lòng thử lại.");
     },
   });
 
@@ -73,6 +74,11 @@ const NormProductInventorys: React.FC = () => {
     setCurrentPage(page);
   };
 
+  const handleItemsPerPageChange = (value: number) => {
+    setRowsPerPage(value);
+    setCurrentPage(1);
+  };
+
   const handleViewDetail = (normId: string) => {
     setSelectedNormId(normId);
     setModalOpen(true);
@@ -83,7 +89,7 @@ const NormProductInventorys: React.FC = () => {
     setSelectedNormId(null);
   };
 
-  const totalPages = Math.ceil((normProductsData?.total || 0) / pageSize);
+  const totalPages = Math.ceil((normProductsData?.total || 0) / rowsPerPage);
 
   return (
     <div className="norm-product-inventorys">
@@ -152,7 +158,7 @@ const NormProductInventorys: React.FC = () => {
                         className="custom-border-tcell primary-tcell"
                         align="center"
                       >
-                        {(currentPage - 1) * pageSize + index + 1}
+                        {(currentPage - 1) * rowsPerPage + index + 1}
                       </TableCell>
                       <TableCell
                         className="custom-border-tcell primary-tcell"
@@ -197,40 +203,13 @@ const NormProductInventorys: React.FC = () => {
               </Table>
             </div>
 
-            {/* Pagination */}
-            {totalPages > 1 && (
-              <div className="pagination">
-                <button
-                  onClick={() => handlePageChange(currentPage - 1)}
-                  disabled={currentPage === 1}
-                  className="pagination-btn"
-                >
-                  ‹
-                </button>
-
-                {Array.from({ length: totalPages }, (_, i) => i + 1).map(
-                  (page) => (
-                    <button
-                      key={page}
-                      onClick={() => handlePageChange(page)}
-                      className={`pagination-btn ${
-                        currentPage === page ? "active" : ""
-                      }`}
-                    >
-                      {page}
-                    </button>
-                  )
-                )}
-
-                <button
-                  onClick={() => handlePageChange(currentPage + 1)}
-                  disabled={currentPage === totalPages}
-                  className="pagination-btn"
-                >
-                  ›
-                </button>
-              </div>
-            )}
+            <PrimaryPagination
+              totalItems={totalPages}
+              page={currentPage}
+              rowsPerPage={rowsPerPage}
+              onPageChange={handlePageChange}
+              onRowsPerPageChange={handleItemsPerPageChange}
+            />
           </>
         )}
       </div>

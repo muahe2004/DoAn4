@@ -12,9 +12,9 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  Button as MuiButton,
   CircularProgress,
   Button,
+  IconButton,
 } from "@mui/material";
 import LabelPrimary from "../../../components/Label/Label";
 import PrimaryPagination from "../../../components/Pagination/Pagination";
@@ -24,6 +24,13 @@ import type {
 } from "../types";
 import * as XLSX from "xlsx";
 import { parseNumber, normalizeText } from "../utils";
+import AutocompletePrimary from "../../../components/Autocomplete/AutoComplete";
+import { useGetDropdownUnits } from "../../units/apis/dropdown";
+import { useGetDropdownCountries } from "../../countries/apis/dropdown";
+import { useGetDropdownPartners } from "../../partners/apis/dropdown";
+import { useGetDropdownCurrencies } from "../../currencies/apis/dropdown";
+import { exportExcel } from "../../../utils/exportExcel";
+import { PiTrashSimpleFill } from "react-icons/pi";
 import "./ExportDeclarationModal.css";
 
 type Mode = "create" | "detail";
@@ -33,10 +40,13 @@ interface HeaderState {
   bill_number: string;
   licence_date: string;
   importer: string;
+  importer_id: string;
   shipping_term: string;
   type_declaration: string;
   type_inventory: string;
   usd_exchange_rate: string;
+  currency_id: string;
+  currency_name: string;
 }
 
 const defaultHeader: HeaderState = {
@@ -44,10 +54,45 @@ const defaultHeader: HeaderState = {
   bill_number: "",
   licence_date: "",
   importer: "",
+  importer_id: "",
   shipping_term: "",
   type_declaration: "",
   type_inventory: "",
   usd_exchange_rate: "",
+  currency_id: "",
+  currency_name: "",
+};
+
+type ExportDetailRow = IExportCreateDetailPayload & { row_id: string };
+
+const createEmptyDetail = (): ExportDetailRow => ({
+  row_id: `row-${Date.now()}-${Math.random().toString(16).slice(2)}`,
+  hs_code: "",
+  product_code: "",
+  product_name: "",
+  origin_country_id: "",
+  origin_country_name: "",
+  origin_country_code: "",
+  unit_id: "",
+  unit_name: "",
+  unit_id_2: "",
+  unit_name_2: "",
+  quantity: undefined,
+  quantity2: undefined,
+  unit_price: undefined,
+  unit_price_transport: undefined,
+  invoice_value: undefined,
+  taxable_price: undefined,
+  status: "active",
+});
+
+const detailInputNoUnderlineSx = {
+  "& .MuiInput-root:before, & .MuiInput-root:after": {
+    borderBottom: "none",
+  },
+  "& .MuiInput-root:hover:not(.Mui-disabled):before": {
+    borderBottom: "none",
+  },
 };
 
 const HEADER_ALIASES: Record<string, string[]> = {
@@ -59,11 +104,19 @@ const HEADER_ALIASES: Record<string, string[]> = {
   type_declaration: ["mã loại hình"],
   type_inventory: ["loại tồn"],
   usd_exchange_rate: ["tỷ giá"],
-  hs_code: ["mã hs"],
-  product_code: ["mã hàng hóa", "mã sp", "mã npl", "mã npl/sp"],
+  origin_country_code: ["mã qg", "mã quốc gia", "country code", "origin country"],
+  origin_country_name: ["quốc gia", "tên quốc gia", "nước xk", "nuoc xk"],
+  hs_code: ["HS Code"],
+  product_code: ["Product Code"],
+  product_name: ["Product Name"],
   unit_name: ["đơn vị tính"],
+  unit_name_2: ["đơn vị tính 2", "đơn vị 2", "đvt2", "đv2"],
   quantity: ["số lượng", "sl"],
-  unit_price: ["đơn giá"],
+  quantity2: ["sl 2", "số lượng 2", "sl2"],
+  unit_price: ["Unit Price"],
+  unit_price_transport: ["unit price transport", "đơn giá vc", "đơn giá vận chuyển"],
+  invoice_value: ["giá hóa đơn", "invoice value"],
+  taxable_price: ["giá tính thuế", "taxable price"],
 };
 
 const normalizeHeaderCell = (cell: unknown) =>
@@ -120,8 +173,13 @@ const extractDetailsFromSheet = (
   const productColumn = columnIndex(HEADER_ALIASES.product_code);
   const productNameColumn = columnIndex(HEADER_ALIASES.product_name ?? []);
   const unitColumn = columnIndex(HEADER_ALIASES.unit_name);
+  const unit2Column = columnIndex(HEADER_ALIASES.unit_name_2);
   const quantityColumn = columnIndex(HEADER_ALIASES.quantity);
+  const quantity2Column = columnIndex(HEADER_ALIASES.quantity2);
   const unitPriceColumn = columnIndex(HEADER_ALIASES.unit_price);
+  const unitPriceTransportColumn = columnIndex(HEADER_ALIASES.unit_price_transport);
+  const invoiceValueColumn = columnIndex(HEADER_ALIASES.invoice_value);
+  const taxablePriceColumn = columnIndex(HEADER_ALIASES.taxable_price);
   const declarationColumn = columnIndex(HEADER_ALIASES.export_declaration_number);
   const billColumn = columnIndex(HEADER_ALIASES.bill_number);
   const importerColumn = columnIndex(HEADER_ALIASES.importer);
@@ -129,6 +187,8 @@ const extractDetailsFromSheet = (
   const typeDeclarationColumn = columnIndex(HEADER_ALIASES.type_declaration);
   const typeInventoryColumn = columnIndex(HEADER_ALIASES.type_inventory);
   const usdColumn = columnIndex(HEADER_ALIASES.usd_exchange_rate);
+  const originCountryCodeColumn = columnIndex(HEADER_ALIASES.origin_country_code);
+  const originCountryNameColumn = columnIndex(HEADER_ALIASES.origin_country_name);
   const normalizeNumber = (row: unknown[], col: number) =>
     col >= 0 ? parseNumber(row[col]) : undefined;
   const readValue = (row: unknown[], col: number) =>
@@ -146,10 +206,20 @@ const extractDetailsFromSheet = (
         row,
         productNameColumn >= 0 ? productNameColumn : productColumn
       ),
-      origin_country_name: undefined,
+      origin_country_name: originCountryNameColumn >= 0
+        ? readValue(row, originCountryNameColumn)
+        : originCountryCodeColumn >= 0
+          ? readValue(row, originCountryCodeColumn)
+          : undefined,
+      origin_country_code: readValue(row, originCountryCodeColumn),
       unit_name: readValue(row, unitColumn),
+      unit_name_2: readValue(row, unit2Column),
       quantity: normalizeNumber(row, quantityColumn),
+      quantity2: normalizeNumber(row, quantity2Column),
       unit_price: normalizeNumber(row, unitPriceColumn),
+      unit_price_transport: normalizeNumber(row, unitPriceTransportColumn),
+      invoice_value: normalizeNumber(row, invoiceValueColumn),
+      taxable_price: normalizeNumber(row, taxablePriceColumn),
       status: "draft",
     };
 
@@ -238,74 +308,121 @@ export default function ExportDeclarationModal({
   saving = false,
 }: ExportDeclarationModalProps) {
   const isCreateMode = mode === "create";
-  const status = data?.header?.status || "draft";
+  const status = data?.header?.status || "active";
+  const headerEditable = isCreateMode || status !== "posted";
   const [headerData, setHeaderData] = useState<HeaderState>(defaultHeader);
-  const [details, setDetails] = useState<IExportCreateDetailPayload[]>([]);
-  const [editableDetails, setEditableDetails] = useState<IExportCreateDetailPayload[]>([]);
-  const [baseDetails, setBaseDetails] = useState<IExportCreateDetailPayload[]>([]);
+  const [detailRows, setDetailRows] = useState<ExportDetailRow[]>([]);
+  const [baseDetails, setBaseDetails] = useState<ExportDetailRow[]>([]);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
-  const handleEditableDetailChange = (
+  const paramsUnit = { skip: 0, limit: 50 };
+  const paramsCountry = { skip: 0, limit: 200 };
+  const { data: units = [] } = useGetDropdownUnits(paramsUnit);
+  const { data: countries = [] } = useGetDropdownCountries(paramsCountry);
+  const { data: partners = [] } = useGetDropdownPartners({ skip: 0, limit: 50 });
+  const { data: currencies = [] } = useGetDropdownCurrencies({ skip: 0, limit: 50 });
+
+  const handleDetailChange = (
     index: number,
     field: keyof IExportCreateDetailPayload,
     value: string
   ) => {
-    setEditableDetails((prev) =>
-      prev.map((detail, idx) =>
-        idx === index
-          ? {
-              ...detail,
-              [field]:
-                field === "quantity"
-                  ? value === ""
-                    ? undefined
-                    : Number(value)
-                  : value,
-            }
-          : detail
-      )
+    setDetailRows((prev) =>
+      prev.map((detail, idx) => {
+        if (idx !== index) return detail;
+        const numberFields = [
+          "quantity",
+          "quantity2",
+          "unit_price",
+          "unit_price_transport",
+          "invoice_value",
+          "taxable_price",
+        ];
+        if (numberFields.includes(field)) {
+          return {
+            ...detail,
+            [field]: value === "" ? undefined : Number(value),
+          };
+        }
+        return {
+          ...detail,
+          [field]: value,
+        };
+      })
     );
   };
-  const detailRows = data?.details || [];
+
+  const handleDetailUpdate = (
+    index: number,
+    updates: Partial<ExportDetailRow>
+  ) => {
+    setDetailRows((prev) =>
+      prev.map((detail, idx) => (idx === index ? { ...detail, ...updates } : detail))
+    );
+  };
+
+  const handleAddRow = () => {
+    setDetailRows((prev) => [...prev, createEmptyDetail()]);
+  };
+
+  const handleRemoveRow = (rowId: string) => {
+    setDetailRows((prev) => prev.filter((row) => row.row_id !== rowId));
+  };
+  const serverDetailRows = data?.details || [];
   const detailHeader = data?.header;
   const usdExchangeRate = detailHeader?.usd_exchange_rate ?? 0;
   const calculateVndPrice = (value: number) => value * (usdExchangeRate || 0);
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(5);
-  const paginatedDetailRows = editableDetails.slice(
+  const paginatedDetailRows = detailRows.slice(
     (page - 1) * rowsPerPage,
     (page - 1) * rowsPerPage + rowsPerPage
   );
-  const detailHeaderState: HeaderState = {
-    export_declaration_number: detailHeader?.export_declaration_number ?? "",
-    bill_number: detailHeader?.bill_number ?? "",
-    licence_date: detailHeader?.licence_date?.split("T")[0] ?? "",
-    importer: detailHeader?.importer ?? "",
-    shipping_term: detailHeader?.shipping_term ?? "",
-    type_declaration: detailHeader?.type_declaration ?? "",
-    type_inventory: detailHeader?.type_inventory ?? "",
-    usd_exchange_rate: detailHeader?.usd_exchange_rate?.toString() ?? "",
-  };
   useEffect(() => {
+    if (!isCreateMode && data?.header) {
+      setHeaderData({
+        export_declaration_number: detailHeader?.export_declaration_number ?? "",
+        bill_number: detailHeader?.bill_number ?? "",
+        licence_date: detailHeader?.licence_date?.split("T")[0] ?? "",
+        importer: detailHeader?.importer ?? "",
+        importer_id: detailHeader?.importer_id ?? "",
+        shipping_term: detailHeader?.shipping_term ?? "",
+        type_declaration: detailHeader?.type_declaration ?? "",
+        type_inventory: detailHeader?.type_inventory ?? "",
+        usd_exchange_rate: detailHeader?.usd_exchange_rate?.toString() ?? "",
+        currency_id: detailHeader?.currency_id ?? "",
+        currency_name: "",
+      });
+    }
     if (!isCreateMode && data?.details) {
       const mappedDetails = data.details.map((detail) => ({
+        row_id: `detail-${detail.id}`,
         hs_code: detail.hs_code,
         product_code: detail.product_code,
         product_name: detail.product_name,
-        origin_country_name: detail.origin_country_name,
-        unit_name: detail.unit_name,
+        origin_country_name: detail.origin_country_name ?? "",
+        origin_country_code: "",
+        origin_country_id: "",
+        unit_id: "",
+        unit_name: detail.unit_name ?? "",
+        unit_id_2: "",
+        unit_name_2: detail.unit_name_2 ?? "",
         quantity: detail.quantity,
+        quantity2: detail.quantity2,
         unit_price: detail.unit_price,
-        status: detail.status ?? "draft",
+        unit_price_transport: detail.unit_price_transport,
+        invoice_value: detail.invoice_value,
+        taxable_price: detail.taxable_price,
+        status: detail.status ?? "active",
       }));
-      setEditableDetails(mappedDetails);
+      setDetailRows(mappedDetails);
       setBaseDetails(mappedDetails.map((detail) => ({ ...detail })));
     }
-  }, [data?.details, isCreateMode]);
+  }, [data?.details, data?.header, detailHeader, isCreateMode]);
 
   useEffect(() => {
     if (isCreateMode && open) {
       setHeaderData(defaultHeader);
-      setDetails([]);
+      setDetailRows([createEmptyDetail()]);
     }
   }, [isCreateMode, open]);
 
@@ -313,14 +430,51 @@ export default function ExportDeclarationModal({
     if (!isCreateMode) {
       setPage(1);
     }
-  }, [detailRows.length, isCreateMode]);
+  }, [serverDetailRows.length, isCreateMode]);
 
   const handleHeaderChange = (field: keyof HeaderState, value: string) => {
-    if (!isCreateMode) return;
     setHeaderData((prev) => ({ ...prev, [field]: value }));
   };
 
   const handleImportClick = () => fileInputRef.current?.click();
+
+  const handleExportTemplate = () => {
+    const headers = {
+      hs_code: "HS Code",
+      product_code: "Mã sản phẩm",
+      product_name: "Tên sản phẩm",
+      origin_country: "Nước XK",
+      unit_name: "Đơn vị",
+      unit_name_2: "Đơn vị 2",
+      quantity: "Số lượng",
+      quantity2: "SL 2",
+      unit_price: "Đơn giá",
+      unit_price_transport: "Đơn giá VC",
+      invoice_value: "Giá hóa đơn",
+      taxable_price: "Giá tính thuế",
+    };
+
+    const templateRow = {
+      hs_code: "",
+      product_code: "",
+      product_name: "",
+      origin_country: "",
+      unit_name: "",
+      unit_name_2: "",
+      quantity: "",
+      quantity2: "",
+      unit_price: "",
+      unit_price_transport: "",
+      invoice_value: "",
+      taxable_price: "",
+    };
+
+    exportExcel([templateRow], "export_products_template", {
+      sheetName: "Template",
+      headers,
+      title: "TEMPLATE TO KHAI XUAT",
+    });
+  };
 
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -338,7 +492,23 @@ export default function ExportDeclarationModal({
       const batches = extractDetailsFromSheet(sheet);
       if (!batches.length) return;
       const matchedBatch = batches[0];
-      setDetails(matchedBatch.details);
+      setDetailRows(
+        matchedBatch.details.map((detail) => ({
+          ...detail,
+          row_id: `import-${Date.now()}-${Math.random().toString(16).slice(2)}`,
+        }))
+      );
+      setHeaderData((prev) => ({
+        ...prev,
+        export_declaration_number:
+          matchedBatch.header.export_declaration_number || prev.export_declaration_number,
+        bill_number: matchedBatch.header.bill_number || prev.bill_number,
+        importer: matchedBatch.header.importer || prev.importer,
+        shipping_term: matchedBatch.header.shipping_term || prev.shipping_term,
+        type_declaration: matchedBatch.header.type_declaration || prev.type_declaration,
+        type_inventory: matchedBatch.header.type_inventory || prev.type_inventory,
+        usd_exchange_rate: matchedBatch.header.usd_exchange_rate || prev.usd_exchange_rate,
+      }));
     };
 
     reader.readAsArrayBuffer(file);
@@ -347,32 +517,44 @@ export default function ExportDeclarationModal({
     }
   };
 
+  const normalizeDetailRows = (rows: ExportDetailRow[]) =>
+    rows.map(({ row_id: _rowId, ...rest }) => ({
+      ...rest,
+      origin_country_id: rest.origin_country_id || undefined,
+      origin_country_name: rest.origin_country_name || undefined,
+      origin_country_code: rest.origin_country_code || undefined,
+      unit_id: rest.unit_id || undefined,
+      unit_name: rest.unit_name || undefined,
+      unit_id_2: rest.unit_id_2 || undefined,
+      unit_name_2: rest.unit_name_2 || undefined,
+      product_name: rest.product_name || undefined,
+    }));
+
   const handleSubmit = () => {
     if (!isCreateMode || !onSubmit) return;
-    if (!headerData.export_declaration_number || !details.length) return;
-    onSubmit(headerData, details);
+    if (!headerData.export_declaration_number || !detailRows.length) return;
+    onSubmit(headerData, normalizeDetailRows(detailRows));
   };
 
   const hasChanges = useMemo(() => {
-    if (editableDetails.length !== baseDetails.length) return true;
-    return editableDetails.some((detail, idx) => {
+    if (isCreateMode) return false;
+    if (detailRows.length !== baseDetails.length) return true;
+    return detailRows.some((detail, idx) => {
       const base = baseDetails[idx];
-      return (
-        detail.product_code !== base?.product_code ||
-        detail.quantity !== base?.quantity
-      );
+      if (!base) return true;
+      const { row_id: _rowId, ...rest } = detail;
+      const { row_id: _baseRowId, ...baseRest } = base;
+      return JSON.stringify(rest) !== JSON.stringify(baseRest);
     });
-  }, [editableDetails, baseDetails]);
+  }, [detailRows, baseDetails, isCreateMode]);
 
   const handleSave = () => {
-    if (isCreateMode || !onSave || !editableDetails.length || !hasChanges) return;
-    onSave(detailHeaderState, editableDetails);
+    if (isCreateMode || !onSave || !detailRows.length || !hasChanges) return;
+    onSave(headerData, normalizeDetailRows(detailRows));
   };
 
   const getHeaderValue = (field: keyof HeaderState) => {
-    if (isCreateMode) return headerData[field];
-    const value = detailHeader?.[field as keyof typeof detailHeader];
-    return value != null ? String(value) : "";
+    return headerData[field] ?? "";
   };
 
   const renderHeaderField = ({
@@ -392,52 +574,213 @@ export default function ExportDeclarationModal({
         type={type}
         fullWidth
         value={getHeaderValue(field)}
-        disabled={!isCreateMode}
+        disabled={!headerEditable}
         className="primary-text__field"
         size="small"
         InputProps={{
-          readOnly: !isCreateMode,
+          readOnly: !headerEditable,
         }}
         InputLabelProps={{
           shrink: type === "date" ? true : undefined,
         }}
         onChange={(event) =>
-          isCreateMode && handleHeaderChange(field, event.target.value)
+          headerEditable && handleHeaderChange(field, event.target.value)
         }
       />
     </Grid>
   );
 
-  const createTable =
-    details.length === 0 ? null : (
-      <TableBody className="primary-tbody">
-        {details.map((detail, idx) => (
-          <TableRow className="primary-trow" key={`${detail.product_code}-${idx}`}>
+  const createTable = (
+    <TableBody className="primary-tbody">
+      {detailRows.length === 0 ? (
+        <TableRow>
+          <TableCell colSpan={13} align="center">
+            Chưa có sản phẩm nào
+          </TableCell>
+        </TableRow>
+      ) : (
+        detailRows.map((detail, idx) => (
+          <TableRow className="primary-trow" key={detail.row_id}>
             <TableCell className="custom-border-tcell primary-tcell">
-              {detail.hs_code}
+              <TextField
+                fullWidth
+                value={detail.hs_code}
+                size="small"
+                onChange={(event) =>
+                  handleDetailChange(idx, "hs_code", event.target.value)
+                }
+              />
             </TableCell>
             <TableCell className="custom-border-tcell primary-tcell">
-              {detail.product_code}
+              <TextField
+                fullWidth
+                value={detail.product_code}
+                size="small"
+                onChange={(event) =>
+                  handleDetailChange(idx, "product_code", event.target.value)
+                }
+              />
             </TableCell>
             <TableCell className="custom-border-tcell primary-tcell">
-              {detail.product_name}
+              <TextField
+                fullWidth
+                value={detail.product_name ?? ""}
+                size="small"
+                onChange={(event) =>
+                  handleDetailChange(idx, "product_name", event.target.value)
+                }
+              />
             </TableCell>
             <TableCell className="custom-border-tcell primary-tcell">
-              {detail.unit_name}
-            </TableCell>
-            <TableCell
-              className="custom-border-tcell primary-tcell"
-              align="center"
-            >
-              {detail.quantity}
+              <AutocompletePrimary
+                labelKey="country_name"
+                valueKey="id"
+                options={countries}
+                value={
+                  detail.origin_country_name
+                    ? {
+                        id: detail.origin_country_id,
+                        country_name: detail.origin_country_name,
+                      }
+                    : null
+                }
+                inputValue={detail.origin_country_name ?? ""}
+                onInputChange={(value) =>
+                  handleDetailUpdate(idx, {
+                    origin_country_name: value,
+                    origin_country_code: value,
+                    origin_country_id: "",
+                  })
+                }
+                onChange={(val) =>
+                  handleDetailUpdate(idx, {
+                    origin_country_id: val.id || "",
+                    origin_country_name: val.country_name || "",
+                    origin_country_code: "",
+                  })
+                }
+              />
             </TableCell>
             <TableCell className="custom-border-tcell primary-tcell">
-              {detail.unit_price}
+              <AutocompletePrimary
+                labelKey="unit_name"
+                valueKey="id"
+                freeSolo
+                options={units}
+                value={
+                  detail.unit_name
+                    ? { id: detail.unit_id, unit_name: detail.unit_name }
+                    : null
+                }
+                inputValue={detail.unit_name ?? ""}
+                onInputChange={(value) =>
+                  handleDetailUpdate(idx, { unit_name: value, unit_id: "" })
+                }
+                onChange={(val) =>
+                  handleDetailUpdate(idx, {
+                    unit_id: val.id || "",
+                    unit_name: val.unit_name || "",
+                  })
+                }
+              />
+            </TableCell>
+            <TableCell className="custom-border-tcell primary-tcell">
+              <AutocompletePrimary
+                labelKey="unit_name"
+                valueKey="id"
+                freeSolo
+                options={units}
+                value={
+                  detail.unit_name_2
+                    ? { id: detail.unit_id_2, unit_name: detail.unit_name_2 }
+                    : null
+                }
+                inputValue={detail.unit_name_2 ?? ""}
+                onInputChange={(value) =>
+                  handleDetailUpdate(idx, { unit_name_2: value, unit_id_2: "" })
+                }
+                onChange={(val) =>
+                  handleDetailUpdate(idx, {
+                    unit_id_2: val.id || "",
+                    unit_name_2: val.unit_name || "",
+                  })
+                }
+              />
+            </TableCell>
+            <TableCell className="custom-border-tcell primary-tcell">
+              <TextField
+                fullWidth
+                value={detail.quantity?.toString() ?? ""}
+                size="small"
+                onChange={(event) =>
+                  handleDetailChange(idx, "quantity", event.target.value)
+                }
+              />
+            </TableCell>
+            <TableCell className="custom-border-tcell primary-tcell">
+              <TextField
+                fullWidth
+                value={detail.quantity2?.toString() ?? ""}
+                size="small"
+                onChange={(event) =>
+                  handleDetailChange(idx, "quantity2", event.target.value)
+                }
+              />
+            </TableCell>
+            <TableCell className="custom-border-tcell primary-tcell">
+              <TextField
+                fullWidth
+                value={detail.unit_price?.toString() ?? ""}
+                size="small"
+                onChange={(event) =>
+                  handleDetailChange(idx, "unit_price", event.target.value)
+                }
+              />
+            </TableCell>
+            <TableCell className="custom-border-tcell primary-tcell">
+              <TextField
+                fullWidth
+                value={detail.unit_price_transport?.toString() ?? ""}
+                size="small"
+                onChange={(event) =>
+                  handleDetailChange(idx, "unit_price_transport", event.target.value)
+                }
+              />
+            </TableCell>
+            <TableCell className="custom-border-tcell primary-tcell">
+              <TextField
+                fullWidth
+                value={detail.invoice_value?.toString() ?? ""}
+                size="small"
+                onChange={(event) =>
+                  handleDetailChange(idx, "invoice_value", event.target.value)
+                }
+              />
+            </TableCell>
+            <TableCell className="custom-border-tcell primary-tcell">
+              <TextField
+                fullWidth
+                value={detail.taxable_price?.toString() ?? ""}
+                size="small"
+                onChange={(event) =>
+                  handleDetailChange(idx, "taxable_price", event.target.value)
+                }
+              />
+            </TableCell>
+            <TableCell className="custom-border-tcell primary-tcell" align="center">
+              <IconButton
+                className="primary-delete-btn"
+                size="small"
+                onClick={() => handleRemoveRow(detail.row_id)}
+              >
+                <PiTrashSimpleFill />
+              </IconButton>
             </TableCell>
           </TableRow>
-        ))}
-      </TableBody>
-    );
+        ))
+      )}
+    </TableBody>
+  );
 
   const detailTable = (
     <>
@@ -451,6 +794,9 @@ export default function ExportDeclarationModal({
           </TableCell>
           <TableCell className="primary-tcell" align="center">
             Tên sản phẩm
+          </TableCell>
+          <TableCell className="primary-tcell" align="center">
+            Mã quốc gia
           </TableCell>
           <TableCell className="primary-tcell" align="center">
             Đơn vị
@@ -473,13 +819,14 @@ export default function ExportDeclarationModal({
           <TableCell className="primary-tcell" align="center">
             TG tính thuế (VND)
           </TableCell>
+          <TableCell className="primary-tcell" align="center"></TableCell>
         </TableRow>
       </TableHead>
       <TableBody className="primary-tbody">
         {paginatedDetailRows.map((detail, idx) => {
           const globalIndex = (page - 1) * rowsPerPage + idx;
           const rowKey =
-            detailRows[globalIndex]?.id ?? `detail-${globalIndex}`;
+            detailRows[globalIndex]?.row_id ?? `detail-${globalIndex}`;
           const quantity = detail.quantity ?? 0;
           const unitPrice = detail.unit_price ?? 0;
           const dgCifUsd = unitPrice;
@@ -492,9 +839,11 @@ export default function ExportDeclarationModal({
                 <TextField
                   fullWidth
                   value={detail.hs_code ?? ""}
-                  variant="standard"
                   size="small"
-                  InputProps={{ readOnly: true, disableUnderline: true }}
+                  sx={detailInputNoUnderlineSx}
+                  onChange={(event) =>
+                    handleDetailChange(globalIndex, "hs_code", event.target.value)
+                  }
                 />
               </TableCell>
               <TableCell className="custom-border-tcell primary-tcell" width={180}>
@@ -502,12 +851,9 @@ export default function ExportDeclarationModal({
                   fullWidth
                   value={detail.product_code ?? ""}
                   size="small"
+                  sx={detailInputNoUnderlineSx}
                   onChange={(event) =>
-                    handleEditableDetailChange(
-                      (page - 1) * rowsPerPage + idx,
-                      "product_code",
-                      event.target.value
-                    )
+                    handleDetailChange(globalIndex, "product_code", event.target.value)
                   }
                 />
               </TableCell>
@@ -515,23 +861,45 @@ export default function ExportDeclarationModal({
                 <TextField
                   fullWidth
                   value={detail.product_name ?? ""}
-                  variant="standard"
                   sx={{
+                    ...detailInputNoUnderlineSx,
                     overflow: "hidden",
                     maxWidth: 250,
-                    flexWrap: "wrap"
+                    flexWrap: "wrap",
                   }}
                   size="small"
-                  InputProps={{ readOnly: true, disableUnderline: true }}
+                  onChange={(event) =>
+                    handleDetailChange(globalIndex, "product_name", event.target.value)
+                  }
+                />
+              </TableCell>
+              <TableCell className="custom-border-tcell primary-tcell" width={150}>
+                <TextField
+                  fullWidth
+                  value={detail.origin_country_code ?? detail.origin_country_name ?? ""}
+                  size="small"
+                  sx={detailInputNoUnderlineSx}
+                  onChange={(event) =>
+                    handleDetailUpdate(globalIndex, {
+                      origin_country_name: event.target.value,
+                      origin_country_code: event.target.value,
+                      origin_country_id: "",
+                    })
+                  }
                 />
               </TableCell>
               <TableCell className="custom-border-tcell primary-tcell" width={120}>
                 <TextField
                   fullWidth
                   value={detail.unit_name ?? ""}
-                  variant="standard"
                   size="small"
-                  InputProps={{ readOnly: true, disableUnderline: true }}
+                  sx={detailInputNoUnderlineSx}
+                  onChange={(event) =>
+                    handleDetailUpdate(globalIndex, {
+                      unit_name: event.target.value,
+                      unit_id: "",
+                    })
+                  }
                 />
               </TableCell>
               <TableCell className="custom-border-tcell primary-tcell" width={100}>
@@ -540,12 +908,9 @@ export default function ExportDeclarationModal({
                   type="number"
                   value={detail.quantity?.toString() ?? ""}
                   size="small"
+                  sx={detailInputNoUnderlineSx}
                   onChange={(event) =>
-                    handleEditableDetailChange(
-                      (page - 1) * rowsPerPage + idx,
-                      "quantity",
-                      event.target.value
-                    )
+                    handleDetailChange(globalIndex, "quantity", event.target.value)
                   }
                 />
               </TableCell>
@@ -553,9 +918,11 @@ export default function ExportDeclarationModal({
                 <TextField
                   fullWidth
                   value={detail.unit_price?.toString() ?? ""}
-                  variant="standard"
                   size="small"
-                  InputProps={{ readOnly: true, disableUnderline: true }}
+                  sx={detailInputNoUnderlineSx}
+                  onChange={(event) =>
+                    handleDetailChange(globalIndex, "unit_price", event.target.value)
+                  }
                 />
               </TableCell>
               <TableCell className="custom-border-tcell primary-tcell">
@@ -564,6 +931,7 @@ export default function ExportDeclarationModal({
                   value={formatUsd(dgCifUsd)}
                   variant="standard"
                   size="small"
+                  sx={detailInputNoUnderlineSx}
                   InputProps={{ readOnly: true, disableUnderline: true }}
                 />
               </TableCell>
@@ -573,6 +941,7 @@ export default function ExportDeclarationModal({
                   value={formatVnd(dgTinhThueVnd)}
                   variant="standard"
                   size="small"
+                  sx={detailInputNoUnderlineSx}
                   InputProps={{ readOnly: true, disableUnderline: true }}
                 />
               </TableCell>
@@ -582,6 +951,7 @@ export default function ExportDeclarationModal({
                   value={formatUsd(tgCifUsd)}
                   variant="standard"
                   size="small"
+                  sx={detailInputNoUnderlineSx}
                   InputProps={{ readOnly: true, disableUnderline: true }}
                 />
               </TableCell>
@@ -591,8 +961,18 @@ export default function ExportDeclarationModal({
                   value={formatVnd(tgTinhThueVnd)}
                   variant="standard"
                   size="small"
+                  sx={detailInputNoUnderlineSx}
                   InputProps={{ readOnly: true, disableUnderline: true }}
                 />
+              </TableCell>
+              <TableCell className="custom-border-tcell primary-tcell" align="center">
+                <IconButton
+                  className="primary-delete-btn"
+                  size="small"
+                  onClick={() => handleRemoveRow(detail.row_id)}
+                >
+                  <PiTrashSimpleFill />
+                </IconButton>
               </TableCell>
             </TableRow>
           );
@@ -632,7 +1012,39 @@ export default function ExportDeclarationModal({
                 required: true,
               })}
               {renderHeaderField({ field: "bill_number", label: "Bill" })}
-              {renderHeaderField({ field: "importer", label: "Người khai" })}
+              <Grid size={3} mt={2}>
+                <LabelPrimary value="Người khai" />
+                <AutocompletePrimary
+                  labelKey="partner_name"
+                  valueKey="id"
+                  options={partners}
+                  value={
+                    headerData.importer
+                      ? {
+                          id: headerData.importer_id,
+                          partner_name: headerData.importer,
+                        }
+                      : null
+                  }
+                  inputValue={headerData.importer}
+                  onInputChange={(value) =>
+                    headerEditable &&
+                    setHeaderData((prev) => ({
+                      ...prev,
+                      importer: value,
+                      importer_id: "",
+                    }))
+                  }
+                  onChange={(val) =>
+                    headerEditable &&
+                    setHeaderData((prev) => ({
+                      ...prev,
+                      importer: val.partner_name || "",
+                      importer_id: val.id || "",
+                    }))
+                  }
+                />
+              </Grid>
             </Grid>
             <Grid container spacing={2} className="export-header-grid">
               {renderHeaderField({
@@ -646,6 +1058,47 @@ export default function ExportDeclarationModal({
                 required: true,
               })}
               {renderHeaderField({ field: "shipping_term", label: "Điều kiện" })}
+              <Grid size={3} mt={2}>
+                <LabelPrimary value="Tiền tệ" />
+                <AutocompletePrimary
+                  labelKey="currency_name"
+                  valueKey="id"
+                  options={currencies}
+                  value={
+                    headerData.currency_name || headerData.currency_id
+                      ? {
+                          id: headerData.currency_id,
+                          currency_name:
+                            headerData.currency_name ||
+                            currencies.find((c) => c.id === headerData.currency_id)
+                              ?.currency_name ||
+                            "",
+                        }
+                      : null
+                  }
+                  inputValue={
+                    headerData.currency_name ||
+                    currencies.find((c) => c.id === headerData.currency_id)?.currency_name ||
+                    ""
+                  }
+                  onInputChange={(value) =>
+                    headerEditable &&
+                    setHeaderData((prev) => ({
+                      ...prev,
+                      currency_name: value,
+                      currency_id: "",
+                    }))
+                  }
+                  onChange={(val) =>
+                    headerEditable &&
+                    setHeaderData((prev) => ({
+                      ...prev,
+                      currency_name: val.currency_name || "",
+                      currency_id: val.id || "",
+                    }))
+                  }
+                />
+              </Grid>
               {renderHeaderField({
                 field: "usd_exchange_rate",
                 label: "Quy đổi tỷ giá (USD->VNĐ)",
@@ -656,11 +1109,21 @@ export default function ExportDeclarationModal({
               <span className="create-modal-title__label">
                 {isCreateMode ? "DANH SÁCH SẢN PHẨM" : "DANH SÁCH SẢN PHẨM (ĐƠN GIÁ CIF/THUẾ)"}
               </span>
-              {isCreateMode && (
-                <Button variant="outlined" sx={{ color: "#FFFF"}} onClick={handleImportClick}>
-                  Tải lên Excel sản phẩm
+              <div style={{ display: "flex", gap: 8 }}>
+                {isCreateMode && (
+                  <Button variant="outlined" onClick={handleExportTemplate}>
+                    Xuất mẫu Excel
+                  </Button>
+                )}
+                {isCreateMode && (
+                  <Button variant="outlined" onClick={handleImportClick}>
+                    Tải lên Excel sản phẩm
+                  </Button>
+                )}
+                <Button variant="outlined" onClick={handleAddRow}>
+                  Thêm dòng
                 </Button>
-              )}
+              </div>
             </div>
 
             <TableContainer className="primary-table-container table-modal">
@@ -679,27 +1142,36 @@ export default function ExportDeclarationModal({
                           Tên sản phẩm
                         </TableCell>
                         <TableCell className="primary-tcell" align="center">
+                          Quốc gia
+                        </TableCell>
+                        <TableCell className="primary-tcell" align="center">
                           Đơn vị
+                        </TableCell>
+                        <TableCell className="primary-tcell" align="center">
+                          Đơn vị 2
                         </TableCell>
                         <TableCell className="primary-tcell" align="center">
                           Số lượng
                         </TableCell>
                         <TableCell className="primary-tcell" align="center">
+                          SL 2
+                        </TableCell>
+                        <TableCell className="primary-tcell" align="center">
                           Đơn giá
                         </TableCell>
+                        <TableCell className="primary-tcell" align="center">
+                          ĐG VC
+                        </TableCell>
+                        <TableCell className="primary-tcell" align="center">
+                          Giá HĐ
+                        </TableCell>
+                        <TableCell className="primary-tcell" align="center">
+                          Giá thuế
+                        </TableCell>
+                        <TableCell className="primary-tcell" align="center"></TableCell>
                       </TableRow>
                     </TableHead>
-                    {details.length === 0 ? (
-                      <TableBody className="primary-tbody">
-                        <TableRow>
-                          <TableCell colSpan={6} align="center">
-                            Chưa có sản phẩm nào
-                          </TableCell>
-                        </TableRow>
-                      </TableBody>
-                    ) : (
-                      createTable
-                    )}
+                    {createTable}
                   </>
                 ) : (
                   <>
@@ -738,24 +1210,24 @@ export default function ExportDeclarationModal({
             <Button onClick={onClose} className="button-cancel" disabled={loading}>
               HUỶ
             </Button>
-            <Button
-              variant="contained"
-              onClick={handleSubmit}
-              disabled={loading || !details.length}
-            >
-              {loading ? "ĐANG LƯU..." : "LƯU TỜ KHAI"}
-            </Button>
-          </>
-        ) : (
-          <>
-            <Button onClick={onClose} className="button-cancel" disabled={saving}>
-              HUỶ
-            </Button>
-            <Button
-              variant="contained"
-              onClick={handleSave}
-              disabled={saving || !editableDetails.length || !hasChanges}
-            >
+              <Button
+                variant="contained"
+                onClick={handleSubmit}
+                disabled={loading || !detailRows.length}
+              >
+                {loading ? "ĐANG LƯU..." : "LƯU TỜ KHAI"}
+              </Button>
+            </>
+          ) : (
+            <>
+              <Button onClick={onClose} className="button-cancel" disabled={saving}>
+                HUỶ
+              </Button>
+              <Button
+                variant="contained"
+                onClick={handleSave}
+                disabled={saving || !detailRows.length || !hasChanges}
+              >
             {saving ? "ĐANG LƯU..." : "LƯU"}
             </Button>
           </>

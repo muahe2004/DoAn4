@@ -1,3 +1,24 @@
+.norm-header {
+  margin-bottom: 20px;
+}
+
+.norm-title {
+  display: flex;
+  flex-direction: column;
+}
+
+.norm-title__label {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--primary-color);
+  margin-bottom: 4px;
+}
+
+.exports-title__subtitle {
+  font-size: 14px;
+  color: var(--secondary-color);
+}
+
 .norm-actions {
   display: flex;
   justify-content: right;

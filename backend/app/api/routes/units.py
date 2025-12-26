@@ -7,6 +7,11 @@ from app.api.deps import SessionDep
 
 router = APIRouter()
 
+# =========================== get units list ===========================
+@router.get("")
+def get_units(session: SessionDep, query: UnitQueryParams = Depends()):
+    return UnitServices.get_list(session=session, query=query)
+
 # =========================== dropdown units ===========================
 @router.get("/drop-down")
 def dropdown_unit(session: SessionDep, query: UnitQueryParams = Depends()):
@@ -45,6 +50,15 @@ def update_unit(
     return UnitServices.update(session=session, unit_id=id, unit_data=data)
 
 # =========================== delete unit ===========================
+@router.delete(
+    "/{id}",
+    response_model=UnitDeleteResponse,
+)
+def delete_unit(
+    session: SessionDep, id: uuid.UUID
+) -> UnitDeleteResponse:
+    return UnitServices.delete(session=session, unit_id=id)
+
 @router.delete(
     "",
     response_model=List[UnitDeleteResponse],
