@@ -16,6 +16,7 @@ const baseApplyDataURL = "apply-data";
 const baseFactorsAffectingExistenceURL = "factors-affecting-existence";
 const basePrepareSettlementReportURL = "prepare-settlement-report";
 const baseManageCatalogsURL = "manage-catalogs";
+export const unitsURL = "/units";
 
 // data-sea-management URLs
 export const seaManagementMaterialsURL = `${baseDataSeaManagementURL}/materials`;

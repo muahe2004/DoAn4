@@ -10,6 +10,7 @@ import {
 import * as XLSX from "xlsx";
 import Button from "../../../components/Button/Button";
 import LabelPrimary from "../../../components/Label/Label";
+import PrimaryPagination from "../../../components/Pagination/Pagination";
 import ImportFormTable, { type ImportMaterialRow } from "./ImportFormTable";
 import type { ImportDeclarationResponse } from "../types";
 import { useGetDropdownUnits } from "../../units/apis/dropdown";
@@ -85,6 +86,8 @@ const ImportFormModal: React.FC<ImportFormModalProps> = ({
 }) => {
     const [formData, setFormData] = useState<ImportDeclarationFormValues>(defaultFormValues);
     const [rows, setRows] = useState<ImportMaterialRow[]>([createEmptyRow()]);
+    const [page, setPage] = useState(1);
+    const [rowsPerPage, setRowsPerPage] = useState(5);
     const fileInputRef = useRef<HTMLInputElement | null>(null);
 
     const paramsUnit = {
@@ -153,7 +156,13 @@ const ImportFormModal: React.FC<ImportFormModalProps> = ({
     };
 
     const handleAddRow = () => {
-        setRows((prev) => [...prev, createEmptyRow()]);
+        setRows((prev) => {
+            const updated = [...prev, createEmptyRow()];
+            if (mode === "edit") {
+                setPage(Math.max(1, Math.ceil(updated.length / rowsPerPage)));
+            }
+            return updated;
+        });
     };
 
     const handleRemoveRow = (id: string) => {
@@ -268,7 +277,13 @@ const ImportFormModal: React.FC<ImportFormModalProps> = ({
                     } as ImportMaterialRow;
                 });
 
-            setRows(mapped.length ? mapped : [createEmptyRow()]);
+            if (mapped.length) {
+                setRows(mapped);
+                setPage(1);
+            } else {
+                setRows([createEmptyRow()]);
+                setPage(1);
+            }
         };
 
         reader.readAsArrayBuffer(file);
@@ -278,6 +293,23 @@ const ImportFormModal: React.FC<ImportFormModalProps> = ({
     const handleSubmit = () => {
         onSubmit?.({ ...formData, materials: rows });
     };
+
+    const shouldPaginate = mode === "edit";
+
+    useEffect(() => {
+        if (!shouldPaginate) return;
+        const totalPages = Math.max(1, Math.ceil(rows.length / rowsPerPage));
+        if (page > totalPages) {
+            setPage(totalPages);
+        }
+    }, [rows.length, rowsPerPage, page, shouldPaginate]);
+
+    const paginatedRows = shouldPaginate
+        ? rows.slice(
+              (page - 1) * rowsPerPage,
+              (page - 1) * rowsPerPage + rowsPerPage
+          )
+        : rows;
 
     return (
         <Dialog
@@ -299,7 +331,7 @@ const ImportFormModal: React.FC<ImportFormModalProps> = ({
                 sx={{ display: "flex", flexDirection: "column", height: "100%" }}
             >
                 <Grid container spacing={2} className="myprofile-form">
-                    <Grid size={4} className="myprofile-form__group">
+                    <Grid size={3} className="myprofile-form__group">
                         <LabelPrimary value="Số tờ khai" required />
                         <TextField
                             name="import_declaration_number"
@@ -310,7 +342,7 @@ const ImportFormModal: React.FC<ImportFormModalProps> = ({
                             className="primary-text__field"
                         />
                     </Grid>
-                    <Grid size={4} className="myprofile-form__group">
+                    <Grid size={3} className="myprofile-form__group">
                         <LabelPrimary value="Số giấy phép" />
                         <TextField
                             name="licence_number"
@@ -321,7 +353,7 @@ const ImportFormModal: React.FC<ImportFormModalProps> = ({
                             className="primary-text__field"
                         />
                     </Grid>
-                    <Grid size={4} className="myprofile-form__group">
+                    <Grid size={3} className="myprofile-form__group">
                         <LabelPrimary value="Số vận đơn" required />
                         <TextField
                             name="bill_number"
@@ -332,7 +364,7 @@ const ImportFormModal: React.FC<ImportFormModalProps> = ({
                             className="primary-text__field"
                         />
                     </Grid>
-                    <Grid size={6} className="myprofile-form__group">
+                    <Grid size={3} className="myprofile-form__group">
                         <LabelPrimary value="Doanh nghiệp" required />
                         <AutocompletePrimary
                             labelKey="partner_name"
@@ -481,14 +513,28 @@ const ImportFormModal: React.FC<ImportFormModalProps> = ({
                     style={{ display: "none" }}
                 />
 
-                <div style={{ marginTop: 16, flex: 1, minHeight: 0 }}>
-                    <ImportFormTable
-                        rows={rows}
-                        unitOptions={units}
-                        countryOptions={countries}
-                        onUpdateRow={handleUpdateRow}
-                        onRemoveRow={handleRemoveRow}
-                    />
+                <div style={{ marginTop: 16, flex: 1, minHeight: 0, display: "flex", flexDirection: "column" }}>
+                    <div style={{ flex: 1, minHeight: 0 }}>
+                        <ImportFormTable
+                            rows={paginatedRows}
+                            unitOptions={units}
+                            countryOptions={countries}
+                            onUpdateRow={handleUpdateRow}
+                            onRemoveRow={handleRemoveRow}
+                        />
+                    </div>
+                    {shouldPaginate && (
+                        <PrimaryPagination
+                            totalItems={rows.length}
+                            page={page}
+                            rowsPerPage={rowsPerPage}
+                            onPageChange={(value) => setPage(value)}
+                            onRowsPerPageChange={(value) => {
+                                setRowsPerPage(value);
+                                setPage(1);
+                            }}
+                        />
+                    )}
                 </div>
             </DialogContent>
 

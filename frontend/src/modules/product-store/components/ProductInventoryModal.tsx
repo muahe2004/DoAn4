@@ -48,15 +48,17 @@ const ProductInventoryModal: React.FC<ProductInventoryModalProps> = ({
       <DialogContent>
         <Box sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 1 }}>
           <FormControl fullWidth disabled={isEditing} required>
-            <InputLabel>Sản phẩm *</InputLabel>
             <Select
               value={formData.product_id}
               onChange={(e) =>
                 setFormData({ ...formData, product_id: e.target.value })
               }
-              label="Sản phẩm *"
+              displayEmpty
               error={!formData.product_id && !isEditing}
             >
+              <MenuItem value="" disabled>
+                <em>Chọn sản phẩm</em>
+              </MenuItem>
               {products.map((product) => (
                 <MenuItem key={product.id} value={product.id}>
                   {product.product_code} - {product.product_name}
@@ -66,15 +68,17 @@ const ProductInventoryModal: React.FC<ProductInventoryModalProps> = ({
           </FormControl>
 
           <FormControl fullWidth disabled={isEditing} required>
-            <InputLabel>Kho *</InputLabel>
             <Select
               value={formData.store_id}
               onChange={(e) =>
                 setFormData({ ...formData, store_id: e.target.value })
               }
-              label="Kho *"
+              displayEmpty
               error={!formData.store_id && !isEditing}
             >
+              <MenuItem value="" disabled>
+                <em>Chọn kho</em>
+              </MenuItem>
               {stores.map((store) => (
                 <MenuItem key={store.id} value={store.id}>
                   {store.store_code} - {store.store_name}

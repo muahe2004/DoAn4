@@ -5,11 +5,11 @@ import {
   DialogContent,
   DialogTitle,
   TextField,
-  Grid,
   FormControl,
   InputLabel,
   Select,
   MenuItem,
+  Box,
 } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
 import { useCreateMaterialInventory } from "../apis/createMaterialInventory";
@@ -68,11 +68,11 @@ const MaterialStoreModal: React.FC<MaterialStoreModalProps> = ({
       });
       onClose();
     },
-    onError: (error: any) => {
+    onError: (error: Error) => {
       console.error("Create failed:", error);
       const errorMessage =
-        error?.response?.data?.detail ||
-        "Thêm tồn kho thất bại. Vui lòng thử lại.";
+        (error as { response?: { data?: { detail?: string } } })?.response?.data
+          ?.detail || "Thêm tồn kho thất bại. Vui lòng thử lại.";
       showSnackbar({
         message: errorMessage,
         severity: "error",
@@ -88,11 +88,11 @@ const MaterialStoreModal: React.FC<MaterialStoreModalProps> = ({
       });
       onClose();
     },
-    onError: (error: any) => {
+    onError: (error: Error) => {
       console.error("Update failed:", error);
       const errorMessage =
-        error?.response?.data?.detail ||
-        "Cập nhật tồn kho thất bại. Vui lòng thử lại.";
+        (error as { response?: { data?: { detail?: string } } })?.response?.data
+          ?.detail || "Cập nhật tồn kho thất bại. Vui lòng thử lại.";
       showSnackbar({
         message: errorMessage,
         severity: "error",
@@ -127,7 +127,7 @@ const MaterialStoreModal: React.FC<MaterialStoreModalProps> = ({
     }
   }, [open, inventory]);
 
-  const handleChange = (field: string, value: any) => {
+  const handleChange = (field: string, value: string | number) => {
     setFormData((prev) => ({
       ...prev,
       [field]: value,
@@ -135,6 +135,31 @@ const MaterialStoreModal: React.FC<MaterialStoreModalProps> = ({
   };
 
   const handleSubmit = async () => {
+    // Validation
+    if (!formData.material_id) {
+      showSnackbar({
+        message: "Vui lòng chọn nguyên vật liệu!",
+        severity: "error",
+      });
+      return;
+    }
+
+    if (!formData.store_id) {
+      showSnackbar({
+        message: "Vui lòng chọn kho!",
+        severity: "error",
+      });
+      return;
+    }
+
+    if (formData.quantity_on_hand < 0) {
+      showSnackbar({
+        message: "Số lượng không được âm!",
+        severity: "error",
+      });
+      return;
+    }
+
     try {
       if (inventory) {
         // Update
@@ -167,117 +192,108 @@ const MaterialStoreModal: React.FC<MaterialStoreModalProps> = ({
     }
   };
 
-  const isFormValid =
-    formData.material_id && formData.store_id && formData.quantity_on_hand >= 0;
-
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
+    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
       <DialogTitle>
         {inventory
           ? "Cập nhật tồn kho nguyên vật liệu"
           : "Thêm tồn kho nguyên vật liệu"}
       </DialogTitle>
       <DialogContent>
-        <Grid container spacing={3} sx={{ mt: 1 }}>
+        <Box sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 1 }}>
           {/* Material Selection */}
-          <Grid item xs={12} md={6}>
-            <FormControl fullWidth>
-              <InputLabel>Nguyên vật liệu *</InputLabel>
-              <Select
-                value={formData.material_id}
-                onChange={(e) => handleChange("material_id", e.target.value)}
-                label="Nguyên vật liệu *"
-              >
-                {materials.map((material) => (
-                  <MenuItem key={material.id} value={material.id}>
-                    {material.material_name}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          </Grid>
+          <FormControl fullWidth disabled={!!inventory} required>
+            <Select
+              value={formData.material_id}
+              onChange={(e) => handleChange("material_id", e.target.value)}
+              displayEmpty
+              error={!formData.material_id}
+            >
+              <MenuItem value="" disabled>
+                <em>Chọn nguyên vật liệu</em>
+              </MenuItem>
+              {materials.map((material) => (
+                <MenuItem key={material.id} value={material.id}>
+                  {material.material_name}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
 
           {/* Store Selection */}
-          <Grid item xs={12} md={6}>
-            <FormControl fullWidth>
-              <InputLabel>Kho *</InputLabel>
-              <Select
-                value={formData.store_id}
-                onChange={(e) => handleChange("store_id", e.target.value)}
-                label="Kho *"
-              >
-                {stores.map((store) => (
-                  <MenuItem key={store.id} value={store.id}>
-                    {store.store_name} ({store.store_code})
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          </Grid>
+          <FormControl fullWidth disabled={!!inventory} required>
+            <Select
+              value={formData.store_id}
+              onChange={(e) => handleChange("store_id", e.target.value)}
+              displayEmpty
+              error={!formData.store_id}
+            >
+              <MenuItem value="" disabled>
+                <em>Chọn kho</em>
+              </MenuItem>
+              {stores.map((store) => (
+                <MenuItem key={store.id} value={store.id}>
+                  {store.store_code} - {store.store_name}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
 
           {/* Quantity */}
-          <Grid item xs={12} md={6}>
-            <TextField
-              fullWidth
-              label="Số lượng *"
-              type="number"
-              value={formData.quantity_on_hand}
-              onChange={(e) =>
-                handleChange(
-                  "quantity_on_hand",
-                  parseFloat(e.target.value) || 0
-                )
-              }
-              inputProps={{ min: 0, step: 0.01 }}
-            />
-          </Grid>
-
-          {/* Status */}
-          <Grid item xs={12} md={6}>
-            <FormControl fullWidth>
-              <InputLabel>Trạng thái</InputLabel>
-              <Select
-                value={formData.status}
-                onChange={(e) => handleChange("status", e.target.value)}
-                label="Trạng thái"
-              >
-                <MenuItem value="ACTIVE">Hoạt động</MenuItem>
-                <MenuItem value="INACTIVE">Không hoạt động</MenuItem>
-              </Select>
-            </FormControl>
-          </Grid>
+          <TextField
+            fullWidth
+            label="Số lượng tồn kho *"
+            type="number"
+            value={formData.quantity_on_hand}
+            onChange={(e) =>
+              handleChange("quantity_on_hand", parseFloat(e.target.value) || 0)
+            }
+            required
+            slotProps={{ htmlInput: { min: 0, step: 0.01 } }}
+            error={formData.quantity_on_hand < 0}
+            helperText={
+              formData.quantity_on_hand < 0 ? "Số lượng không được âm" : ""
+            }
+          />
 
           {/* Internal Code */}
-          <Grid item xs={12} md={6}>
-            <TextField
-              fullWidth
-              label="Mã nội bộ"
-              value={formData.internal_code}
-              onChange={(e) => handleChange("internal_code", e.target.value)}
-            />
-          </Grid>
+          <TextField
+            fullWidth
+            label="Mã nội bộ"
+            value={formData.internal_code}
+            onChange={(e) => handleChange("internal_code", e.target.value)}
+            placeholder="Nhập mã nội bộ (tùy chọn)"
+          />
 
           {/* External Code */}
-          <Grid item xs={12} md={6}>
-            <TextField
-              fullWidth
-              label="Mã hải quan"
-              value={formData.external_code}
-              onChange={(e) => handleChange("external_code", e.target.value)}
-            />
-          </Grid>
-        </Grid>
+          <TextField
+            fullWidth
+            label="Mã hải quan"
+            value={formData.external_code}
+            onChange={(e) => handleChange("external_code", e.target.value)}
+            placeholder="Nhập mã hải quan (tùy chọn)"
+          />
+
+          {/* Status */}
+          <FormControl fullWidth>
+            <InputLabel>Trạng thái</InputLabel>
+            <Select
+              value={formData.status}
+              onChange={(e) => handleChange("status", e.target.value)}
+              label="Trạng thái"
+            >
+              <MenuItem value="ACTIVE">ACTIVE</MenuItem>
+              <MenuItem value="INACTIVE">INACTIVE</MenuItem>
+            </Select>
+          </FormControl>
+        </Box>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose} className="button-cancel">
-          Hủy
-        </Button>
+        <Button onClick={onClose}>Hủy</Button>
         <Button
           onClick={handleSubmit}
           variant="contained"
-          disabled={
-            !isFormValid || createMutation.isPending || updateMutation.isPending
-          }
+          disabled={createMutation.isPending || updateMutation.isPending}
         >
           {createMutation.isPending || updateMutation.isPending
             ? "Đang xử lý..."

@@ -2,6 +2,7 @@ from typing import List
 import uuid
 
 from fastapi import APIRouter, Depends, HTTPException
+from sqlmodel import select
 from starlette import status
 
 from app.api.deps import SessionDep

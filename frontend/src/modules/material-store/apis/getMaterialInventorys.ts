@@ -18,7 +18,7 @@ const getMaterialInventorys = async (
       }
     );
     return response.data;
-  } catch (error: any) {
+  } catch (error) {
     if (axios.isAxiosError(error)) {
       throw error;
     }

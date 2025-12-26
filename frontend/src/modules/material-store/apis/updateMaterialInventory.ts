@@ -39,6 +39,7 @@ export const useUpdateMaterialInventory = (
     mutationFn: updateMaterialInventory,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["material-inventorys"] });
+      queryClient.refetchQueries({ queryKey: ["material-inventorys"] });
     },
     ...config,
   });

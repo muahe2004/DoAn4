@@ -26,6 +26,7 @@ import "./norms.css";
 import { useCreateNorm } from "../apis/addNorm";
 import { useEditNorm } from "../apis/editNorm";
 import { useDeleteNorms } from "../apis/deleteNorm";
+import SearchEngine from "../../../../components/SearchEngine/SearchEngine";
 
 export function Norms() {
   const [page, setPage] = useState(1);
@@ -136,9 +137,20 @@ export function Norms() {
 
   return (
     <Container maxWidth={false} className="primary-container">
-      <div className="norm-actions">
-        <Button onClick={handleOpenAdd}>thêm mới</Button>
+      <div className="norm-header">
+          <div className="norm-title">
+              <p className="norm-title__label">DANH MỤC ĐỊNH MỨC</p>
+          </div>
+          <div className="norm-actions">
+              {/* <SearchEngine placeholder="Tên nguyên vật liệu, mã..."/> */}
+              <div className="norm-actions__buttons">
+                  <div className="norm-actions">
+                    <Button onClick={handleOpenAdd}>thêm mới</Button>
+                  </div>
+              </div>
+          </div>
       </div>
+      
 
       <TableContainer className="primary-table-container">
         <Table stickyHeader aria-label="norms table">
@@ -162,7 +174,7 @@ export function Norms() {
             </TableRow>
           </TableHead>
 
-          <TableBody>
+          <TableBody className="primary-tbody">
             {norms?.data?.map((norm, index) => (
               <TableRow className="primary-trow" key={norm.id}>
                 <TableCell

@@ -40,6 +40,7 @@ export const useDeleteMaterialInventory = (
     mutationFn: deleteMaterialInventory,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["material-inventorys"] });
+      queryClient.refetchQueries({ queryKey: ["material-inventorys"] });
     },
     ...config,
   });

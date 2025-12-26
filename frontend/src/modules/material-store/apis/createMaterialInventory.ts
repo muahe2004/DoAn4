@@ -33,6 +33,7 @@ export const useCreateMaterialInventory = (
     mutationFn: createMaterialInventory,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["material-inventorys"] });
+      queryClient.refetchQueries({ queryKey: ["material-inventorys"] });
     },
     ...config,
   });

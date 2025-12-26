@@ -13,6 +13,8 @@ import {
   DialogContent,
   DialogContentText,
   DialogTitle,
+  Box,
+  TextField,
 } from "@mui/material";
 import { FiEdit } from "react-icons/fi";
 import { PiTrashSimpleFill } from "react-icons/pi";
@@ -21,7 +23,6 @@ import { useDeleteMaterialInventory } from "../apis/deleteMaterialInventory";
 import { useSnackbar } from "../../../components/SnackBar/SnackBar";
 import PrimaryPagination from "../../../components/Pagination/Pagination";
 import Button from "../../../components/Button/Button";
-import SearchEngine from "../../../components/SearchEngine/SearchEngine";
 import MaterialStoreModal from "../components/MaterialStoreModal";
 import type { IMaterialInventory } from "../types";
 import "./MaterialStore.css";
@@ -64,16 +65,6 @@ const MaterialStore: React.FC = () => {
       });
     },
   });
-
-  const handleSearch = (value: string) => {
-    setSearchTerm(value);
-    setCurrentPage(1);
-  };
-
-  const handleFilterChange = (status: string) => {
-    setFilterStatus(status);
-    setCurrentPage(1);
-  };
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
@@ -125,28 +116,23 @@ const MaterialStore: React.FC = () => {
 
   return (
     <Container maxWidth={false} className="material-store-container">
-      {/* Header */}
-      <div className="material-store-header">
-        <h1>Quản lý tồn kho nguyên vật liệu</h1>
-        <div className="material-store-actions">
-          <SearchEngine
+      <Box sx={{ mb: 3 }}>
+        <Box sx={{ display: "flex", gap: 2, mb: 2 }}>
+          <TextField
+            label="Tìm kiếm"
+            variant="outlined"
+            size="small"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
             placeholder="Tìm kiếm nguyên vật liệu..."
-            onSearch={handleSearch}
+            sx={{ minWidth: 300, flexGrow: 1 }}
           />
-          <select
-            value={filterStatus}
-            onChange={(e) => handleFilterChange(e.target.value)}
-            className="status-filter"
-          >
-            <option value="all">Tất cả trạng thái</option>
-            <option value="ACTIVE">Hoạt động</option>
-            <option value="INACTIVE">Không hoạt động</option>
-          </select>
-          <Button onClick={handleAddNew} variant="contained">
+
+          <Button variant="contained" onClick={handleAddNew}>
             Thêm mới
           </Button>
-        </div>
-      </div>
+        </Box>
+      </Box>
 
       {/* Loading */}
       {isLoading ? (
@@ -156,44 +142,98 @@ const MaterialStore: React.FC = () => {
           {/* Table */}
           <TableContainer className="material-store-table">
             <Table stickyHeader>
-              <TableHead>
+              <TableHead className="primary-thead">
                 <TableRow>
-                  <TableCell align="center">STT</TableCell>
-                  <TableCell align="center">Mã nội bộ</TableCell>
-                  <TableCell align="center">Mã hải quan</TableCell>
-                  <TableCell align="center">Tên nguyên vật liệu</TableCell>
-                  <TableCell align="center">Đơn vị tính</TableCell>
-                  <TableCell align="center">Số lượng</TableCell>
-                  <TableCell align="center">Giá trị</TableCell>
-                  <TableCell align="center">Kho</TableCell>
-                  <TableCell align="center">Trạng thái</TableCell>
-                  <TableCell align="center">Thao tác</TableCell>
+                  <TableCell className="primary-tcell" align="center">
+                    STT
+                  </TableCell>
+                  <TableCell className="primary-tcell" align="center">
+                    Mã nội bộ
+                  </TableCell>
+                  <TableCell className="primary-tcell" align="center">
+                    Mã hải quan
+                  </TableCell>
+                  <TableCell className="primary-tcell" align="center">
+                    Tên nguyên vật liệu
+                  </TableCell>
+                  <TableCell className="primary-tcell" align="center">
+                    Đơn vị tính
+                  </TableCell>
+                  <TableCell className="primary-tcell" align="center">
+                    Số lượng
+                  </TableCell>
+                  <TableCell className="primary-tcell" align="center">
+                    Giá trị
+                  </TableCell>
+                  <TableCell className="primary-tcell" align="center">
+                    Kho
+                  </TableCell>
+                  <TableCell className="primary-tcell" align="center">
+                    Trạng thái
+                  </TableCell>
+                  <TableCell
+                    className="primary-tcell"
+                    align="center"
+                  ></TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
                 {materialInventorysData?.data.map((inventory, index) => (
                   <TableRow key={inventory.id}>
-                    <TableCell align="center">
+                    <TableCell
+                      className="custom-border-tcell primary-tcell"
+                      align="center"
+                    >
                       {(currentPage - 1) * pageSize + index + 1}
                     </TableCell>
-                    <TableCell align="center">
+                    <TableCell
+                      className="custom-border-tcell primary-tcell"
+                      align="center"
+                    >
                       {inventory.internal_code || "-"}
                     </TableCell>
-                    <TableCell align="center">
+                    <TableCell
+                      className="custom-border-tcell primary-tcell"
+                      align="center"
+                    >
                       {inventory.external_code || "-"}
                     </TableCell>
-                    <TableCell>{inventory.material_name}</TableCell>
-                    <TableCell align="center">{inventory.unit_name}</TableCell>
-                    <TableCell align="center">
+                    <TableCell
+                      className="custom-border-tcell primary-tcell"
+                      align="center"
+                    >
+                      {inventory.material_name}
+                    </TableCell>
+                    <TableCell
+                      className="custom-border-tcell primary-tcell"
+                      align="center"
+                    >
+                      {inventory.unit_name}
+                    </TableCell>
+                    <TableCell
+                      className="custom-border-tcell primary-tcell"
+                      align="center"
+                    >
                       {inventory.quantity_on_hand.toLocaleString()}
                     </TableCell>
-                    <TableCell align="center">
+                    <TableCell
+                      className="custom-border-tcell primary-tcell"
+                      align="center"
+                    >
                       {inventory.total_value
                         ? formatCurrency(inventory.total_value)
                         : "-"}
                     </TableCell>
-                    <TableCell align="center">{inventory.store_name}</TableCell>
-                    <TableCell align="center">
+                    <TableCell
+                      className="custom-border-tcell primary-tcell"
+                      align="center"
+                    >
+                      {inventory.store_name}
+                    </TableCell>
+                    <TableCell
+                      className="custom-border-tcell primary-tcell"
+                      align="center"
+                    >
                       <span
                         className={`status-badge ${
                           inventory.status === "ACTIVE"
@@ -206,7 +246,10 @@ const MaterialStore: React.FC = () => {
                           : "Không hoạt động"}
                       </span>
                     </TableCell>
-                    <TableCell align="center">
+                    <TableCell
+                      className="custom-border-tcell primary-tcell"
+                      align="center"
+                    >
                       <IconButton
                         size="small"
                         onClick={() => handleViewDetail(inventory)}

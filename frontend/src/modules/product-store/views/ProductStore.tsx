@@ -19,7 +19,7 @@ import {
   DialogActions,
   DialogContentText,
 } from "@mui/material";
-import { Edit, Delete, Add } from "@mui/icons-material";
+import { Edit, Delete } from "@mui/icons-material";
 import Button from "../../../components/Button/Button";
 
 import { getProductInventorys } from "../apis/getProductInventorys";
@@ -322,12 +322,7 @@ const ProductStore: React.FC = () => {
             placeholder="Tìm theo tên sản phẩm, mã sản phẩm..."
             sx={{ minWidth: 300, flexGrow: 1 }}
           />
-          <Button
-            variant="contained"
-            startIcon={<Add />}
-            onClick={handleCreate}
-            color="primary"
-          >
+          <Button variant="contained" onClick={handleCreate} color="primary">
             Thêm mới
           </Button>
         </Box>
@@ -364,9 +359,7 @@ const ProductStore: React.FC = () => {
               <TableCell className="primary-tcell" align="center">
                 Trạng thái
               </TableCell>
-              <TableCell className="primary-tcell" align="center">
-                Thao tác
-              </TableCell>
+              <TableCell className="primary-tcell" align="center"></TableCell>
             </TableRow>
           </TableHead>
           <TableBody>

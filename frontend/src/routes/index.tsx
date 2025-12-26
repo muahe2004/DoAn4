@@ -10,6 +10,9 @@ import {
   warehouseProductsURL,
   seaManagementInvoiceImportURL,
   standardNormsURL,
+  seaManagementInvoiceExportURL,
+  unitsURL,
+  unitConversionURL,
   warehouseClosingProductsURL,
   warehouseClosingMaterialsURL,
 } from "./urls";
@@ -21,8 +24,11 @@ import Register from "../modules/auth/views/Register";
 import { Products } from "../modules/products/views/Products";
 import { Materials } from "../modules/materials/views/Materials";
 import { isAuthenticated } from "../modules/auth/services/authState";
+import { ExportDeclaration } from "../modules/exports/views/Exports";
 import { ImportDeclarations } from "../modules/import/views/ImportDeclarations";
 import { Norms } from "../modules/standard-management/norms/views/Norms";
+import { Units } from "../modules/units/views/units";
+import UoM from "../modules/units/views/UoM";
 import ProductStore from "../modules/product-store/views/ProductStore";
 import MaterialStore from "../modules/material-store/views/MaterialStore";
 
@@ -73,8 +79,20 @@ export const createRouterConfig = () =>
               element: <ImportDeclarations />,
             },
             {
+              path: seaManagementInvoiceExportURL,
+              element: <ExportDeclaration />,
+            },
+            {
               path: standardNormsURL,
               element: <Norms />,
+            },
+            {
+              path: unitsURL,
+              element: <Units />,
+            },
+            {
+              path: unitConversionURL,
+              element: <UoM />,
             },
             {
               path: warehouseClosingProductsURL,
