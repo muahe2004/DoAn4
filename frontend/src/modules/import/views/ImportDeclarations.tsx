@@ -65,15 +65,6 @@ export function ImportDeclarations() {
             return;
         }
 
-        const missingCountry = data.materials.some((row) => !row.country_id);
-        if (missingCountry) {
-            showSnackbar({
-                message: "Vui lòng chọn quốc gia cho tất cả nguyên vật liệu",
-                severity: "warning",
-            });
-            return;
-        }
-
         const missingUnit = data.materials.some(
             (row) => !row.unit_id && !row.unit_name
         );
@@ -107,6 +98,8 @@ export function ImportDeclarations() {
                 unit_name_2: row.unit_name_2 || undefined,
                 description: row.description || undefined,
                 country_id: row.country_id || undefined,
+                country_code: row.country_id ? undefined : row.country_code || row.country_name || undefined,
+                country_name: row.country_id ? undefined : row.country_name || undefined,
                 status: data.status || "active",
                 quantity: row.quantity ? Number(row.quantity) : undefined,
                 quantity2: row.quantity2 ? Number(row.quantity2) : undefined,
