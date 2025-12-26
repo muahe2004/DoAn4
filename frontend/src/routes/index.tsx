@@ -12,7 +12,10 @@ import {
     standardNormsURL,
     seaManagementInvoiceExportURL,
     unitsURL,
-    unitConversionURL
+    unitConversionURL,
+    prepareSettlementReportUserURL,
+    prepareSettlementReportInventoryProductURL,
+    prepareSettlementReportInventorySummaryURL
 } from "./urls";
 import Layout from "../modules/app/Layout";
 import Test from "../modules/Test/Test";
@@ -27,6 +30,9 @@ import { ImportDeclarations } from "../modules/import/views/ImportDeclarations";
 import { Norms } from "../modules/standard-management/norms/views/Norms";
 import { Units } from "../modules/units/views/units";
 import  UoM  from "../modules/units/views/UoM";
+import { MaterialSettlementReport } from "../modules/reports/views/MaterialSettlementReport";
+import { ProductSettlementReport } from "../modules/reports/views/ProductSettlementReport";
+import { MaterialInventorySummary } from "../modules/reports/views/MaterialInventorySummary";
 
 /* ===== Route Guards ===== */
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
@@ -89,6 +95,18 @@ export const createRouterConfig = () =>
                 {
                     path: unitConversionURL,
                     element: <UoM />,
+                },
+                {
+                    path: prepareSettlementReportUserURL,
+                    element: <MaterialSettlementReport />,
+                },
+                {
+                    path: prepareSettlementReportInventoryProductURL,
+                    element: <ProductSettlementReport />,
+                },
+                {
+                    path: prepareSettlementReportInventorySummaryURL,
+                    element: <MaterialInventorySummary />,
                 },
             ],
         },

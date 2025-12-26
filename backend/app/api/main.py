@@ -12,7 +12,8 @@ from app.api.routes import (
     importDeclarations,
     countries,
     partners,
-    currencies
+    currencies,
+    settlementReports,
 )
 
 api_router = APIRouter()
@@ -30,3 +31,4 @@ api_router.include_router(partners.router, prefix="/partners", tags=["partners"]
 api_router.include_router(currencies.router, prefix="/currencies", tags=["currencies"])
 
 api_router.include_router(importDeclarations.router, prefix="/import_declarations", tags=["import_declarations"])
+api_router.include_router(settlementReports.router, prefix="/settlement-reports", tags=["settlement-reports"])
