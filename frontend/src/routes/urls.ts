@@ -10,3 +10,4 @@ export const productsURL = "/products";
 export const normsURL = "/norms";
 export const normProductInventorysURL =
   "/setup-data-fiscal-years/norm-product-inventorys";
+export const productStoreURL = "/product-store";

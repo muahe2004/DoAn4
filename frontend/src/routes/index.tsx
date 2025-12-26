@@ -9,6 +9,7 @@ import {
   productsURL,
   normsURL,
   normProductInventorysURL,
+  productStoreURL,
 } from "./urls";
 
 import Layout from "../modules/app/Layout";
@@ -19,6 +20,7 @@ import Register from "../modules/auth/views/Register";
 import { Products } from "../modules/products/views/Products";
 import { Norms } from "../modules/norms/views/Norms";
 import NormProductInventorys from "../modules/setup-data-fiscal-years/norm-product-inventorys/views/NormProductInventorys";
+import ProductStore from "../modules/product-store/views/ProductStore";
 import { isAuthenticated } from "../modules/auth/services/authState";
 
 /* ===== Route Guards ===== */
@@ -68,6 +70,14 @@ export const createRouterConfig = () =>
           element: (
             <ProtectedRoute>
               <NormProductInventorys />
+            </ProtectedRoute>
+          ),
+        },
+        {
+          path: productStoreURL,
+          element: (
+            <ProtectedRoute>
+              <ProductStore />
             </ProtectedRoute>
           ),
         },

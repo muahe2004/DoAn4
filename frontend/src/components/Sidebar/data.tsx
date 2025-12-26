@@ -96,7 +96,7 @@ export const sidebarData: SidebarData = [
       {
         id: "closing-product",
         label: "Quản lý chốt tồn kho sản phẩm",
-        path: "/invoice",
+        path: "/product-store",
         icon: <FiFileText />,
       },
     ],
