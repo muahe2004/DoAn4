@@ -132,6 +132,9 @@ export function Materials() {
                                 Đơn vị tính
                             </TableCell>
                             <TableCell className="primary-tcell" align="center">
+                                Quốc gia
+                            </TableCell>
+                            <TableCell className="primary-tcell" align="center">
                                 Trạng thái
                             </TableCell>
                             <TableCell className="primary-tcell" align="center"></TableCell>
@@ -166,11 +169,15 @@ export function Materials() {
                                     <TableCell className="custom-border-tcell primary-tcell">
                                         {material.unit_name}
                                     </TableCell>
+                                    <TableCell className="custom-border-tcell primary-tcell">
+                                        {material.country_name}
+                                    </TableCell>
                                     <TableCell className="custom-border-tcell primary-tcell" align="center">
                                         <span className={`status-badge ${badgeClass}`}>
                                             {STATUS_DISPLAY[statusKey] ?? material.status ?? "Unknown"}
                                         </span>
                                     </TableCell>
+
                                     <TableCell className="custom-border-tcell primary-tcell" align="center" width={150}>
                                         <IconButton
                                             className="primary-edit-btn"

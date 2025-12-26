@@ -26,7 +26,7 @@ class ExportDeclarationDetailPayload(SQLModel):
     unit_price_transport: Optional[float] = None
     invoice_value: Optional[float] = None
     taxable_price: Optional[float] = None
-    status: Optional[str] = Field(default="draft")
+    status: Optional[str] = Field(default="active")
 
 
 class ExportDeclarationCreate(SQLModel):

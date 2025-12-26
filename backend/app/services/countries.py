@@ -13,7 +13,6 @@ from app.models.schemas.countries.country_schemas import (
     CountryDropdownResponse,
     CountryQueryParams,
 )
-from app.enums.status import StatusEnum
 
 class CountryServices:
     @staticmethod
@@ -43,7 +42,32 @@ class CountryServices:
         ]
 
     @staticmethod
+    def ensure_default_country(session: Session) -> Countries:
+        DEFAULT_CODE = "VN"
+        DEFAULT_NAME = "Việt Nam"
+        existing = session.exec(
+            select(Countries).where(func.upper(Countries.country_code) == DEFAULT_CODE.upper())
+        ).first()
+        if existing:
+            return existing
+
+        payload = CountryCreate(
+            country_code=DEFAULT_CODE,
+            country_name=DEFAULT_NAME,
+            description="Đơn vị móc định",
+            status=StatusEnum.ACTIVE,
+        )
+        country = Countries(**payload.model_dump())
+        session.add(country)
+        session.commit()
+        session.refresh(country)
+        return country
+
+    @staticmethod
     def resolve_country_generic(session, country_id, country_code, country_name):
+        if not country_id and not country_code and not country_name:
+            default_country = CountryServices.ensure_default_country(session)
+            return default_country.id
         if country_id:
             existing_by_id = session.get(Countries, country_id)
             if existing_by_id:
@@ -55,16 +79,13 @@ class CountryServices:
                 )
         
         if not country_code or not country_code.strip():
-            raise HTTPException(
-                status_code=400,
-                detail="Country code must be provided."
-            )
-
-        if not country_name or not country_name.strip():
-            raise HTTPException(
-                status_code=400,
-                detail="Country name must be provided."
-            )
+            if country_name and country_name.strip():
+                country_code = country_name.strip()
+            else:
+                raise HTTPException(
+                    status_code=400,
+                    detail="Country code must be provided."
+                )
 
         existing_by_code = session.exec(
             select(Countries).where(
@@ -74,9 +95,12 @@ class CountryServices:
         if existing_by_code:
             return existing_by_code.id
 
+        effective_name = (country_name or country_code).strip()
+        trimmed_code = country_code.strip()[:10]
+
         payload = CountryCreate(
-            country_name=country_name.strip(),
-            country_code=country_code.strip(),
+            country_name=effective_name,
+            country_code=trimmed_code,
             description="",
             status=StatusEnum.ACTIVE,
         )
