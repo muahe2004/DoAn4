@@ -8,7 +8,7 @@ import {
     TableHead,
     TableRow,
 } from "@mui/material";
-import { type ChangeEvent, useRef, useState } from "react";
+import { type ChangeEvent, useCallback, useRef, useState } from "react";
 import { useGetProducts } from "../apis/getProducts";
 import { FiEdit } from "react-icons/fi";
 import { PiTrashSimpleFill } from "react-icons/pi";
@@ -83,7 +83,7 @@ export function Products() {
     }
 
     const normalizeProductPayload = (data: IProductResponse): IProduct => {
-        const fixId = (v: any) => (v === "" ? null : v);
+        const fixId = (v: string | null) => (v === "" ? null : v);
 
         const {
             id,
@@ -107,9 +107,9 @@ export function Products() {
             description,
             is_semi_product,
             status,
-            unit_id: fixId(unit_id),
-            unit_id_2: fixId(unit_id_2),
-            norm_id: fixId(norm_id),
+            unit_id: fixId(unit_id as string | null),
+            unit_id_2: fixId(unit_id_2 as string | null),
+            norm_id: fixId(norm_id as string | null),
             unit_name,
             unit_name_2,
             norm_name,
@@ -131,7 +131,7 @@ export function Products() {
                 showSnackbar({ message: "Thêm sản phẩm thành công", severity: "success" });
             }
             handleCloseModal();
-        } catch (error) {
+        } catch (_error) {
             showSnackbar({ message: "Có lỗi xảy ra, vui lòng thử lại", severity: "error" });
         }
     };
@@ -162,10 +162,10 @@ export function Products() {
         }
     };
 
-    const handleSearch = (value: string) => {
+    const handleSearch = useCallback((value: string) => {
         setSearch(value);
         setPage(1);
-    }
+    }, []);
 
     const handleImport = () => {
         fileInputRef.current?.click();
@@ -267,11 +267,24 @@ export function Products() {
 
     return (
         <Container maxWidth={false} className="primary-container">
-            <div className="product-actions">
-                <SearchEngine placeholder="Tìm kiếm" onSearch={handleSearch}/>
-                <Button onClick={handleExport} className="product-upload-button">Xuất mẫu excel</Button>
-                <Button onClick={handleImport} className="product-upload-button">tải lên</Button>
-                <Button onClick={handleOpenAdd}>thêm mới</Button>
+            <div className="product-header">
+                <div className="product-title">
+                    <p className="product-title__label">DANH MỤC SẢN PHẨM</p>
+                </div>
+                <div className="product-actions">
+                    <SearchEngine placeholder="Tên sản phẩm, mã..." onSearch={handleSearch} />
+                    <div className="product-actions__buttons">
+                        <Button className="product-action-btn" onClick={handleExport}>
+                            Xuất mẫu excel
+                        </Button>
+                        <Button className="product-action-btn" onClick={handleImport}>
+                            Tải lên
+                        </Button>
+                        <Button className="product-action-btn" onClick={handleOpenAdd}>
+                            Thêm mới
+                        </Button>
+                    </div>
+                </div>
             </div>
             <input
                 type="file"

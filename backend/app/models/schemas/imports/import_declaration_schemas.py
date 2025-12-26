@@ -5,6 +5,7 @@ from sqlalchemy import Column, Float, ForeignKey, String, Integer, DateTime
 from uuid import UUID
 
 from app.models.schemas.common.query import BaseQueryParams
+from app.models.schemas.imports.import_declaration_details_schemas import ImportDeclarationDetailsResponse
 
 class ImportDeclarationBase(SQLModel):
     import_declaration_number: str | None = Field(default=None, sa_column=Column(String(50), nullable=False))
@@ -25,6 +26,7 @@ class ImportDeclarationBase(SQLModel):
 
 class  ImportDeclarationPublic(ImportDeclarationBase):
     id: UUID
+
 class ImportDeclarationQueryParams(BaseQueryParams):
     type: Optional[str] = Field(None)
 
@@ -37,6 +39,12 @@ class ImportDeclarationMaterialCreate(SQLModel):
     unit_name_2: Optional[str] = Field(default=None, max_length=50)
     description: Optional[str] = Field(default=None, max_length=500)
     country_id: Optional[UUID] = Field(default=None, foreign_key="countries.id")
+    country_code: Optional[str] = Field(default=None, max_length=10)
+    country_name: Optional[str] = Field(default=None, max_length=100)
+    quantity: Optional[float] = Field(default=None)
+    quantity2: Optional[float] = Field(default=None)
+    unit_price: Optional[float] = Field(default=None)
+    unit_price_transport: Optional[float] = Field(default=None)
     status: Optional[str] = Field(default="active", max_length=50)
 
 class ImportDeclarationCreate(SQLModel):
@@ -54,3 +62,15 @@ class ImportDeclarationCreate(SQLModel):
     shipping_fee: Optional[float] = None
     status: Optional[str] = None
     materials: List[ImportDeclarationMaterialCreate]
+
+class ImportDeclarationQueryParams(BaseQueryParams):
+    exporter_id: Optional[UUID] = Field(None)
+
+class ImportDeclarationResponse(ImportDeclarationPublic):
+    currency_name: str
+    details: list[ImportDeclarationDetailsResponse] = Field(default_factory=list)
+    # unit_name_2: Optional[str] = Field(None)
+
+class ImportDeclarationListResponse(SQLModel):
+    total: int
+    data: list[ImportDeclarationResponse]

@@ -6,18 +6,21 @@ import {
   testURL,
   signinUrl,
   registerUrl,
-  productsURL,
-  normsURL,
+  warehouseMaterialsURL,
+  warehouseProductsURL,
+  seaManagementInvoiceImportURL,
+  standardNormsURL,
 } from "./urls";
-
 import Layout from "../modules/app/Layout";
 import Test from "../modules/Test/Test";
 import { NotFound } from "../modules/NotFound/NotFound";
 import Login from "../modules/auth/views/Login";
 import Register from "../modules/auth/views/Register";
 import { Products } from "../modules/products/views/Products";
-import { Norms } from "../modules/norms/views/Norms";
+import { Materials } from "../modules/materials/views/Materials";
 import { isAuthenticated } from "../modules/auth/services/authState";
+import { ImportDeclarations } from "../modules/import/views/ImportDeclarations";
+import { Norms } from "../modules/standard-management/norms/views/Norms";
 
 /* ===== Route Guards ===== */
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
@@ -38,28 +41,42 @@ export const createRouterConfig = () =>
       element: <Layout />,
       children: [
         {
-          path: homeUrl,
-          element: <div>Trang chủ</div>,
+          path: layoutUrl,
+          element: (
+            <ProtectedRoute>
+              <Layout />
+            </ProtectedRoute>
+          ),
+          children: [
+            {
+              path: homeUrl,
+              element: <div>Trang chủ</div>,
+            },
+            {
+              path: testURL,
+              element: <Test />,
+            },
+            {
+              path: warehouseProductsURL,
+              element: <Products />,
+            },
+            {
+              path: warehouseMaterialsURL,
+              element: <Materials />,
+            },
+            {
+              path: seaManagementInvoiceImportURL,
+              element: <ImportDeclarations />,
+            },
+            {
+              path: standardNormsURL,
+              element: <Norms />,
+            },
+          ],
         },
         {
           path: testURL,
           element: <Test />,
-        },
-        {
-          path: productsURL,
-          element: (
-            <ProtectedRoute>
-              <Products />
-            </ProtectedRoute>
-          ),
-        },
-        {
-          path: normsURL,
-          element: (
-            <ProtectedRoute>
-              <Norms />
-            </ProtectedRoute>
-          ),
         },
       ],
     },
