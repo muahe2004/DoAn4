@@ -8,10 +8,21 @@ from app.models.schemas.norms.norm_schemas import MultiNormCreate, NormCreate, N
 
 router = APIRouter()
 
+# =========================== get all norms ===========================
+@router.get("")
+def get_norms(session: SessionDep, query: BaseQueryParams = Depends()):
+    data, total = NormServices.get_all(session=session, query=query)
+    return {"total": total, "data": data}
+
 # =========================== dropdown norms ===========================
 @router.get("/drop-down")
 def dropdown_norm(session: SessionDep, query: BaseQueryParams = Depends()):
     return NormServices.dropdown(session=session, query=query)
+
+# =========================== get norm by id ===========================
+@router.get("/{id}", response_model=NormPublic)
+def get_norm_by_id(session: SessionDep, id: uuid.UUID) -> NormPublic:
+    return NormServices.get_by_id(session=session, norm_id=id)
 
 # =========================== create norm ===========================
 @router.post(
@@ -21,7 +32,7 @@ def dropdown_norm(session: SessionDep, query: BaseQueryParams = Depends()):
 def create_norm(
     request: Request, session: SessionDep, data: NormCreate
 ) -> NormPublic:
-    return NormServices.create(session=session, norm=data)
+    return NormServices.create(session=session, norm_data=data)
 
 # =========================== create multi unit ===========================
 @router.post(

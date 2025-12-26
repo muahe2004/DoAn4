@@ -17,6 +17,7 @@ import { useGetDropdownCountries } from "../../countries/apis/dropdown";
 import { useGetDropdownPartners } from "../../partners/apis/dropdown";
 import { useGetDropdownCurrencies } from "../../currencies/apis/dropdown";
 import AutocompletePrimary from "../../../components/Autocomplete/AutoComplete";
+import { exportExcel } from "../../../utils/exportExcel";
 
 export type ImportDeclarationFormValues = {
     import_declaration_number: string;
@@ -71,6 +72,7 @@ const createEmptyRow = (): ImportMaterialRow => ({
     unit_price: "",
     country_id: "",
     country_name: "",
+    country_code: "",
     description: "",
 });
 
@@ -133,6 +135,7 @@ const ImportFormModal: React.FC<ImportFormModalProps> = ({
                 unit_price: detail.unit_price?.toString() ?? "",
                 country_id: detail.origin_country_id || "",
                 country_name: detail.country_name || "",
+                country_code: "",
                 description: "",
             }));
 
@@ -167,6 +170,38 @@ const ImportFormModal: React.FC<ImportFormModalProps> = ({
         fileInputRef.current?.click();
     };
 
+    const handleExportTemplate = () => {
+        const headers = {
+            material_code: "HS Code",
+            material_name: "Tên NVL",
+            unit_name: "ĐVT",
+            unit_name_2: "ĐVT 2",
+            quantity: "Số lượng",
+            quantity2: "SL 2",
+            unit_price: "Đơn giá",
+            origin_country: "Mã QG",
+            description: "Mô tả",
+        };
+
+        const templateRow = {
+            material_code: "",
+            material_name: "",
+            unit_name: "",
+            unit_name_2: "",
+            quantity: "",
+            quantity2: "",
+            unit_price: "",
+            origin_country: "",
+            description: "",
+        };
+
+        exportExcel([templateRow], "import_materials_template", {
+            sheetName: "Template",
+            headers,
+            title: "TEMPLATE NGUYEN VAT LIEU",
+        });
+    };
+
     const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
         if (!file) return;
@@ -182,7 +217,7 @@ const ImportFormModal: React.FC<ImportFormModalProps> = ({
 
             const rowsFromExcel: any[][] = XLSX.utils.sheet_to_json(sheet, {
                 header: 1,
-                range: 1,
+                range: 2,
                 defval: "",
             });
 
@@ -228,6 +263,7 @@ const ImportFormModal: React.FC<ImportFormModalProps> = ({
                         unit_price: `${unit_price}`.trim(),
                         country_id: matchedCountry?.id || "",
                         country_name: matchedCountry?.name || `${origin_country}`.trim(),
+                        country_code: `${origin_country}`.trim(),
                         description: `${description}`.trim(),
                     } as ImportMaterialRow;
                 });
@@ -241,7 +277,6 @@ const ImportFormModal: React.FC<ImportFormModalProps> = ({
 
     const handleSubmit = () => {
         onSubmit?.({ ...formData, materials: rows });
-        onClose();
     };
 
     return (
@@ -426,6 +461,9 @@ const ImportFormModal: React.FC<ImportFormModalProps> = ({
 
                 <div className="product-actions" style={{ marginTop: 16 }}>
                     <div className="product-actions__buttons">
+                        <Button className="product-action-btn" onClick={handleExportTemplate}>
+                            Xuất mẫu Excel
+                        </Button>
                         <Button className="product-action-btn" onClick={handleImportClick}>
                             Tải lên Excel
                         </Button>

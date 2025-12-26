@@ -1,12 +1,19 @@
 import uuid
 from typing import Optional
 
+from fastapi import HTTPException
+from sqlmodel import Session, select
 from sqlalchemy import func
 from sqlmodel import Session, select
 
 from app.enums.status import StatusEnum
 from app.models.models import Countries
-from app.models.schemas.countries.country_schemas import CountryDropdownResponse, CountryQueryParams
+from app.models.schemas.countries.country_schemas import (
+    CountryCreate,
+    CountryDropdownResponse,
+    CountryQueryParams,
+)
+from app.enums.status import StatusEnum
 
 class CountryServices:
     @staticmethod
@@ -34,58 +41,49 @@ class CountryServices:
             CountryDropdownResponse(id=row[0], country_name=row[1])
             for row in raw_results
         ]
-        DEFAULT_COUNTRY_CODE = "DEFAULT"
-        
-    DEFAULT_COUNTRY_NAME = "Không xác định"
-    DEFAULT_COUNTRY_CODE = "DEFAULT"
+
     @staticmethod
-    def resolve_country_generic(
-        session: Session,
-        country_id: Optional[uuid.UUID] = None,
-        *,
-        country_code: Optional[str] = None,
-        country_name: Optional[str] = None,
-    ) -> uuid.UUID:
+    def resolve_country_generic(session, country_id, country_code, country_name):
         if country_id:
             existing_by_id = session.get(Countries, country_id)
             if existing_by_id:
                 return existing_by_id.id
+            if not country_code:
+                raise HTTPException(
+                    status_code=400,
+                    detail="Country id does not exist."
+                )
+        
+        if not country_code or not country_code.strip():
+            raise HTTPException(
+                status_code=400,
+                detail="Country code must be provided."
+            )
 
-        if country_code:
-            normalized_code = country_code.strip().upper()
-            existing_by_code = session.exec(
-                select(Countries).where(func.upper(Countries.country_code) == normalized_code)
-            ).first()
-            if existing_by_code:
-                return existing_by_code.id
+        if not country_name or not country_name.strip():
+            raise HTTPException(
+                status_code=400,
+                detail="Country name must be provided."
+            )
 
-        if country_name:
-            normalized_name = country_name.strip().lower()
-            existing_by_name = session.exec(
-                select(Countries).where(func.lower(Countries.country_name) == normalized_name)
-            ).first()
-            if existing_by_name:
-                return existing_by_name.id
-
-        default = CountryServices.ensure_default_country(session)
-        return default.id
-
-    @staticmethod
-    def ensure_default_country(session: Session) -> Countries:
-        normalized_code = CountryServices.DEFAULT_COUNTRY_NAME
-        existing = session.exec(
-            select(Countries).where(func.upper(Countries.country_code) == normalized_code)
+        existing_by_code = session.exec(
+            select(Countries).where(
+                func.upper(Countries.country_code) == country_code.strip().upper()
+            )
         ).first()
-        if existing:
-            return existing
+        if existing_by_code:
+            return existing_by_code.id
 
-        new_country = Countries(
-            country_code=CountryServices.DEFAULT_COUNTRY_CODE,
-            country_name=CountryServices.DEFAULT_COUNTRY_NAME,
-            description="Country created by export declaration flow",
+        payload = CountryCreate(
+            country_name=country_name.strip(),
+            country_code=country_code.strip(),
+            description="",
             status=StatusEnum.ACTIVE,
         )
+
+        new_country = Countries(**payload.model_dump())
         session.add(new_country)
         session.commit()
         session.refresh(new_country)
-        return new_country
+
+        return new_country.id

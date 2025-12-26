@@ -24,6 +24,7 @@ export type ImportMaterialRow = {
     unit_price: string;
     country_id: string;
     country_name: string;
+    country_code: string;
     description: string;
 };
 
@@ -238,7 +239,7 @@ export default function ImportFormTable({
                                 align="center"
                                 sx={colSx.country}
                             >
-                                <AutocompletePrimary
+                                    <AutocompletePrimary
                                         labelKey="country_name"
                                         valueKey="id"
                                         options={countryOptions}
@@ -249,12 +250,17 @@ export default function ImportFormTable({
                                         }
                                         inputValue={row.country_name}
                                         onInputChange={(value) =>
-                                            onUpdateRow(row.id, { country_name: value, country_id: "" })
+                                            onUpdateRow(row.id, {
+                                                country_name: value,
+                                                country_code: value,
+                                                country_id: "",
+                                            })
                                         }
                                         onChange={(val) =>
                                             onUpdateRow(row.id, {
                                                 country_id: val.id || "",
                                                 country_name: val.country_name || "",
+                                                country_code: "",
                                             })
                                         }
                                     />

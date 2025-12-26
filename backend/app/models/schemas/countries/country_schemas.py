@@ -22,3 +22,6 @@ class CountryQueryParams(BaseQueryParams):
 class CountryDropdownResponse(SQLModel):
     id: UUID
     country_name: str
+
+class CountryCreate(CountryBase):
+    pass

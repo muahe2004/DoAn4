@@ -4,7 +4,7 @@
   min-height: 100vh;
   width: 100%;
   position: relative;
-  padding-top: 65px;
+  padding-top: 20px;
 }
 
 * {
@@ -39,7 +39,7 @@
 .layout-content {
   flex: 1;
   padding: 24px;
-  margin-left: 18vw;
+  margin-left: 9vw;
   min-width: 0;
   transition: margin-left 0.3s ease, width 0.3s ease;
   background-color: #fafafa;
@@ -62,13 +62,13 @@
     margin-left: 0 !important;
     width: 100%;
   }
-  
+
   .layout-main.collapsed .layout-content {
     margin-left: 0 !important;
   }
-  
+
   .layout-main.sidebar-visible .layout-content::before {
-    content: '';
+    content: "";
     position: fixed;
     top: 65px;
     left: 0;
