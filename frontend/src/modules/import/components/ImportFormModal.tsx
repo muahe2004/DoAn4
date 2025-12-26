@@ -299,7 +299,7 @@ const ImportFormModal: React.FC<ImportFormModalProps> = ({
                 sx={{ display: "flex", flexDirection: "column", height: "100%" }}
             >
                 <Grid container spacing={2} className="myprofile-form">
-                    <Grid size={4} className="myprofile-form__group">
+                    <Grid size={3} className="myprofile-form__group">
                         <LabelPrimary value="Số tờ khai" required />
                         <TextField
                             name="import_declaration_number"
@@ -310,7 +310,7 @@ const ImportFormModal: React.FC<ImportFormModalProps> = ({
                             className="primary-text__field"
                         />
                     </Grid>
-                    <Grid size={4} className="myprofile-form__group">
+                    <Grid size={3} className="myprofile-form__group">
                         <LabelPrimary value="Số giấy phép" />
                         <TextField
                             name="licence_number"
@@ -321,7 +321,7 @@ const ImportFormModal: React.FC<ImportFormModalProps> = ({
                             className="primary-text__field"
                         />
                     </Grid>
-                    <Grid size={4} className="myprofile-form__group">
+                    <Grid size={3} className="myprofile-form__group">
                         <LabelPrimary value="Số vận đơn" required />
                         <TextField
                             name="bill_number"
@@ -332,7 +332,7 @@ const ImportFormModal: React.FC<ImportFormModalProps> = ({
                             className="primary-text__field"
                         />
                     </Grid>
-                    <Grid size={6} className="myprofile-form__group">
+                    <Grid size={3} className="myprofile-form__group">
                         <LabelPrimary value="Doanh nghiệp" required />
                         <AutocompletePrimary
                             labelKey="partner_name"

@@ -1,15 +1,16 @@
 /* eslint-disable react-refresh/only-export-components */
 import { createBrowserRouter, Navigate } from "react-router-dom";
 import {
-  homeUrl,
-  layoutUrl,
-  testURL,
-  signinUrl,
-  registerUrl,
-  warehouseMaterialsURL,
-  warehouseProductsURL,
-  seaManagementInvoiceImportURL,
-  standardNormsURL,
+    homeUrl,
+    layoutUrl,
+    testURL,
+    signinUrl,
+    registerUrl,
+    warehouseMaterialsURL,
+    warehouseProductsURL,
+    seaManagementInvoiceImportURL,
+    standardNormsURL,
+    seaManagementInvoiceExportURL,
 } from "./urls";
 import Layout from "../modules/app/Layout";
 import Test from "../modules/Test/Test";
@@ -19,6 +20,7 @@ import Register from "../modules/auth/views/Register";
 import { Products } from "../modules/products/views/Products";
 import { Materials } from "../modules/materials/views/Materials";
 import { isAuthenticated } from "../modules/auth/services/authState";
+import { ExportDeclaration } from "../modules/exports/views/Exports";
 import { ImportDeclarations } from "../modules/import/views/ImportDeclarations";
 import { Norms } from "../modules/standard-management/norms/views/Norms";
 
@@ -41,38 +43,42 @@ export const createRouterConfig = () =>
       element: <Layout />,
       children: [
         {
-          path: layoutUrl,
-          element: (
-            <ProtectedRoute>
-              <Layout />
-            </ProtectedRoute>
-          ),
-          children: [
-            {
-              path: homeUrl,
-              element: <div>Trang chủ</div>,
-            },
-            {
-              path: testURL,
-              element: <Test />,
-            },
-            {
-              path: warehouseProductsURL,
-              element: <Products />,
-            },
-            {
-              path: warehouseMaterialsURL,
-              element: <Materials />,
-            },
-            {
-              path: seaManagementInvoiceImportURL,
-              element: <ImportDeclarations />,
-            },
-            {
-              path: standardNormsURL,
-              element: <Norms />,
-            },
-          ],
+            path: layoutUrl,
+            element: (
+                <ProtectedRoute>
+                    <Layout />
+                </ProtectedRoute>
+            ),
+            children: [
+                {
+                    path: homeUrl, 
+                    element: <div>Trang chủ</div>, 
+                },
+                {
+                    path: testURL, 
+                    element: <Test />,
+                },
+                {
+                    path: warehouseProductsURL,
+                    element: <Products />,
+                },
+                {
+                    path: warehouseMaterialsURL,
+                    element: <Materials />,
+                },
+                {
+                    path: seaManagementInvoiceImportURL,
+                    element: <ImportDeclarations />,
+                },
+                {
+                    path: seaManagementInvoiceExportURL,
+                    element: <ExportDeclaration />,
+                },
+                {
+                    path: standardNormsURL,
+                    element: <Norms />,
+                },
+            ],
         },
         {
           path: testURL,
