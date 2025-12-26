@@ -60,6 +60,7 @@ class UserPublic(BaseModel):
 
 
 class UserLoginResponse(BaseModel):
+    id: UUID
     message: str
     code: str
     status: str

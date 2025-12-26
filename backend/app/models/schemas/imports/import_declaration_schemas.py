@@ -5,6 +5,7 @@ from sqlalchemy import Column, Float, ForeignKey, String, Integer, DateTime
 from uuid import UUID
 
 from app.models.schemas.common.query import BaseQueryParams
+from app.models.schemas.imports.import_declaration_details_schemas import ImportDeclarationDetailsResponse
 
 class ImportDeclarationBase(SQLModel):
     import_declaration_number: str | None = Field(default=None, sa_column=Column(String(50), nullable=False))
@@ -25,6 +26,7 @@ class ImportDeclarationBase(SQLModel):
 
 class  ImportDeclarationPublic(ImportDeclarationBase):
     id: UUID
+
 class ImportDeclarationQueryParams(BaseQueryParams):
     type: Optional[str] = Field(None)
 
@@ -54,3 +56,15 @@ class ImportDeclarationCreate(SQLModel):
     shipping_fee: Optional[float] = None
     status: Optional[str] = None
     materials: List[ImportDeclarationMaterialCreate]
+
+class ImportDeclarationQueryParams(BaseQueryParams):
+    exporter_id: Optional[UUID] = Field(None)
+
+class ImportDeclarationResponse(ImportDeclarationPublic):
+    currency_name: str
+    details: list[ImportDeclarationDetailsResponse] = Field(default_factory=list)
+    # unit_name_2: Optional[str] = Field(None)
+
+class ImportDeclarationListResponse(SQLModel):
+    total: int
+    data: list[ImportDeclarationResponse]

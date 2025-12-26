@@ -7,6 +7,7 @@ export interface LoginRequest {
 }
 
 export interface LoginResponse {
+  id: string;
   message: string;
   code: string;
   status: string;

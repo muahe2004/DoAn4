@@ -11,14 +11,84 @@ from starlette import status
 from typing import List, Optional, Tuple
 from sqlalchemy.orm import aliased
 
-from app.models.models import Countries, ImportDeclarations, Materials, Norms, Products, Units
-from app.models.schemas.imports.import_declaration_schemas import ImportDeclarationCreate, ImportDeclarationPublic
+from app.models.models import Countries, Currencies, ImportDeclarations, Materials, Norms, Products, Units
+from app.models.schemas.imports.import_declaration_schemas import ImportDeclarationCreate, ImportDeclarationListResponse, ImportDeclarationPublic, ImportDeclarationQueryParams
 from app.models.schemas.imports.import_declaration_details_schemas import ImportDeclarationDetailCreate
 from app.services.units import UnitServices
 from app.services.materials import MaterialServices
 from app.services.import_declaration_details import ImportDeclarationDetailServices
 
 class ImportDeclarationServices:
+
+    @staticmethod
+    def get_all(*, session: Session, query: ImportDeclarationQueryParams) -> ImportDeclarationListResponse:
+
+        statement = (
+            select(
+                ImportDeclarations.id,
+                ImportDeclarations.import_declaration_number,
+                ImportDeclarations.licence_number,
+                ImportDeclarations.licence_date,
+                ImportDeclarations.bill_number,
+                ImportDeclarations.exporter,
+                ImportDeclarations.exporter_id,
+                ImportDeclarations.usd_exchange_rate,
+                ImportDeclarations.currency_id,
+                Currencies.currency_name,
+                ImportDeclarations.type_declaration,
+                ImportDeclarations.type_inventory,
+                ImportDeclarations.shipping_term,
+                ImportDeclarations.shipping_fee,
+                ImportDeclarations.status,
+                ImportDeclarations.created_at,
+                ImportDeclarations.updated_at,
+            )
+            .join(Currencies, Currencies.id == ImportDeclarations.currency_id)
+        )
+
+        conditions = []
+        if query.status:
+            conditions.append(ImportDeclarations.status == query.status)
+        if query.exporter_id:
+            conditions.append(ImportDeclarations.exporter_id == query.exporter_id)
+        if query.search:
+            search_text = f"%{query.search}%"
+            conditions.append(
+                or_(
+                    func.unaccent(ImportDeclarations.import_declaration_number).ilike(func.unaccent(search_text)),
+                )
+            )
+        
+        if conditions:
+            statement = statement.where(*conditions)
+
+        count_stmt = select(func.count()).select_from(ImportDeclarations)
+        if conditions:
+            count_stmt = count_stmt.where(*conditions)
+
+        total = session.exec(count_stmt).one()
+
+        statement = (
+            statement.order_by(ImportDeclarations.created_at.desc())
+            .offset(query.skip)
+            .limit(query.limit)
+        )
+
+        results = session.exec(statement).all()
+
+        detail_map = ImportDeclarationDetailServices.get_by_import_declaration_ids(
+            session=session,
+            import_declaration_ids=[row.id for row in results],
+        )
+
+        data = []
+        for row in results:
+            item = dict(row._mapping)
+            item["details"] = detail_map.get(row.id, [])
+            data.append(item)
+
+        return data, total    
+    
     @staticmethod
     def create(
         *,
@@ -35,7 +105,10 @@ class ImportDeclarationServices:
                 detail=f"Import declaration {import_declaration.import_declaration_number} already exists.",
             )
     
-        new_import_declaration = ImportDeclarations(**import_declaration.model_dump(exclude={"materials"}))
+        declaration_data = import_declaration.model_dump(exclude={"materials"})
+        if not declaration_data.get("licence_date"):
+            declaration_data["licence_date"] = datetime.now()
+        new_import_declaration = ImportDeclarations(**declaration_data)
         session.add(new_import_declaration)
         session.commit()
         session.refresh(new_import_declaration)
@@ -46,7 +119,10 @@ class ImportDeclarationServices:
             for idx, material in enumerate(import_declaration.materials, start=1):
 
                 material.unit_id = UnitServices.resolve_unit_generic(session, material.unit_id, material.unit_name)
-                material.unit_id_2 = UnitServices.resolve_unit_generic(session, material.unit_id_2, material.unit_name_2)
+                if material.unit_id_2 or material.unit_name_2:
+                    material.unit_id_2 = UnitServices.resolve_unit_generic(
+                        session, material.unit_id_2, material.unit_name_2
+                    )
                 material_id = MaterialServices.resolve_material_generic(
                     session,
                     None,
@@ -67,8 +143,8 @@ class ImportDeclarationServices:
                     import_declaration_id=new_import_declaration_id,
                     material_id=material_id,
                     origin_country_id=material.country_id,
-                    unit=material.unit_name,
-                    unit2=material.unit_name_2,
+                    unit_id=material.unit_id,
+                    unit_id_2=material.unit_id_2,
                     quantity=getattr(material, "quantity", None),
                     quantity2=getattr(material, "quantity2", getattr(material, "quantity_2", None)),
                     unit_price=getattr(material, "unit_price", None),
@@ -80,24 +156,4 @@ class ImportDeclarationServices:
                     import_declaration=detail_payload,
                 )
 
-                # print(f"[{idx}]")
-                # print("  material_code :", material.material_code)
-                # print("  material_name :", material.material_name)
-                # print("  material_id   :", material_id)
-                # print("  unit_id       :", material.unit_id)
-                # print("  unit_name     :", material.unit_name)
-                # print("  unit_id_2     :", material.unit_id_2)
-                # print("  unit_name_2   :", material.unit_name_2)
-                # print("  description   :", material.description)
-                # print("  country_id    :", material.country_id)
-                # print("  status        :", material.status)
-
         return ImportDeclarationPublic.model_validate(new_import_declaration)
-
-    # đầu tiên thêm thông tin tờ khai để lấy id của nó 
-        # sau đó cần thêm chi tiết tờ khai
-            # 1. ở chi tiết tờ khai có nvl, cần check nvl có tồn tại chưa, nếu chưa thì thêm vào db trước
-                # check ở bảng compare_material_code_schemas
-                    # if có -> lâý id của nvl ở đó
-                    # else -> ko lấy     
-            # 2. tách func check tồn tại hay chưa ra ngoài

@@ -6,19 +6,19 @@ from app.api.deps import SessionDep
 from app.services.products import ProductServices
 from typing import List
 
-from app.models.schemas.imports.import_declaration_schemas import ImportDeclarationCreate, ImportDeclarationPublic
+from app.models.schemas.imports.import_declaration_schemas import ImportDeclarationCreate, ImportDeclarationListResponse, ImportDeclarationPublic, ImportDeclarationQueryParams
 from app.models.models import ImportDeclarations
 from app.services.import_declaration import ImportDeclarationServices
 
 router = APIRouter()
 
-# # =========================== get all products ===========================
-# @router.get("")
-# def get_products(session: SessionDep, query: ProductQueryParams = Depends()):
-#     data, total = ProductServices.get_all(session=session,query=query)
-#     return ProductListResponse(total=total, data=data)
+# =========================== get all ===========================
+@router.get("")
+def get_import_declarations(session: SessionDep, query: ImportDeclarationQueryParams = Depends()):
+    data, total = ImportDeclarationServices.get_all(session=session,query=query)
+    return ImportDeclarationListResponse(total=total, data=data)
 
-# =========================== add product ===========================
+# =========================== add ===========================
 @router.post(
     "",
     response_model=ImportDeclarationPublic,

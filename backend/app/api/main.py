@@ -8,7 +8,10 @@ from app.api.routes import (
     units,
     norms,
     materials,
-    importDeclarations
+    importDeclarations,
+    countries,
+    partners,
+    currencies
 )
 
 api_router = APIRouter()
@@ -20,5 +23,8 @@ api_router.include_router(users.router, prefix="/users", tags=["users"])
 api_router.include_router(login.router, prefix="/login", tags=["login"])
 api_router.include_router(units.router, prefix="/units", tags=["units"])
 api_router.include_router(norms.router, prefix="/norms", tags=["norms"])
+api_router.include_router(countries.router, prefix="/countries", tags=["countries"])
+api_router.include_router(partners.router, prefix="/partners", tags=["partners"])
+api_router.include_router(currencies.router, prefix="/currencies", tags=["currencies"])
 
 api_router.include_router(importDeclarations.router, prefix="/import_declarations", tags=["import_declarations"])
