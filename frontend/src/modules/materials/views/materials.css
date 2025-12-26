@@ -1,0 +1,39 @@
+.material-header {
+    margin-bottom: 20px;
+}
+
+.material-title {
+    display: flex;
+    flex-direction: column;
+}
+
+.material-title__label {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--primary-color);
+    margin-bottom: 4px;
+}
+
+.material-title__subtitle {
+    font-size: 14px;
+    color: var(--secondary-color);
+}
+
+.material-actions {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    width: 100%;
+}
+
+.material-actions__buttons {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.material-action-btn {
+    min-width: 150px !important;
+}

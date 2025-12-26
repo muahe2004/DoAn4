@@ -1,5 +1,6 @@
 from datetime import datetime
 from typing import List, Optional
+from app.models.schemas.common.query import BaseQueryParams
 from sqlmodel import SQLModel, Field, Column, String, DateTime
 from sqlalchemy import Column, String, Integer, DateTime 
 from uuid import UUID
@@ -14,3 +15,10 @@ class CountryBase(SQLModel):
 
 class  CountryPublic(CountryBase):
     id: UUID
+
+class CountryQueryParams(BaseQueryParams):
+    pass
+
+class CountryDropdownResponse(SQLModel):
+    id: UUID
+    country_name: str
