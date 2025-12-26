@@ -8,7 +8,7 @@ import {
     TableHead,
     TableRow,
 } from "@mui/material";
-import { type ChangeEvent, useRef, useState } from "react";
+import { type ChangeEvent, useCallback, useRef, useState } from "react";
 import { useGetProducts } from "../apis/getProducts";
 import { FiEdit } from "react-icons/fi";
 import { PiTrashSimpleFill } from "react-icons/pi";
@@ -162,10 +162,10 @@ export function Products() {
         }
     };
 
-    const handleSearch = (value: string) => {
+    const handleSearch = useCallback((value: string) => {
         setSearch(value);
         setPage(1);
-    }
+    }, []);
 
     const handleImport = () => {
         fileInputRef.current?.click();

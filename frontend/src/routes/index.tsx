@@ -8,7 +8,7 @@ import {
     registerUrl,
     warehouseMaterialsURL,
     warehouseProductsURL,
-    seaManagementInvoiceExportURL,
+    seaManagementInvoiceImportURL,
 } from "./urls";
 import Layout from "../modules/app/Layout";
 import Test from "../modules/Test/Test";
@@ -18,7 +18,7 @@ import Register from "../modules/auth/views/Register";
 import { Products } from "../modules/products/views/Products";
 import { Materials } from "../modules/materials/views/Materials";
 import { isAuthenticated } from "../modules/auth/services/authState";
-import { Exports } from "../modules/exports/views/Exports";
+import { ImportDeclarations } from "../modules/import/views/ImportDeclarations"
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
     if (!isAuthenticated()) return <Navigate to={signinUrl} replace />;
@@ -57,9 +57,9 @@ export const createRouterConfig = () =>
                     element: <Materials />,
                 },
                 {
-                    path: seaManagementInvoiceExportURL,
-                    element: <Exports />,
-                }
+                    path: seaManagementInvoiceImportURL,
+                    element: <ImportDeclarations />,
+                },
             ],
         },
         {
