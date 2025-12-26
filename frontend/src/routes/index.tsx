@@ -1,18 +1,23 @@
 /* eslint-disable react-refresh/only-export-components */
 import { createBrowserRouter, Navigate } from "react-router-dom";
 import {
-    homeUrl,
-    layoutUrl,
-    testURL,
-    signinUrl,
-    registerUrl,
-    warehouseMaterialsURL,
-    warehouseProductsURL,
-    seaManagementInvoiceImportURL,
-    standardNormsURL,
-    seaManagementInvoiceExportURL,
-    unitsURL,
-    unitConversionURL
+  homeUrl,
+  layoutUrl,
+  testURL,
+  signinUrl,
+  registerUrl,
+  warehouseMaterialsURL,
+  warehouseProductsURL,
+  seaManagementInvoiceImportURL,
+  standardNormsURL,
+  seaManagementInvoiceExportURL,
+  unitsURL,
+  unitConversionURL,
+  warehouseClosingProductsURL,
+  warehouseClosingMaterialsURL,
+  prepareSettlementReportUserURL,
+  prepareSettlementReportInventoryProductURL,
+  prepareSettlementReportInventorySummaryURL
 } from "./urls";
 import Layout from "../modules/app/Layout";
 import Test from "../modules/Test/Test";
@@ -26,7 +31,12 @@ import { ExportDeclaration } from "../modules/exports/views/Exports";
 import { ImportDeclarations } from "../modules/import/views/ImportDeclarations";
 import { Norms } from "../modules/standard-management/norms/views/Norms";
 import { Units } from "../modules/units/views/units";
-import  UoM  from "../modules/units/views/UoM";
+import UoM from "../modules/units/views/UoM";
+import ProductStore from "../modules/product-store/views/ProductStore";
+import MaterialStore from "../modules/material-store/views/MaterialStore";
+import { MaterialSettlementReport } from "../modules/reports/views/MaterialSettlementReport";
+import { ProductSettlementReport } from "../modules/reports/views/ProductSettlementReport";
+import { MaterialInventorySummary } from "../modules/reports/views/MaterialInventorySummary";
 
 /* ===== Route Guards ===== */
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
@@ -47,50 +57,70 @@ export const createRouterConfig = () =>
       element: <Layout />,
       children: [
         {
-            path: layoutUrl,
-            element: (
-                <ProtectedRoute>
-                    <Layout />
-                </ProtectedRoute>
-            ),
-            children: [
+          path: layoutUrl,
+          element: (
+            <ProtectedRoute>
+              <Layout />
+            </ProtectedRoute>
+          ),
+          children: [
+            {
+              path: homeUrl,
+              element: <div>Trang chủ</div>,
+            },
+            {
+              path: testURL,
+              element: <Test />,
+            },
+            {
+              path: warehouseProductsURL,
+              element: <Products />,
+            },
+            {
+              path: warehouseMaterialsURL,
+              element: <Materials />,
+            },
+            {
+              path: seaManagementInvoiceImportURL,
+              element: <ImportDeclarations />,
+            },
+            {
+              path: seaManagementInvoiceExportURL,
+              element: <ExportDeclaration />,
+            },
+            {
+              path: standardNormsURL,
+              element: <Norms />,
+            },
+            {
+              path: unitsURL,
+              element: <Units />,
+            },
+            {
+              path: unitConversionURL,
+              element: <UoM />,
+            },
+            {
+              path: warehouseClosingProductsURL,
+              element: <ProductStore />,
+            },
+            {
+              path: warehouseClosingMaterialsURL,
+              element: <MaterialStore />,
+            },
                 {
-                    path: homeUrl, 
-                    element: <div>Trang chủ</div>, 
+                    path: prepareSettlementReportUserURL,
+                    element: <MaterialSettlementReport />,
                 },
                 {
-                    path: testURL, 
-                    element: <Test />,
+                    path: prepareSettlementReportInventoryProductURL,
+                    element: <ProductSettlementReport />,
                 },
                 {
-                    path: warehouseProductsURL,
-                    element: <Products />,
+                    path: prepareSettlementReportInventorySummaryURL,
+                    element: <MaterialInventorySummary />,
                 },
-                {
-                    path: warehouseMaterialsURL,
-                    element: <Materials />,
-                },
-                {
-                    path: seaManagementInvoiceImportURL,
-                    element: <ImportDeclarations />,
-                },
-                {
-                    path: seaManagementInvoiceExportURL,
-                    element: <ExportDeclaration />,
-                },
-                {
-                    path: standardNormsURL,
-                    element: <Norms />,
-                },
-                {
-                    path: unitsURL,
-                    element: <Units />,
-                },
-                {
-                    path: unitConversionURL,
-                    element: <UoM />,
-                },
-            ],
+          ],
         },
         {
           path: testURL,

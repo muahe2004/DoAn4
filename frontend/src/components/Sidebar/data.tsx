@@ -126,24 +126,24 @@ export const sidebarData: SidebarData = [
       //   path: warehouseSalesBooksURL,
       //   icon: <FiFileText />,
       // },
-      // {
-      //   id: "closing-material-warehouse",
-      //   label: "Quản lý chốt tồn kho nguyên vật liệu",
-      //   path: warehouseClosingMaterialsURL,
-      //   icon: <FiFileText />,
-      // },
+      {
+        id: "closing-material-warehouse",
+        label: "Quản lý chốt tồn kho nguyên vật liệu",
+        path: warehouseClosingMaterialsURL,
+        icon: <FiFileText />,
+      },
       // {
       //   id: "closing-semi-product-warehouse",
       //   label: "Quản lý chốt tồn kho bán thành phẩm",
       //   path: warehouseClosingSemiProductsURL,
       //   icon: <FiFileText />,
       // },
-      // {
-      //   id: "closing-product-warehouse",
-      //   label: "Quản lý chốt tồn kho sản phẩm",
-      //   path: warehouseClosingProductsURL,
-      //   icon: <FiFileText />,
-      // },
+      {
+        id: "closing-product-warehouse",
+        label: "Quản lý chốt tồn kho sản phẩm",
+        path: warehouseClosingProductsURL,
+        icon: <FiFileText />,
+      },
     ],
   },
   {
@@ -255,12 +255,12 @@ export const sidebarData: SidebarData = [
       //   path: applyInventoryProductURL,
       //   icon: <FiFileText />,
       // },
-      {
-        id: "inventory-from-semi-product",
-        label: "Tổng hợp tồn nvl từ bán thành phẩm",
-        path: applyInventoryFromSemiProductURL,
-        icon: <FiFileText />,
-      },
+      // {
+      //   id: "inventory-from-semi-product",
+      //   label: "Tổng hợp tồn nvl từ bán thành phẩm",
+      //   path: applyInventoryFromSemiProductURL,
+      //   icon: <FiFileText />,
+      // },
     ],
   },
   // {
