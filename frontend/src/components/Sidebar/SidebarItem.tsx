@@ -1,10 +1,11 @@
 import React from "react";
 import { FiChevronDown } from "react-icons/fi";
 import type { SidebarParent } from "./types";
-import { NavLink, useNavigate } from "react-router-dom";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import "./Sidebar.css";
 import Typography from "@mui/material/Typography";
 import Tooltip from "@mui/material/Tooltip";
+
 
 type Props = {
   parent: SidebarParent;
@@ -24,6 +25,19 @@ export const SidebarItem: React.FC<Props> = ({
 }) => {
   const hasChildren = (parent.children && parent.children.length > 0) ?? false;
   const navigate = useNavigate();
+
+  const location = useLocation();
+
+  const isChildActive = parent.children?.some(child =>
+    location.pathname === child.path ||
+    location.pathname.startsWith(child.path + "/")
+  );
+
+  const isParentActive =
+    (!!parent.path && location.pathname === parent.path) || isChildActive;
+
+  const shouldExpand = expanded || isChildActive;
+
 
   // Handle click on parent item
   const handleParentClick = () => {
@@ -57,7 +71,7 @@ export const SidebarItem: React.FC<Props> = ({
   return (
     <div className="sidebar__item">
       <button 
-        className={`sidebar__button ${hasChildren ? 'sidebar__button--has-children' : ''}`}
+        className={`sidebar__button ${isParentActive ? "sidebar__button--active" : ""}`}
         onClick={handleParentClick}
         type="button"
       >
@@ -72,7 +86,7 @@ export const SidebarItem: React.FC<Props> = ({
 
         {hasChildren && (
           <span 
-            className={`sidebar__chevron ${expanded ? 'sidebar__chevron--open' : ''}`}
+            className={`sidebar__chevron ${shouldExpand ? 'sidebar__chevron--open' : ''}`}
             onClick={(e) => {
               e.stopPropagation(); // Prevent parent click handler from firing
               onToggle(parent.id);
@@ -84,10 +98,10 @@ export const SidebarItem: React.FC<Props> = ({
       </button>
 
       {hasChildren && (
-        <div className="sidebar__children" style={{ display: expanded ? "block" : "none" }}>
+        <div className="sidebar__children" style={{ display: shouldExpand ? "block" : "none" }}>
           {parent.children!.map((child, index) => {          
             return (    
-              <Tooltip className="sidebar__link" key={child.id} title={child.label} placement="top" arrow disableInteractive>
+              <Tooltip className="sidebar__link" key={child.id} title={child.label} placement="top" arrow>
                 <NavLink key={`${child.id}-${index}`} to={child.path}
                   className={({ isActive }) => `sidebar__link ${isActive ? "sidebar__link--active" : ""}`}>
                     {child.icon && (

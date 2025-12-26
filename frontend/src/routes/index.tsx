@@ -1,27 +1,51 @@
 /* eslint-disable react-refresh/only-export-components */
 import { createBrowserRouter, Navigate } from "react-router-dom";
-import { homeUrl, layoutUrl, testURL, signinUrl, registerUrl, productsURL, unitsURL } from "./urls";
+import {
+    homeUrl,
+    layoutUrl,
+    testURL,
+    signinUrl,
+    registerUrl,
+    warehouseMaterialsURL,
+    warehouseProductsURL,
+    seaManagementInvoiceImportURL,
+    standardNormsURL,
+    seaManagementInvoiceExportURL,
+    unitsURL,
+    unitConversionURL
+} from "./urls";
 import Layout from "../modules/app/Layout";
 import Test from "../modules/Test/Test";
 import { NotFound } from "../modules/NotFound/NotFound";
 import Login from "../modules/auth/views/Login";
 import Register from "../modules/auth/views/Register";
 import { Products } from "../modules/products/views/Products";
+import { Materials } from "../modules/materials/views/Materials";
 import { isAuthenticated } from "../modules/auth/services/authState";
+import { ExportDeclaration } from "../modules/exports/views/Exports";
+import { ImportDeclarations } from "../modules/import/views/ImportDeclarations";
+import { Norms } from "../modules/standard-management/norms/views/Norms";
 import { Units } from "../modules/units/views/units";
+import  UoM  from "../modules/units/views/UoM";
 
+/* ===== Route Guards ===== */
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-    if (!isAuthenticated()) return <Navigate to={signinUrl} replace />;
-    return <>{children}</>;
+  if (!isAuthenticated()) return <Navigate to={signinUrl} replace />;
+  return <>{children}</>;
 };
 
 const AuthOnlyRoute = ({ children }: { children: React.ReactNode }) => {
-    if (isAuthenticated()) return <Navigate to={homeUrl} replace />;
-    return <>{children}</>;
+  if (isAuthenticated()) return <Navigate to={homeUrl} replace />;
+  return <>{children}</>;
 };
 
+/* ===== Router ===== */
 export const createRouterConfig = () =>
-    createBrowserRouter([
+  createBrowserRouter([
+    {
+      path: layoutUrl,
+      element: <Layout />,
+      children: [
         {
             path: layoutUrl,
             element: (
@@ -39,34 +63,59 @@ export const createRouterConfig = () =>
                     element: <Test />,
                 },
                 {
-                    path: productsURL,
-                    element: <Products/>
+                    path: warehouseProductsURL,
+                    element: <Products />,
+                },
+                {
+                    path: warehouseMaterialsURL,
+                    element: <Materials />,
+                },
+                {
+                    path: seaManagementInvoiceImportURL,
+                    element: <ImportDeclarations />,
+                },
+                {
+                    path: seaManagementInvoiceExportURL,
+                    element: <ExportDeclaration />,
+                },
+                {
+                    path: standardNormsURL,
+                    element: <Norms />,
                 },
                 {
                     path: unitsURL,
-                    element: <Units/>
+                    element: <Units />,
                 },
-                
+                {
+                    path: unitConversionURL,
+                    element: <UoM />,
+                },
             ],
         },
         {
-            path: "*",
-            element: <NotFound />,
+          path: testURL,
+          element: <Test />,
         },
-        {
-            path: signinUrl,
-            element: (
-                <AuthOnlyRoute>
-                    <Login />
-                </AuthOnlyRoute>
-            )
-        },
-        {
-            path: registerUrl,
-            element: (
-                <AuthOnlyRoute>
-                    <Register />
-                </AuthOnlyRoute>
-            )
-        }
-    ]);
+      ],
+    },
+    {
+      path: signinUrl,
+      element: (
+        <AuthOnlyRoute>
+          <Login />
+        </AuthOnlyRoute>
+      ),
+    },
+    {
+      path: registerUrl,
+      element: (
+        <AuthOnlyRoute>
+          <Register />
+        </AuthOnlyRoute>
+      ),
+    },
+    {
+      path: "*",
+      element: <NotFound />,
+    },
+  ]);

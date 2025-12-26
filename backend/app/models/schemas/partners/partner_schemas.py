@@ -1,5 +1,6 @@
 from datetime import datetime
 from typing import List, Optional
+from app.models.schemas.common.query import BaseQueryParams
 from sqlmodel import SQLModel, Field, Column, String, DateTime
 from sqlalchemy import Column, ForeignKey, String, Integer, DateTime 
 from uuid import UUID
@@ -18,3 +19,10 @@ class PartnerBase(SQLModel):
 
 class  PartnerPublic(PartnerBase):
     id: UUID
+
+class PartnerQueryParams(BaseQueryParams):
+    pass
+
+class PartnerDropdownResponse(SQLModel):
+    id: UUID
+    partner_name: str

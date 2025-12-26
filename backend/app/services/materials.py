@@ -3,7 +3,7 @@ from datetime import datetime
 import json
 from app.models.schemas.products.product_schemas import ProductCreate, ProductDeleteResponse, ProductListResponse, ProductPublic, ProductQueryParams, ProductResponse, ProductUpdate
 from app.enums.status import StatusEnum
-from app.models.schemas.materials.material_schemas import MaterialDeleteResponse, MaterialListResponse, MaterialPublic, MaterialQueryParams, MaterialUpdate
+from app.models.schemas.materials.material_schemas import MaterialCreate, MaterialDeleteResponse, MaterialListResponse, MaterialPublic, MaterialQueryParams, MaterialUpdate
 from fastapi import HTTPException, Request
 from sqlalchemy import or_
 from sqlmodel import Session, select, func
@@ -11,9 +11,39 @@ from starlette import status
 from typing import List, Optional, Tuple
 from sqlalchemy.orm import aliased
 
-from app.models.models import Countries, Materials, Norms, Products, Units
+from app.models.models import CompareMaterialCodes, Countries, Materials, Norms, Products, Units
 
 class MaterialServices:
+    @staticmethod
+    def dropdown(*, session: Session, query) -> list:
+        statement = select(Materials.id, Materials.material_name)
+        
+        conditions = []
+        
+        if hasattr(query, 'status') and query.status:
+            conditions.append(Materials.status == query.status)
+        else:
+            conditions.append(Materials.status == StatusEnum.ACTIVE)
+            
+        if hasattr(query, 'search') and query.search:
+            conditions.append(Materials.material_name.ilike(f"%{query.search}%"))
+        
+        if conditions:
+            statement = statement.where(*conditions)
+        
+        statement = (
+            statement.order_by(Materials.created_at.desc())
+            .offset(query.skip)
+            .limit(query.limit)
+        )
+        
+        raw_results = session.exec(statement).all()
+        
+        return [
+            {"id": str(row[0]), "material_name": row[1]}
+            for row in raw_results
+        ]
+
     @staticmethod
     def get_all(*, session: Session, query: MaterialQueryParams) -> MaterialListResponse:
         statement = (
@@ -31,7 +61,7 @@ class MaterialServices:
                 Countries.country_name
             )
             .join(Units, Units.id == Materials.unit_id)
-            .join(Countries, Countries.id == Materials.country_id)
+            .outerjoin(Countries, Countries.id == Materials.country_id)
         )
 
         conditions = []
@@ -142,3 +172,51 @@ class MaterialServices:
             raise e
 
         return results
+    
+    @staticmethod
+    def resolve_material_generic(session, maerial_id, material_code, material_name, unit_id, description, country_id):
+        if maerial_id:
+            existing_by_id = session.get(Materials, maerial_id)
+            if existing_by_id:
+                return existing_by_id.id
+            if not material_code:
+                raise HTTPException(
+                    status_code=400,
+                    detail="Material id does not exist."
+                )
+        
+        if not material_code or not material_code.strip():
+            raise HTTPException(
+                status_code=400,
+                detail="Material code must be provided."
+            )
+
+        existing_compare = session.exec(
+            select(CompareMaterialCodes).where(
+                func.upper(CompareMaterialCodes.external_code) == material_code.strip().upper()
+            )
+        ).first()
+        if existing_compare:
+            return existing_compare.material_id
+
+        payload = MaterialCreate(
+            material_code=material_code.strip(),
+            material_name=material_name.strip(),
+            description=(description or "").strip(),
+            unit_id=unit_id,
+            country_id=country_id,
+            status=StatusEnum.ACTIVE,
+        )
+
+        try:
+            new_material = MaterialServices.create(session=session, material=payload)
+            return new_material.id
+        except HTTPException as e:
+            if e.status_code == 400 and "already exists" in e.detail:
+                existing = session.exec(
+                    select(Materials).where(
+                        func.upper(Materials.material_code) == material_code.strip().upper()
+                    )
+                ).first()
+                return existing.id
+            raise

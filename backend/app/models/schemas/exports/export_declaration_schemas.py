@@ -9,7 +9,7 @@ class ExportDeclarationBase(SQLModel):
     licence_number: str | None = Field(default=None, sa_column=Column(String(50), nullable=True))
     licence_date: datetime = Field(default_factory=datetime.now, sa_column=Column(DateTime, nullable=True))
     bill_number: str = Field(sa_column=Column(String(50), nullable=True))
-    importer: str = Field(sa_column=Column(String(500), nullable=False, unique=True))
+    importer: str = Field(sa_column=Column(String(500), nullable=False, unique=False))
     importer_id: Optional[UUID] | None = Field(default=None, foreign_key="partners.id", nullable=False)
     usd_exchange_rate: float | None = Field(default=None, sa_column=Column(Float, nullable=True))
     currency_id: Optional[UUID] | None = Field(default=None, foreign_key="currencies.id", nullable=True)

@@ -33,7 +33,7 @@ export default function AutocompletePrimary({
       freeSolo={freeSolo}
       options={options}
       value={value}
-      getOptionLabel={(option: any) =>
+      getOptionLabel={(option: string | AutoOption) =>
         typeof option === "string" ? option : option?.[labelKey] || ""
       }
       inputValue={inputValue}

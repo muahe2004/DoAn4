@@ -1,5 +1,5 @@
 import { loginApi, registerApi } from "../api/authApi";
-import { setAuthenticated, clearAuthenticated } from "./authState";
+import { setAuthenticated, clearAuthenticated, setUserId } from "./authState";
 import type { LoginFormErrors, LoginFormValues, LoginResponse, RegisterFormErrors, RegisterFormValues, RegisterRequest, RegisterResponse, UserRole } from "../types/auth";
 
 import { emailRegex, phoneRegex, validateLoginForm, validateRegisterForm } from "./validators";
@@ -22,6 +22,9 @@ export const submitLogin = async (
 
   const data = await loginApi(payload);
   setAuthenticated();
+  if (data?.id) {
+    setUserId(data.id);
+  }
   return { data };
 };
 
