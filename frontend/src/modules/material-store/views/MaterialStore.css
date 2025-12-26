@@ -1,0 +1,140 @@
+.material-store-container {
+  padding: 20px;
+  max-width: 100%;
+}
+
+.material-store-header {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.material-store-header h1 {
+  margin: 0;
+  color: #333;
+  font-size: 24px;
+  font-weight: 600;
+}
+
+.material-store-actions {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.status-filter {
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background: white;
+  font-size: 14px;
+  min-width: 150px;
+}
+
+.status-filter:focus {
+  outline: none;
+  border-color: #1976d2;
+}
+
+.material-store-table {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+}
+
+.material-store-table .MuiTableHead-root {
+  background-color: #f5f5f5;
+}
+
+.material-store-table .MuiTableHead-root .MuiTableCell-root {
+  font-weight: 600;
+  color: #333;
+  border-bottom: 2px solid #e0e0e0;
+}
+
+.material-store-table .MuiTableBody-root .MuiTableRow-root:hover {
+  background-color: #f9f9f9;
+}
+
+.material-store-table .MuiTableCell-root {
+  padding: 12px 16px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.status-badge {
+  padding: 4px 12px;
+  border-radius: 16px;
+  font-size: 12px;
+  font-weight: 500;
+  text-transform: uppercase;
+}
+
+.status-active {
+  background-color: #e8f5e8;
+  color: #2e7d32;
+}
+
+.status-inactive {
+  background-color: #ffebee;
+  color: #c62828;
+}
+
+.edit-btn {
+  color: #1976d2;
+  margin-right: 8px;
+}
+
+.edit-btn:hover {
+  background-color: rgba(25, 118, 210, 0.1);
+}
+
+.delete-btn {
+  color: #d32f2f;
+}
+
+.delete-btn:hover {
+  background-color: rgba(211, 47, 47, 0.1);
+}
+
+.loading {
+  text-align: center;
+  padding: 40px;
+  font-size: 16px;
+  color: #666;
+}
+
+.button-cancel {
+  background-color: #f5f5f5;
+  color: #333;
+  border: 1px solid #ddd;
+}
+
+.button-cancel:hover {
+  background-color: #e0e0e0;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .material-store-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .material-store-actions {
+    justify-content: space-between;
+  }
+
+  .material-store-table {
+    overflow-x: auto;
+  }
+
+  .material-store-table .MuiTableCell-root {
+    padding: 8px 12px;
+    font-size: 14px;
+  }
+}
