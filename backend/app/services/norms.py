@@ -378,7 +378,7 @@ class NormServices:
         )
 
         try:
-            new_norm = NormServices.create(session=session, norm=payload)
+            new_norm = NormServices.create(session=session, norm_data=payload)
             return new_norm.id
         except HTTPException as e:
             if e.status_code == 400 and "already exists" in e.detail:

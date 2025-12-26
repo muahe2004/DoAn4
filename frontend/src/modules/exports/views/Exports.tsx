@@ -12,7 +12,6 @@ import {
   Typography,
 } from "@mui/material";
 import Button from "../../../components/Button/Button";
-import LabelPrimary from "../../../components/Label/Label";
 import SearchEngine from "../../../components/SearchEngine/SearchEngine";
 import { useSnackbar } from "../../../components/SnackBar/SnackBar";
 import ExportDeclarationModal from "../components/ExportDeclarationModal";
@@ -95,7 +94,7 @@ export function ExportDeclaration() {
       type_declaration: header.type_declaration,
       type_inventory: header.type_inventory,
       usd_exchange_rate: parseExchangeRate(header.usd_exchange_rate),
-      status: "draft",
+      status: "active",
       details,
     };
 
@@ -131,7 +130,7 @@ export function ExportDeclaration() {
       type_declaration: header.type_declaration,
       type_inventory: header.type_inventory,
       usd_exchange_rate: parseExchangeRate(header.usd_exchange_rate),
-      status: "draft",
+      status: "active",
       details,
     };
 
