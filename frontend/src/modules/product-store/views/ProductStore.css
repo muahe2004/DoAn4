@@ -1,0 +1,29 @@
+.product-store-container {
+  padding: 20px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.status {
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.status.active {
+  background-color: #e8f5e8;
+  color: #2e7d32;
+}
+
+.status.inactive {
+  background-color: #ffebee;
+  color: #c62828;
+}
+
+@media (max-width: 768px) {
+  .product-store-container {
+    padding: 10px;
+  }
+}
