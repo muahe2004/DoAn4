@@ -125,12 +125,12 @@ export const sidebarData: SidebarData = [
       //   path: warehouseSalesBooksURL,
       //   icon: <FiFileText />,
       // },
-      // {
-      //   id: "closing-material-warehouse",
-      //   label: "Quản lý chốt tồn kho nguyên vật liệu",
-      //   path: warehouseClosingMaterialsURL,
-      //   icon: <FiFileText />,
-      // },
+      {
+        id: "closing-material-warehouse",
+        label: "Quản lý chốt tồn kho nguyên vật liệu",
+        path: warehouseClosingMaterialsURL,
+        icon: <FiFileText />,
+      },
       // {
       //   id: "closing-semi-product-warehouse",
       //   label: "Quản lý chốt tồn kho bán thành phẩm",
@@ -138,7 +138,7 @@ export const sidebarData: SidebarData = [
       //   icon: <FiFileText />,
       // },
       {
-        id: "product-store",
+        id: "closing-product-warehouse",
         label: "Quản lý chốt tồn kho sản phẩm",
         path: warehouseClosingProductsURL,
         icon: <FiFileText />,

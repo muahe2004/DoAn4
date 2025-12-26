@@ -11,6 +11,7 @@ import {
   seaManagementInvoiceImportURL,
   standardNormsURL,
   warehouseClosingProductsURL,
+  warehouseClosingMaterialsURL,
 } from "./urls";
 import Layout from "../modules/app/Layout";
 import Test from "../modules/Test/Test";
@@ -23,6 +24,7 @@ import { isAuthenticated } from "../modules/auth/services/authState";
 import { ImportDeclarations } from "../modules/import/views/ImportDeclarations";
 import { Norms } from "../modules/standard-management/norms/views/Norms";
 import ProductStore from "../modules/product-store/views/ProductStore";
+import MaterialStore from "../modules/material-store/views/MaterialStore";
 
 /* ===== Route Guards ===== */
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
@@ -77,6 +79,10 @@ export const createRouterConfig = () =>
             {
               path: warehouseClosingProductsURL,
               element: <ProductStore />,
+            },
+            {
+              path: warehouseClosingMaterialsURL,
+              element: <MaterialStore />,
             },
           ],
         },

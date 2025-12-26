@@ -32,7 +32,7 @@ export const warehousePurchaseBooksURL = `${baseWarehouseAccountingDataURL}/purc
 export const warehouseSalesBooksURL = `${baseWarehouseAccountingDataURL}/sales-books`;
 export const warehouseClosingMaterialsURL = `${baseWarehouseAccountingDataURL}/closing-materials`;
 export const warehouseClosingSemiProductsURL = `${baseWarehouseAccountingDataURL}/closing-semi-products`;
-export const warehouseClosingProductsURL = `/product-store`;
+export const warehouseClosingProductsURL = `${baseWarehouseAccountingDataURL}/closing-products`;
 
 // Standard management URLs
 export const standardNormsURL = `${baseStandardManagementURL}/norms`;
