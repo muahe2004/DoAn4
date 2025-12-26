@@ -6,7 +6,11 @@ from app.api.routes import (
     users,
     login,
     units,
-    norms,
+    norms,    
+    importDeclarations,
+    countries,
+    partners,
+    currencies,
     norm_product_inventorys,
     product_inventorys,
     stores
@@ -24,3 +28,8 @@ api_router.include_router(norms.router, prefix="/norms", tags=["norms"])
 api_router.include_router(norm_product_inventorys.router, prefix="/norm-product-inventorys", tags=["norm-product-inventorys"])
 api_router.include_router(product_inventorys.router, prefix="/product-inventorys", tags=["product-inventorys"])
 api_router.include_router(stores.router, prefix="/stores", tags=["stores"])
+api_router.include_router(countries.router, prefix="/countries", tags=["countries"])
+api_router.include_router(partners.router, prefix="/partners", tags=["partners"])
+api_router.include_router(currencies.router, prefix="/currencies", tags=["currencies"])
+
+api_router.include_router(importDeclarations.router, prefix="/import_declarations", tags=["import_declarations"])

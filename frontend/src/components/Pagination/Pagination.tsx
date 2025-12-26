@@ -50,6 +50,9 @@ export default function PrimaryPagination({
                 <Select<number>
                     labelId="rows-per-page-label"
                     value={rowsPerPage}
+                    sx={{
+                        minWidth: "80px"
+                    }}
                     onChange={handleChangeRowsPerPage}
                 >
                     <MenuItem value={5}>5</MenuItem>
