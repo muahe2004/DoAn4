@@ -7,30 +7,31 @@ import {
   TextField,
   Grid,
 } from '@mui/material';
-import type { IUnitResponse } from '../types';
+import type { ICompareMaterialCodeResponse } from '../types';
 import LabelPrimary from '../../../components/Label/Label';
 import Button from '../../../components/Button/Button';
 import { STATUS } from '../../../constants/status';
 
-interface UnitFormModelProps {
+interface CompareMaterialCodeFormModelProps {
   open: boolean;
   onClose: () => void;
-  onSubmit: (data: IUnitResponse) => void;
-  initialData?: IUnitResponse;
+  onSubmit: (data: ICompareMaterialCodeResponse) => void;
+  initialData?: ICompareMaterialCodeResponse;
   mode?: 'add' | 'edit';
 }
 
-const UnitFormModel: React.FC<UnitFormModelProps> = ({ 
+const CompareMaterialCodeFormModel: React.FC<CompareMaterialCodeFormModelProps> = ({ 
   open, 
   onClose, 
   onSubmit, 
   initialData, 
   mode = 'add' 
 }) => {
-  const [formData, setFormData] = useState<IUnitResponse>({
-    unit_name: '',
+  const [formData, setFormData] = useState<ICompareMaterialCodeResponse>({
+    material_id: '',
+    internal_code: '',
+    external_code: '',
     description: '',
-    type: '',
     status: STATUS.ACTIVE,
   });
 
@@ -41,9 +42,10 @@ const UnitFormModel: React.FC<UnitFormModelProps> = ({
       });
     } else if (mode === 'add') {
       setFormData({
-        unit_name: '',
+        material_id: '',
+        internal_code: '',
+        external_code: '',
         description: '',
-        type: '',
         status: STATUS.ACTIVE,
       });
     }
@@ -62,17 +64,31 @@ const UnitFormModel: React.FC<UnitFormModelProps> = ({
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
       <DialogTitle className='primary-dialog-title'>
-        {mode === 'edit' ? 'SỬA THÔNG TIN ĐƠN VỊ TÍNH' : 'THÊM ĐƠN VỊ TÍNH'}
+        {mode === 'edit' ? 'SỬA MÃ SO SÁNH' : 'THÊM MÃ SO SÁNH'}
       </DialogTitle>
       <DialogContent className='primary-dialog-content'>
         <Grid container spacing={2} className="myprofile-form">
 
-          {/* UNIT NAME */}
+          {/* MATERIAL ID */}
           <Grid size={12} className="myprofile-form__group">
-            <LabelPrimary value="Tên đơn vị tính" required />
+            <LabelPrimary value="Mã nguyên vật liệu" required />
             <TextField
-              value={formData.unit_name}
-              name="unit_name"
+              value={formData.material_id}
+              name="material_id"
+              onChange={handleChange}
+              fullWidth
+              variant="outlined"
+              className="primary-text__field"
+              disabled={mode === 'edit'}
+            />
+          </Grid>
+
+          {/* INTERNAL CODE */}
+          <Grid size={6} className="myprofile-form__group">
+            <LabelPrimary value="Mã nội bộ" />
+            <TextField
+              value={formData.internal_code}
+              name="internal_code"
               onChange={handleChange}
               fullWidth
               variant="outlined"
@@ -80,12 +96,12 @@ const UnitFormModel: React.FC<UnitFormModelProps> = ({
             />
           </Grid>
 
-          {/* TYPE */}
-          <Grid size={12} className="myprofile-form__group">
-            <LabelPrimary value="Loại" />
+          {/* EXTERNAL CODE */}
+          <Grid size={6} className="myprofile-form__group">
+            <LabelPrimary value="Mã hải quan" />
             <TextField
-              value={formData.type}
-              name="type"
+              value={formData.external_code}
+              name="external_code"
               onChange={handleChange}
               fullWidth
               variant="outlined"
@@ -118,4 +134,4 @@ const UnitFormModel: React.FC<UnitFormModelProps> = ({
   );
 };
 
-export default UnitFormModel;
+export default CompareMaterialCodeFormModel;

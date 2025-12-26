@@ -19,6 +19,9 @@ export interface IFiscalImportDeclaration {
 
 export interface IFiscalImportDeclarationResponse extends IFiscalImportDeclaration {
     status: string;
+    internal_code?: string;
+    external_code?: string;
+    importer?: string;
 }
 
 export interface IFiscalImportDeclarationDetail {
@@ -46,4 +49,11 @@ export interface IFiscalImportDeclarationDetail {
 
 export interface IFiscalImportDeclarationDetailResponse extends IFiscalImportDeclarationDetail {
     status: string;
+    standard_unit?: string;
+    customs_unit?: string;
+    conversion_factor?: number;
+    converted_declaration_quantity?: number;
+    converted_accounting_quantity?: number;
+    variance?: number;
+    accounting_quantity?: number;
 }

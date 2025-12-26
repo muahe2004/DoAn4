@@ -1,4 +1,4 @@
-import { productsURL, FiscalImportDeclarationsURL, FiscalExportDeclarationsURL } from "../../routes/urls";
+import { productsURL, FiscalImportDeclarationsURL, FiscalExportDeclarationsURL, MaterialStoresURL } from "../../routes/urls";
 import type { SidebarData } from "./types";
 import { FiBox, FiGrid, FiFileText, FiHome } from "react-icons/fi";
 
@@ -84,7 +84,7 @@ export const sidebarData: SidebarData = [
       {
         id: "closing-material",
         label: "Quản lý chốt tồn kho nguyên vật liệu",
-        path: "/invoice",
+        path: MaterialStoresURL,
         icon: <FiFileText />,
       },
       {

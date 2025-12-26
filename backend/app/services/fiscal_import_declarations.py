@@ -4,7 +4,7 @@ from sqlalchemy import func
 from sqlmodel import Session, select
 from starlette import status
 
-from app.models.models import ImportDeclarations, ImportDeclarationDetails
+from app.models.models import ImportDeclarations, ImportDeclarationDetails, Materials, CompareMaterialCodes
 from app.models.schemas.imports.import_declaration_schemas import (
     ImportDeclarationPublic,
     ImportDeclarationQueryParams
@@ -56,11 +56,40 @@ class FiscalImportDeclarationServices:
 
         import_declarations = session.exec(statement).all()
         
+        # Get internal_code and external_code for each declaration
+        data = []
+        for declaration in import_declarations:
+            declaration_dict = declaration.model_dump()
+            
+            # Get first material from declaration details
+            first_detail = session.exec(
+                select(ImportDeclarationDetails)
+                .where(ImportDeclarationDetails.import_declaration_id == declaration.id)
+                .limit(1)
+            ).first()
+            
+            if first_detail:
+                # Get compare material code
+                compare_code = session.exec(
+                    select(CompareMaterialCodes)
+                    .where(CompareMaterialCodes.material_id == first_detail.material_id)
+                    .limit(1)
+                ).first()
+                
+                if compare_code:
+                    declaration_dict['internal_code'] = compare_code.internal_code
+                    declaration_dict['external_code'] = compare_code.external_code
+                else:
+                    declaration_dict['internal_code'] = None
+                    declaration_dict['external_code'] = None
+            else:
+                declaration_dict['internal_code'] = None
+                declaration_dict['external_code'] = None
+            
+            data.append(declaration_dict)
+        
         return {
-            "data": [
-                ImportDeclarationPublic.model_validate(declaration) 
-                for declaration in import_declarations
-            ],
+            "data": data,
             "total": total
         }
 

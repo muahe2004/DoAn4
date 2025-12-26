@@ -36,10 +36,10 @@ const getFiscalImportDeclarations = async (params: Params): Promise<FiscalImport
     }
 };
 
-export const useGetFiscalImportDeclarations = (params: Params) => {
+export const useGetFiscalImportDeclarations = (params: Params, options?: { enabled?: boolean }) => {
     return useQuery<FiscalImportDeclarationListResponse, AxiosError<{ detail?: string }>>({
         queryKey: ['fiscal-import-declarations', params],
         queryFn: () => getFiscalImportDeclarations(params),
-        keepPreviousData: true,
+        enabled: options?.enabled ?? true,
     });
 };

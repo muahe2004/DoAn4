@@ -13,9 +13,11 @@ import { useState } from "react";
 import Button from "../../../../components/Button/Button";
 import PrimaryPagination from "../../../../components/Pagination/Pagination";
 import SearchEngine from "../../../../components/SearchEngine/SearchEngine";
-import { useGetFiscalImportDeclarations } from "../apis/getFiscalImportDeclarations";
-import { useGetFiscalImportDeclarationDetails } from "../apis/getFiscalImportDeclarationDetails";
+import { useGetFiscalImportDeclarations, type FiscalImportDeclarationListResponse } from "../apis/getFiscalImportDeclarations";
+import { useGetFiscalImportDeclarationDetails, type FiscalImportDeclarationDetailListResponse } from "../apis/getFiscalImportDeclarationDetails";
 import { STATUS_DISPLAY } from "../../../../utils/statusDisplay";
+import { formatQuantity } from "../utils/unitConversion";
+import type { IFiscalImportDeclarationResponse, IFiscalImportDeclarationDetailResponse } from "../types";
 
 import "./import.css";
 
@@ -53,8 +55,15 @@ function SetupFiscalImportDeclarations() {
         ParamsDetail
     });
 
-    const { data: fiscalImportDeclarations } = useGetFiscalImportDeclarations(ParamsList);
-    const { data: fiscalImportDeclarationDetails } = useGetFiscalImportDeclarationDetails(ParamsDetail);
+    const { data: fiscalImportDeclarationsData } = useGetFiscalImportDeclarations(
+        ParamsList,
+        { enabled: viewMode === 'list' }
+    ) as { data: FiscalImportDeclarationListResponse | undefined };
+    
+    const { data: fiscalImportDeclarationDetailsData } = useGetFiscalImportDeclarationDetails(
+        ParamsDetail,
+        { enabled: viewMode === 'detail' }
+    ) as { data: FiscalImportDeclarationDetailListResponse | undefined };
 
     const handlePageChange = (newPage: number) => {
         console.log('Page change:', { viewMode, newPage, currentPageList: pageList, currentPageDetail: pageDetail });
@@ -156,15 +165,16 @@ function SetupFiscalImportDeclarations() {
                                 {viewMode === 'list' ? (
                                     <TableRow>
                                         <TableCell align="center" width={50}>STT</TableCell>
+                                        <TableCell align="center" sx={{ minWidth: 120 }}>MÃ HẢI QUAN</TableCell>
+                                        <TableCell align="center" sx={{ minWidth: 120 }}>MÃ NỘI BỘ</TableCell>
                                         <TableCell align="center">SỐ TỜ KHAI</TableCell>
                                         <TableCell align="center">NGÀY</TableCell>
                                         <TableCell align="center">MÃ LOẠI HÌNH</TableCell>
                                         <TableCell align="center">SỐ HÓA ĐƠN</TableCell>
-                                        <TableCell align="center">NGƯỜI XUẤT KHẨU</TableCell>
                                         <TableCell align="center">NGƯỜI NHẬP KHẨU</TableCell>
+                                        <TableCell align="center">NGƯỜI XUẤT KHẨU</TableCell>
                                         <TableCell align="center">ĐKVC</TableCell>
                                         <TableCell align="center">TRẠNG THÁI</TableCell>
-                                        <TableCell align="center">ACTION</TableCell>
                                     </TableRow>
                                 ) : (
                                     <TableRow>
@@ -174,83 +184,133 @@ function SetupFiscalImportDeclarations() {
                                         <TableCell align="center">MÃ LOẠI HÌNH</TableCell>
                                         <TableCell align="center" sx={{ minWidth: 150 }}>MÃ NL, VT</TableCell>
                                         <TableCell align="center" sx={{ minWidth: 200 }}>TÊN NL, VT</TableCell>
-                                        <TableCell align="center">ĐƠN VỊ</TableCell>
+                                        <TableCell align="center">ĐƠN VỊ CHUẨN</TableCell>
                                         <TableCell align="center">SỐ LƯỢNG</TableCell>
                                         <TableCell align="center">ĐƠN GIÁ</TableCell>
                                         <TableCell align="center">STT HÀNG</TableCell>
-                                        <TableCell align="center">ĐƠN VỊ(HQ)</TableCell>
-                                        <TableCell align="center">SỐ LƯỢNG(HQ)</TableCell>
+                                        <TableCell align="center">ĐƠN VỊ HẢI QUAN</TableCell>
+                                        <TableCell align="center">HỆ SỐ QUY ĐỔI</TableCell>
                                         <TableCell align="center" sx={{ minWidth: 130 }}>SL THEO TK QUY ĐỔI(1)</TableCell>
                                         <TableCell align="center" sx={{ minWidth: 130 }}>SL THEO SỔ QUY ĐỔI(2)</TableCell>
                                         <TableCell align="center" sx={{ minWidth: 100 }}>SAI LỆCH</TableCell>
+                                        <TableCell align="center" sx={{ minWidth: 150, bgcolor: '#fff3e0' }}>CHI TIẾT SAI LỆCH</TableCell>
                                     </TableRow>
                                 )}
                             </TableHead>
                             <TableBody>
                                 {viewMode === 'list' ? (
-                                    fiscalImportDeclarations?.data && fiscalImportDeclarations.data.length > 0 ? (
-                                        fiscalImportDeclarations.data.map((declaration, index) => {
+                                    fiscalImportDeclarationsData?.data && fiscalImportDeclarationsData.data.length > 0 ? (
+                                        fiscalImportDeclarationsData.data.map((declaration: IFiscalImportDeclarationResponse, index: number) => {
                                             const statusKey = declaration.status?.toLowerCase?.() ?? "";
                                             const badgeClass = STATUS_DISPLAY[statusKey] ? `status-${statusKey}` : "status-unknown";
                                             
                                             return (
                                                 <TableRow key={declaration.id}>
                                                     <TableCell align="center">{(pageList - 1) * rowsPerPageList + index + 1}</TableCell>
+                                                    <TableCell align="center">{declaration.external_code || '-'}</TableCell>
+                                                    <TableCell align="center">{declaration.internal_code || '-'}</TableCell>
                                                     <TableCell align="center">{declaration.import_declaration_number}</TableCell>
                                                     <TableCell align="center">
                                                         {declaration.licence_date ? new Date(declaration.licence_date).toLocaleDateString('vi-VN') : '-'}
                                                     </TableCell>
                                                     <TableCell align="center">{declaration.type_declaration}</TableCell>
                                                     <TableCell align="center">{declaration.bill_number || '-'}</TableCell>
-                                                    <TableCell align="center">{declaration.exporter}</TableCell>
-                                                    <TableCell align="center">-</TableCell>
-                                                    <TableCell align="center">{declaration.type_inventory}</TableCell>
+                                                    <TableCell align="center">{declaration.importer || '-'}</TableCell>
+                                                    <TableCell align="center">{declaration.exporter || '-'}</TableCell>
+                                                    <TableCell align="center">{declaration.type_inventory || '-'}</TableCell>
                                                     <TableCell align="center">
                                                         <span className={`status-badge ${badgeClass}`}>
                                                             {STATUS_DISPLAY[statusKey] ?? declaration.status ?? "Unknown"}
                                                         </span>
-                                                    </TableCell>
-                                                    <TableCell align="center">
-                                                        <IconButton size="small">
-                                                            <FiFileText />
-                                                        </IconButton>
                                                     </TableCell>
                                                 </TableRow>
                                             );
                                         })
                                     ) : (
                                         <TableRow>
-                                            <TableCell colSpan={10} align="center" sx={{ py: 10, color: '#999' }}>
+                                            <TableCell colSpan={11} align="center" sx={{ py: 10, color: '#999' }}>
                                                 Chưa có dữ liệu trong hệ thống
                                             </TableCell>
                                         </TableRow>
                                     )
                                 ) : (
-                                    fiscalImportDeclarationDetails?.data && fiscalImportDeclarationDetails.data.length > 0 ? (
-                                        fiscalImportDeclarationDetails.data.map((detail, index) => (
-                                            <TableRow key={detail.id}>
-                                                <TableCell align="center">{(pageDetail - 1) * rowsPerPageDetail + index + 1}</TableCell>
-                                                <TableCell align="center">{detail.import_declaration_number || '-'}</TableCell>
-                                                <TableCell align="center">
-                                                    {detail.licence_date ? new Date(detail.licence_date).toLocaleDateString('vi-VN') : '-'}
-                                                </TableCell>
-                                                <TableCell align="center">{detail.type_declaration || '-'}</TableCell>
-                                                <TableCell align="center">{detail.material_code || '-'}</TableCell>
-                                                <TableCell align="center">{detail.material_name || '-'}</TableCell>
-                                                <TableCell align="center">{detail.unit || '-'}</TableCell>
-                                                <TableCell align="center">{detail.quantity || '-'}</TableCell>
-                                                <TableCell align="center">{detail.unit_price || '-'}</TableCell>
-                                                <TableCell align="center">{detail.hs_code}</TableCell>
-                                                <TableCell align="center">{detail.unit2 || '-'}</TableCell>
-                                                <TableCell align="center">{detail.quantity2 || '-'}</TableCell>
-                                                <TableCell align="center">-</TableCell>
-                                                <TableCell align="center">-</TableCell>
-                                                <TableCell align="center">-</TableCell>
-                                            </TableRow>
-                                        ))
+                                    fiscalImportDeclarationDetailsData?.data && fiscalImportDeclarationDetailsData.data.length > 0 ? (
+                                        fiscalImportDeclarationDetailsData.data.map((detail: IFiscalImportDeclarationDetailResponse, index: number) => {
+                                            // Backend đã tính sẵn các giá trị
+                                            const convertedDeclQty = detail.converted_declaration_quantity || 0;
+                                            const convertedAcctQty = detail.converted_accounting_quantity || 0;
+                                            const variance = detail.variance || 0;
+
+                                            // Xác định trạng thái sai lệch chi tiết
+                                            let varianceStatus = '';
+                                            let varianceColor = '#666';
+                                            let varianceBg = '#f5f5f5';
+                                            
+                                            if (variance === 0) {
+                                                varianceStatus = '✓ Khớp chính xác';
+                                                varianceColor = '#2e7d32';
+                                                varianceBg = '#e8f5e9';
+                                            } else if (variance > 0) {
+                                                const percent = ((variance / convertedDeclQty) * 100).toFixed(1);
+                                                varianceStatus = `↑ Nhập thừa ${formatQuantity(variance)} (${percent}%)`;
+                                                varianceColor = '#1976d2';
+                                                varianceBg = '#e3f2fd';
+                                            } else {
+                                                const percent = ((Math.abs(variance) / convertedDeclQty) * 100).toFixed(1);
+                                                varianceStatus = `↓ Nhập thiếu ${formatQuantity(Math.abs(variance))} (${percent}%)`;
+                                                varianceColor = '#d32f2f';
+                                                varianceBg = '#ffebee';
+                                            }
+
+                                            return (
+                                                <TableRow key={detail.id}>
+                                                    <TableCell align="center">{(pageDetail - 1) * rowsPerPageDetail + index + 1}</TableCell>
+                                                    <TableCell align="center">{detail.import_declaration_number || '-'}</TableCell>
+                                                    <TableCell align="center">
+                                                        {detail.licence_date ? new Date(detail.licence_date).toLocaleDateString('vi-VN') : '-'}
+                                                    </TableCell>
+                                                    <TableCell align="center">{detail.type_declaration || '-'}</TableCell>
+                                                    <TableCell align="center">{detail.material_code || '-'}</TableCell>
+                                                    <TableCell align="center">{detail.material_name || '-'}</TableCell>
+                                                    <TableCell align="center">{detail.standard_unit || '-'}</TableCell>
+                                                    <TableCell align="center">{detail.quantity || '-'}</TableCell>
+                                                    <TableCell align="center">{detail.unit_price || '-'}</TableCell>
+                                                    <TableCell align="center">{detail.hs_code}</TableCell>
+                                                    <TableCell align="center">{detail.customs_unit || '-'}</TableCell>
+                                                    <TableCell align="center">{detail.conversion_factor || '-'}</TableCell>
+                                                    <TableCell align="center" sx={{ fontWeight: 'bold', color: '#1976d2' }}>
+                                                        {formatQuantity(convertedDeclQty)}
+                                                    </TableCell>
+                                                    <TableCell align="center" sx={{ fontWeight: 'bold', color: '#2e7d32' }}>
+                                                        {formatQuantity(convertedAcctQty)}
+                                                    </TableCell>
+                                                    <TableCell 
+                                                        align="center" 
+                                                        sx={{ 
+                                                            fontWeight: 'bold', 
+                                                            color: variance === 0 ? '#666' : variance > 0 ? '#2e7d32' : '#d32f2f' 
+                                                        }}
+                                                    >
+                                                        {formatQuantity(variance)}
+                                                    </TableCell>
+                                                    <TableCell 
+                                                        align="left" 
+                                                        sx={{ 
+                                                            fontWeight: 'bold',
+                                                            fontSize: '0.9rem',
+                                                            color: varianceColor,
+                                                            bgcolor: varianceBg,
+                                                            px: 2
+                                                        }}
+                                                    >
+                                                        {varianceStatus}
+                                                    </TableCell>
+                                                </TableRow>
+                                            );
+                                        })
                                     ) : (
                                         <TableRow>
-                                            <TableCell colSpan={15} align="center" sx={{ py: 10, color: '#999' }}>
+                                            <TableCell colSpan={16} align="center" sx={{ py: 10, color: '#999' }}>
                                                 Chưa có dữ liệu trong hệ thống
                                             </TableCell>
                                         </TableRow>
@@ -263,8 +323,8 @@ function SetupFiscalImportDeclarations() {
                             <PrimaryPagination
                                 totalItems={
                                     viewMode === 'list' 
-                                        ? (fiscalImportDeclarations?.total || 0)
-                                        : (fiscalImportDeclarationDetails?.total || 0)
+                                        ? (fiscalImportDeclarationsData?.total || 0)
+                                        : (fiscalImportDeclarationDetailsData?.total || 0)
                                 } 
                                 page={viewMode === 'list' ? pageList : pageDetail}
                                 rowsPerPage={viewMode === 'list' ? rowsPerPageList : rowsPerPageDetail}

@@ -11,7 +11,7 @@ from starlette import status
 from typing import List, Optional, Tuple
 from sqlalchemy.orm import aliased
 
-from app.models.models import Countries, Materials, Norms, Products, Units
+from app.models.models import Countries, Materials, Norms, Products, Units, CompareMaterialCodes
 
 class MaterialServices:
     @staticmethod

@@ -9,40 +9,40 @@ import {
     TableRow,
 } from "@mui/material";
 import { type ChangeEvent, useRef, useState } from "react";
-import { useGetUnits } from "../apis/getUnits";
+import { useGetCompareMaterialCodes } from "../apis/getCompareMaterialCodes";
 import { FiEdit } from "react-icons/fi";
 import { PiTrashSimpleFill } from "react-icons/pi";
 import { useSnackbar } from "../../../components/SnackBar/SnackBar";
 import PrimaryPagination from "../../../components/Pagination/Pagination";
-import type { IUnit, IUnitResponse } from "../types";
-import UnitFormModel from "../components/UnitFormModel";
+import type { ICompareMaterialCode, ICompareMaterialCodeResponse } from "../types";
+import CompareMaterialCodeFormModel from "../components/CompareMaterialCodeFormModel";
 import Button from "../../../components/Button/Button";
-import "./units.css";
-import { useCreateUnit } from "../apis/addUnit";
-import { useEditUnit } from "../apis/editUnit";
+import "./CompareMaterialCodes.css";
+import { useCreateCompareMaterialCode } from "../apis/addCompareMaterialCode";
+import { useEditCompareMaterialCode } from "../apis/editCompareMaterialCode";
 import SearchEngine from "../../../components/SearchEngine/SearchEngine";
 import * as XLSX from "xlsx";
 import { STATUS } from "../../../constants/status";
 import { STATUS_DISPLAY } from "../../../utils/statusDisplay";
-import { useCreateUnitMulti } from "../apis/addUnitMulti";
+import { useCreateCompareMaterialCodeMulti } from "../apis/addCompareMaterialCodeMulti";
 import { exportExcel } from "../../../utils/exportExcel";
 
-type ImportedUnit = Omit<IUnitResponse, "id"> & {
+type ImportedCompareMaterialCode = Omit<ICompareMaterialCodeResponse, "id"> & {
     id?: string;
 };
 
-export function Units() {
+export function CompareMaterialCodes() {
     const [page, setPage] = useState(1);
     const [rowsPerPage, setRowsPerPage] = useState(10);
     const [search, setSearch] = useState("");
     const fileInputRef = useRef<HTMLInputElement | null>(null);
 
-    const [selectedUnit, setSelectedUnit] = useState<IUnitResponse | null>(null);
+    const [selectedCode, setSelectedCode] = useState<ICompareMaterialCodeResponse | null>(null);
     const [openModal, setOpenModal] = useState(false);
     const { showSnackbar } = useSnackbar();
-    const { mutateAsync: createUnit } = useCreateUnit({});
-    const { mutateAsync: editUnit } = useEditUnit({});
-    const { mutateAsync: createUnitMulti } = useCreateUnitMulti({});
+    const { mutateAsync: createCode } = useCreateCompareMaterialCode({});
+    const { mutateAsync: editCode } = useEditCompareMaterialCode({});
+    const { mutateAsync: createCodeMulti } = useCreateCompareMaterialCodeMulti({});
 
     const Params = {
         limit: rowsPerPage,
@@ -51,8 +51,8 @@ export function Units() {
     };
 
     const {
-        data: units,
-    } = useGetUnits(Params);
+        data: codes,
+    } = useGetCompareMaterialCodes(Params);
 
     const handlePageChange = (page: number) => {
         setPage(page);
@@ -63,82 +63,59 @@ export function Units() {
         setPage(1);
     };
 
-    const handleOpenEdit = (unit: IUnitResponse) => {
-        setSelectedUnit(unit);
+    const handleOpenEdit = (code: ICompareMaterialCodeResponse) => {
+        setSelectedCode(code);
         setOpenModal(true);
     }
 
     const handleOpenAdd = () => {
-        setSelectedUnit(null);
+        setSelectedCode(null);
         setOpenModal(true);
     }
 
     const handleCloseModal = () => {
         setOpenModal(false);
-        setSelectedUnit(null);
+        setSelectedCode(null);
     }
 
-    const normalizeUnitPayload = (data: IUnitResponse): IUnit => {
+    const normalizePayload = (data: ICompareMaterialCodeResponse): ICompareMaterialCode => {
         const {
             id,
-            unit_name,
+            material_id,
+            internal_code,
+            external_code,
             description,
-            type,
             status,
         } = data;
 
         return {
             id,
-            unit_name,
+            material_id,
+            internal_code,
+            external_code,
             description,
-            type,
             status,
         };
     };
 
-    const handleSubmitUnit = async (data: IUnitResponse) => {
-        const payload = normalizeUnitPayload(data);
-        console.log(payload);
+    const handleSubmit = async (data: ICompareMaterialCodeResponse) => {
+        const payload = normalizePayload(data);
         try {
-            if (selectedUnit) {
-                await editUnit({
+            if (selectedCode) {
+                await editCode({
                     id: data.id!,
                     data: payload,
                 });
-                showSnackbar({ message: "Cập nhật đơn vị tính thành công", severity: "success" });
+                showSnackbar({ message: "Cập nhật mã so sánh thành công", severity: "success" });
             } else {
-                await createUnit(payload);
-                showSnackbar({ message: "Thêm đơn vị tính thành công", severity: "success" });
+                await createCode(payload);
+                showSnackbar({ message: "Thêm mã so sánh thành công", severity: "success" });
             }
             handleCloseModal();
         } catch (error) {
             showSnackbar({ message: "Có lỗi xảy ra, vui lòng thử lại", severity: "error" });
         }
     };
-
-    const handleImportUnits = async (data: IUnitResponse[]) => {
-        const payload = {
-            units: data.map(unit => ({
-                unit_name: unit.unit_name,
-                description: unit.description,
-                type: unit.type,
-                status: unit.status,
-            }))
-        };
-
-        try {
-            await createUnitMulti(payload);
-            showSnackbar({ message: "Thêm đơn vị tính thành công", severity: "success" });
-            handleCloseModal();
-        } catch (error) {
-            showSnackbar({ message: "Có lỗi xảy ra, vui lòng thử lại", severity: "error" });
-        }
-    };
-
-    const handleSearch = (value: string) => {
-        setSearch(value);
-        setPage(1);
-    }
 
     const handleImport = () => {
         fileInputRef.current?.click();
@@ -147,22 +124,24 @@ export function Units() {
     const handleExport = () => {
         const headers = {
             number: "STT",
-            unit_name: "Tên đơn vị tính",
+            material_id: "Mã nguyên vật liệu",
+            internal_code: "Mã nội bộ",
+            external_code: "Mã hải quan",
             description: "Mô tả",
-            type: "Loại",
         };
 
         const templateRow = {
             number: "",
-            unit_name: "",
+            material_id: "",
+            internal_code: "",
+            external_code: "",
             description: "",
-            type: "",
         };
 
-        exportExcel([templateRow], "units_template", {
+        exportExcel([templateRow], "compare_material_codes_template", {
             sheetName: "Template",
             headers,
-            title: "DANH MỤC ĐƠN VỊ TÍNH",
+            title: "DANH MỤC MÃ SO SÁNH",
         });
     };
 
@@ -185,35 +164,56 @@ export function Units() {
                 defval: "",
             });
 
-            const mapped: ImportedUnit[] = rows
+            const mapped: ImportedCompareMaterialCode[] = rows
                 .filter((row) => row.some((cell) => `${cell}`.trim() !== ""))
                 .map((row) => {
                     const [
-                        unit_name_raw = "",
+                        material_id_raw = "",
+                        internal_code_raw = "",
+                        external_code_raw = "",
                         description_raw = "",
-                        type_raw = "",
                         status_raw = STATUS.ACTIVE,
                     ] = row;
 
-                    const unit_name = `${unit_name_raw}`.trim();
-                    const description = `${description_raw}`.trim();
-                    const type = `${type_raw}`.trim();
-                    const status = `${status_raw}`.trim() || STATUS.ACTIVE;
-
                     return {
-                        unit_name,
-                        description,
-                        type,
-                        status,
+                        material_id: `${material_id_raw}`.trim(),
+                        internal_code: `${internal_code_raw}`.trim(),
+                        external_code: `${external_code_raw}`.trim(),
+                        description: `${description_raw}`.trim(),
+                        status: `${status_raw}`.trim() || STATUS.ACTIVE,
                     };
                 });
 
-            handleImportUnits(mapped);
+            handleImportMulti(mapped);
         };
 
         reader.readAsArrayBuffer(file);
         event.target.value = "";
     };
+
+    const handleImportMulti = async (data: ICompareMaterialCodeResponse[]) => {
+        const payload = {
+            compare_material_codes: data.map(code => ({
+                material_id: code.material_id,
+                internal_code: code.internal_code,
+                external_code: code.external_code,
+                description: code.description,
+                status: code.status,
+            }))
+        };
+
+        try {
+            await createCodeMulti(payload);
+            showSnackbar({ message: "Import mã so sánh thành công", severity: "success" });
+        } catch (error) {
+            showSnackbar({ message: "Có lỗi xảy ra, vui lòng thử lại", severity: "error" });
+        }
+    };
+
+    const handleSearch = (value: string) => {
+        setSearch(value);
+        setPage(1);
+    }
 
     return (
         <Container maxWidth={false} className="primary-container">
@@ -232,34 +232,38 @@ export function Units() {
             />
 
             <TableContainer className="primary-table-container">
-                <Table stickyHeader aria-label="units table">
+                <Table stickyHeader aria-label="compare material codes table">
                     <TableHead className="primary-thead">
                         <TableRow>
-                            <TableCell className="primary-tcell" align="center">Tên đơn vị tính</TableCell>
+                            <TableCell className="primary-tcell" align="center">Mã nguyên vật liệu</TableCell>
+                            <TableCell className="primary-tcell" align="center">Tên nguyên vật liệu</TableCell>
+                            <TableCell className="primary-tcell" align="center">Mã nội bộ</TableCell>
+                            <TableCell className="primary-tcell" align="center">Mã hải quan</TableCell>
                             <TableCell className="primary-tcell" align="center">Mô tả</TableCell>
-                            <TableCell className="primary-tcell" align="center">Loại</TableCell>
                             <TableCell className="primary-tcell" align="center">Trạng thái</TableCell>
                             <TableCell className="primary-tcell" align="center"></TableCell>
                         </TableRow>
                     </TableHead>
 
                     <TableBody>
-                        {units?.data.map((unit) => {
-                            const statusKey = unit.status?.toLowerCase?.() ?? "";
+                        {codes?.data.map((code) => {
+                            const statusKey = code.status?.toLowerCase?.() ?? "";
                             const badgeClass = STATUS_DISPLAY[statusKey] ? `status-${statusKey}` : "status-unknown";
 
                             return (
-                                <TableRow className="primary-trow" key={unit.id}>
-                                    <TableCell className="custom-border-tcell primary-tcell">{unit.unit_name}</TableCell>
-                                    <TableCell className="custom-border-tcell primary-tcell">{unit.description || '-'}</TableCell>
-                                    <TableCell className="custom-border-tcell primary-tcell">{unit.type || '-'}</TableCell>
+                                <TableRow className="primary-trow" key={code.id}>
+                                    <TableCell className="custom-border-tcell primary-tcell">{code.material_code || '-'}</TableCell>
+                                    <TableCell className="custom-border-tcell primary-tcell">{code.material_name || '-'}</TableCell>
+                                    <TableCell className="custom-border-tcell primary-tcell">{code.internal_code || '-'}</TableCell>
+                                    <TableCell className="custom-border-tcell primary-tcell">{code.external_code || '-'}</TableCell>
+                                    <TableCell className="custom-border-tcell primary-tcell">{code.description || '-'}</TableCell>
                                     <TableCell align="center" className="custom-border-tcell primary-tcell">
                                         <span className={`status-badge ${badgeClass}`}>
-                                            {STATUS_DISPLAY[statusKey] ?? unit.status ?? "Unknown"}
+                                            {STATUS_DISPLAY[statusKey] ?? code.status ?? "Unknown"}
                                         </span>
                                     </TableCell>
                                     <TableCell align="center" className="custom-border-tcell primary-tcell">
-                                        <IconButton className="primary-edit-btn" size="small" onClick={() => handleOpenEdit(unit)}>
+                                        <IconButton className="primary-edit-btn" size="small" onClick={() => handleOpenEdit(code)}>
                                             <FiEdit />
                                         </IconButton>
                                         <IconButton className="primary-delete-btn" size="small" onClick={() => console.log("Delete clicked")}>
@@ -274,19 +278,19 @@ export function Units() {
             </TableContainer>
 
             <PrimaryPagination
-                totalItems={units?.total || 0}
+                totalItems={codes?.total || 0}
                 page={page}
                 rowsPerPage={rowsPerPage}
                 onPageChange={handlePageChange}
                 onRowsPerPageChange={handleItemsPerPageChange}
             />
 
-            <UnitFormModel
+            <CompareMaterialCodeFormModel
                 open={openModal}
                 onClose={handleCloseModal}
-                onSubmit={handleSubmitUnit}
-                initialData={selectedUnit || undefined}
-                mode={selectedUnit ? 'edit' : 'add'}
+                onSubmit={handleSubmit}
+                initialData={selectedCode || undefined}
+                mode={selectedCode ? 'edit' : 'add'}
             />
         </Container>
     );
