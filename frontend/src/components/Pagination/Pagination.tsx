@@ -23,7 +23,7 @@ export default function PrimaryPagination({
     onPageChange,
     onRowsPerPageChange,
 }: PrimaryPaginationProps) {
-    const totalPages = Math.ceil(totalItems / rowsPerPage);
+    const totalPages = Math.max(1, Math.ceil(totalItems / rowsPerPage));
 
     const handleChangePage = (event: React.ChangeEvent<unknown>, value: number) => {
         onPageChange(value);
@@ -50,6 +50,9 @@ export default function PrimaryPagination({
                 <Select<number>
                     labelId="rows-per-page-label"
                     value={rowsPerPage}
+                    sx={{
+                        minWidth: "80px"
+                    }}
                     onChange={handleChangeRowsPerPage}
                 >
                     <MenuItem value={5}>5</MenuItem>

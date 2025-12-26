@@ -1,6 +1,6 @@
 import axios, { AxiosError } from "axios";
 import { useQuery } from "@tanstack/react-query";
-import { URL_API_NORM } from "../../../constants/config";
+import { URL_API_NORM } from "../../../../constants/config";
 import type { INormResponse } from "../types/index";
 
 export interface NormListResponse {

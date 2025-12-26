@@ -3,8 +3,8 @@ import {
   useQueryClient,
   type UseMutationOptions,
 } from "@tanstack/react-query";
-import { URL_API_NORM } from "../../../constants/config";
-import { apiClient } from "../../../lib/api";
+import { URL_API_NORM } from "../../../../constants/config";
+import { apiClient } from "../../../../lib/api";
 import type { INorm } from "../types";
 
 export type NormEditDto = Partial<INorm>;

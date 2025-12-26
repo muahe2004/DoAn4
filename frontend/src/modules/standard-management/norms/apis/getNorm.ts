@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
-import { URL_API_NORM } from "../../../constants/config";
+import { URL_API_NORM } from "../../../../constants/config";
 import type { INorm } from "../types";
-import { apiClient } from "../../../lib/api";
+import { apiClient } from "../../../../lib/api";
 
 const getNorm = async (id: string): Promise<INorm> => {
   const response = await apiClient.get(`${URL_API_NORM}/${id}`);

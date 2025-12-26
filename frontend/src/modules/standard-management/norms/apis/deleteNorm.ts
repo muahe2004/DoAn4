@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { URL_API_NORM } from "../../../constants/config";
-import { apiClient } from "../../../lib/api";
+import { URL_API_NORM } from "../../../../constants/config";
+import { apiClient } from "../../../../lib/api";
 
 interface NormDeleteResponse {
   message: string;

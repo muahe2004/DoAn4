@@ -7,9 +7,11 @@ import {
   MenuItem,
   Select,
   IconButton,
+  Table,
   TableHead,
   TableRow,
   TableCell,
+  TableBody,
 } from "@mui/material";
 import { Visibility } from "@mui/icons-material";
 import NormDetailModal from "../components/NormProductDetailModal";
@@ -18,7 +20,6 @@ const NormProductInventorys: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
-  const [viewMode, setViewMode] = useState<"table" | "grid">("table");
   const [selectedNormId, setSelectedNormId] = useState<string | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
   const pageSize = 10;
@@ -116,35 +117,12 @@ const NormProductInventorys: React.FC = () => {
 
       {/* Table Section */}
       <div className="norm-product-table-section">
-        <div className="table-header">
-          <h2 className="table-title">
-            DANH SÁCH CÁC SẢN PHẨM ĐƯỢC ÁP ĐỊNH MỨC
-          </h2>
-
-          <div className="table-controls">
-            <div className="view-toggle">
-              <button
-                className={`view-btn ${viewMode === "table" ? "active" : ""}`}
-                onClick={() => setViewMode("table")}
-              >
-                <span className="table-icon">⊞</span>
-              </button>
-              <button
-                className={`view-btn ${viewMode === "grid" ? "active" : ""}`}
-                onClick={() => setViewMode("grid")}
-              >
-                <span className="grid-icon">⊡</span>
-              </button>
-            </div>
-          </div>
-        </div>
-
         {isLoading ? (
           <div className="loading-state">Đang tải dữ liệu...</div>
         ) : (
           <>
             <div className="table-container">
-              <table className="norm-product-table">
+              <Table stickyHeader aria-label="norms table">
                 <TableHead className="primary-thead">
                   <TableRow>
                     <TableCell className="primary-tcell" align="center">
@@ -167,17 +145,43 @@ const NormProductInventorys: React.FC = () => {
                     </TableCell>
                   </TableRow>
                 </TableHead>
-                <tbody>
+                <TableBody>
                   {normProductsData?.data?.map((item, index) => (
                     <tr key={item.id}>
-                      <td>{(currentPage - 1) * pageSize + index + 1}</td>
-                      <td>{item.product_code}</td>
-                      <td>{item.product_name}</td>
-                      <td>{item.unit_name}</td>
-                      <td>
+                      <TableCell
+                        className="custom-border-tcell primary-tcell"
+                        align="center"
+                      >
+                        {(currentPage - 1) * pageSize + index + 1}
+                      </TableCell>
+                      <TableCell
+                        className="custom-border-tcell primary-tcell"
+                        align="center"
+                      >
+                        {item.product_code}
+                      </TableCell>
+                      <TableCell
+                        className="custom-border-tcell primary-tcell"
+                        align="center"
+                      >
+                        {item.product_name}
+                      </TableCell>
+                      <TableCell
+                        className="custom-border-tcell primary-tcell"
+                        align="center"
+                      >
+                        {item.unit_name}
+                      </TableCell>
+                      <TableCell
+                        className="custom-border-tcell primary-tcell"
+                        align="center"
+                      >
                         <span className="norm-name">{item.norm_name}</span>
-                      </td>
-                      <td>
+                      </TableCell>
+                      <TableCell
+                        className="custom-border-tcell primary-tcell"
+                        align="center"
+                      >
                         <IconButton
                           size="small"
                           onClick={() => handleViewDetail(item.id)}
@@ -186,11 +190,11 @@ const NormProductInventorys: React.FC = () => {
                         >
                           <Visibility fontSize="small" />
                         </IconButton>
-                      </td>
+                      </TableCell>
                     </tr>
                   )) || []}
-                </tbody>
-              </table>
+                </TableBody>
+              </Table>
             </div>
 
             {/* Pagination */}

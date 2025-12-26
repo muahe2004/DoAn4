@@ -1,6 +1,6 @@
 import axios, { AxiosError } from "axios";
 import { useQuery } from "@tanstack/react-query";
-import { URL_API_MATERIAL } from "../../../constants/config";
+import { URL_API_MATERIAL } from "../../../../constants/config";
 
 export interface MaterialDropdownResponse {
   id: string;

@@ -1,0 +1,109 @@
+.exports-header {
+  margin-bottom: 20px;
+}
+
+.exports-title {
+  display: flex;
+  flex-direction: column;
+}
+
+.exports-title__label {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--primary-color);
+  margin-bottom: 4px;
+}
+
+.exports-title__subtitle {
+  font-size: 14px;
+  color: var(--secondary-color);
+}
+
+.exports-actions {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  width: auto;
+}
+
+.exports-actions__filters {
+  display: flex;
+  gap: 5px;
+  width: auto;
+}
+
+.export-action-btn {
+  min-width: 160px;
+}
+
+.export-detail-btn {
+  min-width: 36px;
+  padding: 4px 8px;
+}
+
+.export-detail-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+
+.export-detail-row__label {
+  font-weight: 600;
+  color: #666;
+  margin-right: 4px;
+}
+
+.export-detail-row__value {
+  font-weight: 600;
+}
+
+.export-detail-status {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 16px;
+}
+
+.exports-loading {
+  padding: 24px;
+  display: flex;
+  justify-content: center;
+}
+
+.export-detail-actions {
+  gap: 8px;
+}
+
+.export-form-details-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 16px 0 8px;
+}
+
+.export-actions .search-engine__input {
+  min-width: 240px;
+  max-width: 320px;
+}
+
+.export-detail-form-row {
+  margin-bottom: 12px;
+}
+
+.export-detail-remove {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.status-pending {
+  color: #1f78ff;
+  background-color: rgba(20, 125, 255, 0.1);
+  border-color: rgba(20, 125, 255, 0.4);
+}
+
+.status-posted {
+  color: #0a8a42;
+  background-color: rgba(22, 190, 105, 0.1);
+  border-color: rgba(22, 190, 105, 0.4);
+}
