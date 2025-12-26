@@ -49,6 +49,7 @@ export interface IExportCreateDetailPayload {
   hs_code: string;
   product_code: string;
   product_name?: string;
+  origin_country_id?: string | null;
   origin_country_name?: string;
   origin_country_code?: string;
   unit_id?: string | null;

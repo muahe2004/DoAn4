@@ -16,7 +16,8 @@ from app.api.routes import (
     norm_product_inventorys,
     product_inventorys,
     material_inventorys,
-    stores
+    stores,
+    settlementReports,
 )
 
 api_router = APIRouter()
@@ -37,3 +38,4 @@ api_router.include_router(product_inventorys.router, prefix="/product-inventorys
 api_router.include_router(material_inventorys.router, prefix="/material-inventorys", tags=["material-inventorys"])
 api_router.include_router(stores.router, prefix="/stores", tags=["stores"])
 api_router.include_router(importDeclarations.router, prefix="/import_declarations", tags=["import_declarations"])
+api_router.include_router(settlementReports.router, prefix="/settlement-reports", tags=["settlement-reports"])
