@@ -16,3 +16,17 @@ class NormDetailBase(SQLModel):
 
 class NormDetailPublic(NormDetailBase):
     id: UUID
+
+class NormDetailCreate(SQLModel):
+    unit_id: UUID
+    material_id: UUID
+    description: Optional[str] = None
+    norm_value: float
+    status: Optional[str] = None
+
+class NormDetailUpdate(SQLModel):
+    unit_id: UUID | None = None
+    material_id: UUID | None = None
+    description: str | None = None
+    norm_value: float | None = None
+    status: str | None = None
