@@ -1,0 +1,26 @@
+.export-form-details-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 16px 0;
+}
+
+.create-modal-header {
+  margin-bottom: 16px;
+}
+
+.create-modal-title {
+  display: flex;
+  flex-direction: column;
+}
+
+.create-modal-title__label {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.create-modal-title__subtitle {
+  font-size: 14px;
+  color: var(--secondary-color);
+}

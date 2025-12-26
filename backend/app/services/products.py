@@ -106,6 +106,7 @@ class ProductServices:
         product.unit_id = UnitServices.resolve_unit_generic(session, product.unit_id, product.unit_name)
         product.unit_id_2 = UnitServices.resolve_unit_generic(session, product.unit_id_2, product.unit_name_2)
         product.norm_id = NormServices.resolve_norm_generic(session, product.norm_id, product.norm_name)
+        
 
         new_product = Products(**product.model_dump())
         session.add(new_product)

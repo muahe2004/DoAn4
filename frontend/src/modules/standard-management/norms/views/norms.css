@@ -1,0 +1,59 @@
+.norm-header {
+  margin-bottom: 20px;
+}
+
+.norm-title {
+  display: flex;
+  flex-direction: column;
+}
+
+.norm-title__label {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--primary-color);
+  margin-bottom: 4px;
+}
+
+.exports-title__subtitle {
+  font-size: 14px;
+  color: var(--secondary-color);
+}
+
+.norm-actions {
+  display: flex;
+  justify-content: right;
+  margin-bottom: 10px;
+}
+.norm-details-header {
+  padding: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.norm-details-header h3 {
+  margin: 0;
+}
+
+.norm-detail-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+/* Loading and Error States */
+.norm-loading-container {
+  padding: 32px;
+  text-align: center;
+}
+
+.norm-loading-text {
+  margin-top: 16px;
+}
+
+.norm-error-container {
+  padding: 16px;
+}
+
+.norm-empty-state {
+  padding: 32px;
+}

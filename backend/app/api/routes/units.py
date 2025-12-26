@@ -51,6 +51,15 @@ def update_unit(
 
 # =========================== delete unit ===========================
 @router.delete(
+    "/{id}",
+    response_model=UnitDeleteResponse,
+)
+def delete_unit(
+    session: SessionDep, id: uuid.UUID
+) -> UnitDeleteResponse:
+    return UnitServices.delete(session=session, unit_id=id)
+
+@router.delete(
     "",
     response_model=List[UnitDeleteResponse],
 )
