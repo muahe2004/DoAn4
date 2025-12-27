@@ -41,6 +41,7 @@ import {
 
 import ProductInventoryModal from "../components/ProductInventoryModal";
 import "./ProductStore.css";
+import SearchEngine from "../../../components/SearchEngine/SearchEngine";
 
 const ProductStore: React.FC = () => {
   const [inventories, setInventories] = useState<IProductInventory[]>([]);
@@ -311,23 +312,21 @@ const ProductStore: React.FC = () => {
 
   return (
     <div className="product-store-container">
-      <Box sx={{ mb: 3 }}>
-        <Box sx={{ display: "flex", gap: 2, mb: 2 }}>
-          <TextField
-            label="Tìm kiếm"
-            variant="outlined"
-            size="small"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder="Tìm theo tên sản phẩm, mã sản phẩm..."
-            sx={{ minWidth: 300, flexGrow: 1 }}
-          />
-          <Button variant="contained" onClick={handleCreate} color="primary">
-            Thêm mới
-          </Button>
+      <div className="exports-header">
+        <div className="exports-title">
+          <p className="exports-title__label">QUẢN LÝ CHỐT TỒN KHO SẢN PHẨM</p>
+        </div>
+        <Box className="toolbar">
+          <Box className="left-tools">
+            <SearchEngine placeholder="Tìm kiếm" onSearch={setSearchTerm} />
+          </Box>
+          <Box className="right-tools">
+            <Button variant="contained" onClick={handleCreate} color="primary">
+              Thêm mới
+            </Button>
+          </Box>
         </Box>
-      </Box>
-
+      </div>
       <TableContainer component={Paper}>
         <Table>
           <TableHead className="primary-thead">
@@ -362,7 +361,7 @@ const ProductStore: React.FC = () => {
               <TableCell className="primary-tcell" align="center"></TableCell>
             </TableRow>
           </TableHead>
-          <TableBody>
+          <TableBody className="primary-tbody">
             {loading ? (
               <TableRow>
                 <TableCell colSpan={10} align="center">

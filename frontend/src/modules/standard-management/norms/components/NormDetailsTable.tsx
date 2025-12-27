@@ -244,7 +244,7 @@ const NormDetailsTable: React.FC<NormDetailsTableProps> = ({
                 </TableCell>
               </TableRow>
             </TableHead>
-            <TableBody>
+            <TableBody className="primary-tbody">
               {normDetails.map((detail, index) => {
                 const isEditing = editingId === detail.id;
 

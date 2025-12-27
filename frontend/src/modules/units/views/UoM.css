@@ -62,36 +62,17 @@
   color: var(--text-secondary);
 }
 
-/* Buttons */
-.btn-sample {
+.btn-import, .btn-add, .btn-sample {
   height: 36px;
   text-transform: none !important;
   font-weight: 700 !important;
   font-size: 12px !important;
-  color: #4ea4f3 !important; 
-  background-color: #fff !important;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.05) !important;
   border-radius: 6px !important;
 }
 
 .btn-import {
-  height: 36px;
-  text-transform: none !important;
-  font-weight: 700 !important;
-  font-size: 12px !important;
-  color: var(--primary-color) !important;
-  border: 1px solid var(--primary-color) !important;
-  border-radius: 6px !important;
-}
-
-.btn-add {
-  height: 36px;
-  text-transform: none !important;
-  font-weight: 700 !important;
-  font-size: 12px !important;
-  background-color: var(--primary-color) !important;
   color: #fff !important;
-  border-radius: 6px !important;
+  border: 1px solid var(--primary-color) !important;
 }
 
 .table-header-cell {

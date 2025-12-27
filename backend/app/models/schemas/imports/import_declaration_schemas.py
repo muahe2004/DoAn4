@@ -26,9 +26,11 @@ class ImportDeclarationBase(SQLModel):
 
 class  ImportDeclarationPublic(ImportDeclarationBase):
     id: UUID
-
 class ImportDeclarationQueryParams(BaseQueryParams):
     type: Optional[str] = Field(None)
+    from_date: Optional[str] = Field(None)
+    to_date: Optional[str] = Field(None)
+    exporter_id: Optional[UUID] = Field(None)
 
 class ImportDeclarationMaterialCreate(SQLModel):
     material_code: Optional[str] = Field(default=None, max_length=50)
@@ -62,9 +64,6 @@ class ImportDeclarationCreate(SQLModel):
     shipping_fee: Optional[float] = None
     status: Optional[str] = None
     materials: List[ImportDeclarationMaterialCreate]
-
-class ImportDeclarationQueryParams(BaseQueryParams):
-    exporter_id: Optional[UUID] = Field(None)
 
 class ImportDeclarationResponse(ImportDeclarationPublic):
     currency_name: str

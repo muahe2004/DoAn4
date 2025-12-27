@@ -58,7 +58,7 @@ export default function ImportFormTable({
 
     return (
         <TableContainer
-            className="primary-table-container table-modal"
+            className="primary-table-container"
         >
             <Table stickyHeader aria-label="import materials table">
                 <TableHead className="primary-thead">

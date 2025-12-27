@@ -6,6 +6,15 @@ export const signinUrl = "/sign-in";
 export const registerUrl = "/register";
 
 export const testURL = "/test";
+export const productsURL = "/products";
+
+export const unitsURL = "/units";
+export const compareMaterialCodesURL = "/compare-material-codes";
+
+export const FiscalImportDeclarationsURL = "/setup-data-fiscal-years/fiscal-import-declarations";
+export const FiscalExportDeclarationsURL = "/setup-data-fiscal-years/fiscal-export-declarations";
+
+export const MaterialStoresURL = "/store-materials";
 
 // Base URLs for different sections
 const baseDataSeaManagementURL = "data-sea-management";
@@ -16,7 +25,6 @@ const baseApplyDataURL = "apply-data";
 const baseFactorsAffectingExistenceURL = "factors-affecting-existence";
 const basePrepareSettlementReportURL = "prepare-settlement-report";
 const baseManageCatalogsURL = "manage-catalogs";
-export const unitsURL = "/units";
 
 // data-sea-management URLs
 export const seaManagementMaterialsURL = `${baseDataSeaManagementURL}/materials`;

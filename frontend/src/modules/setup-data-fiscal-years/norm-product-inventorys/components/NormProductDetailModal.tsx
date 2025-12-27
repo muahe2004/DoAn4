@@ -119,7 +119,7 @@ const NormDetailModal: React.FC<NormDetailModalProps> = ({
                       <TableCell>Mô tả</TableCell>
                     </TableRow>
                   </TableHead>
-                  <TableBody>
+                  <TableBody className="primary-tbody">
                     {detail.norm_details && detail.norm_details.length > 0 ? (
                       detail.norm_details.map(
                         (item: INormDetailInfo, index: number) => (
