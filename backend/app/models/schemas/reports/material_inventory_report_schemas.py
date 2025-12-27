@@ -7,7 +7,8 @@ from app.models.schemas.common.query import BaseQueryParams
 
 
 class MaterialInventorySettlementQueryParams(BaseQueryParams):
-    pass
+    start_date: datetime | None = None
+    end_date: datetime | None = None
 
 
 class MaterialInventorySettlementRow(SQLModel):

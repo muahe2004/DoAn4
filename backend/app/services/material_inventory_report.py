@@ -26,8 +26,8 @@ class MaterialInventoryReportServices:
     def get_material_inventory_report(
         session: Session, query: MaterialInventorySettlementQueryParams
     ) -> MaterialInventorySettlementResponse:
-        end_date = datetime.now()
-        start_date = end_date - timedelta(days=30)
+        end_date = query.end_date or datetime.now()
+        start_date = query.start_date or (end_date - timedelta(days=30))
 
         base_conditions = []
         if query.search:
