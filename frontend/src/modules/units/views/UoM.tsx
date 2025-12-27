@@ -20,14 +20,14 @@ import {
   Grid,
 } from "@mui/material";
 import FileDownloadOutlinedIcon from "@mui/icons-material/FileDownloadOutlined";
-import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
-import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
-import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
 import CloseIcon from "@mui/icons-material/Close";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
+import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
+import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import "./UoM.css";
 import SearchEngine from "../../../components/SearchEngine/SearchEngine";
+import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
 
 const UoM: React.FC = () => {
   const [loading, setLoading] = useState(false);
@@ -211,7 +211,7 @@ const UoM: React.FC = () => {
         </div>
         <Box className="toolbar">
           <Box className="left-tools">
-            <SearchEngine placeholder="Tìm kiếm" onSearch={(event) => handleSearch(event.target.value)} />
+            <SearchEngine placeholder="Tìm kiếm" onSearch={handleSearch} />
           </Box>
 
           <Box className="right-tools">

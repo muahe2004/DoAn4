@@ -7,6 +7,8 @@ export interface MaterialSettlementParams {
     skip: number;
     limit: number;
     search?: string;
+    start_date?: string;
+    end_date?: string;
 }
 
 const getMaterialSettlementReport = async (

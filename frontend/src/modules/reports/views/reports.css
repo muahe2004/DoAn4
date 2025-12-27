@@ -22,7 +22,7 @@
 .product-actions {
     display: flex;
     align-items: flex-start;
-    justify-content: space-between;
+    justify-content: flex-end;
     flex-wrap: wrap;
     gap: 12px;
     width: 100%;
@@ -32,4 +32,16 @@
     flex: 1;
     min-width: 220px;
     max-width: 420px;
+}
+
+.report-filters {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 12px;
+    width: 100%;
+}
+
+.report-date-input {
+    min-width: 180px;
 }

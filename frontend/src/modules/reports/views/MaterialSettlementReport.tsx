@@ -1,4 +1,4 @@
-import { Container } from "@mui/material";
+import { Container, TextField } from "@mui/material";
 import { useCallback, useMemo, useState } from "react";
 import PrimaryPagination from "../../../components/Pagination/Pagination";
 import SearchEngine from "../../../components/SearchEngine/SearchEngine";
@@ -17,11 +17,15 @@ export function MaterialSettlementReport() {
     const [page, setPage] = useState(1);
     const [rowsPerPage, setRowsPerPage] = useState(10);
     const [search, setSearch] = useState("");
+    const [startDate, setStartDate] = useState("");
+    const [endDate, setEndDate] = useState("");
 
     const params = {
         skip: (page - 1) * rowsPerPage,
         limit: rowsPerPage,
         ...(search && { search }),
+        ...(startDate && { start_date: startDate }),
+        ...(endDate && { end_date: endDate }),
     };
 
     const { data: reportData } = useGetMaterialSettlementReport(params);
@@ -38,6 +42,16 @@ export function MaterialSettlementReport() {
         setPage(1);
     }, []);
 
+    const handleStartDateChange = (value: string) => {
+        setStartDate(value);
+        setPage(1);
+    };
+
+    const handleEndDateChange = (value: string) => {
+        setEndDate(value);
+        setPage(1);
+    };
+
     return (
         <Container maxWidth={false} className="primary-container">
             <div className="product-header">
@@ -50,10 +64,34 @@ export function MaterialSettlementReport() {
                     )}
                 </div>
                 <div className="product-actions">
-                    <SearchEngine
-                        placeholder="Mã hoặc tên nguyên vật liệu..."
-                        onSearch={handleSearch}
-                    />
+                    <div className="report-filters">
+                        <SearchEngine
+                            placeholder="Mã hoặc tên nguyên vật liệu..."
+                            onSearch={handleSearch}
+                        />
+                        <TextField
+                            type="date"
+                            label="Từ ngày"
+                            size="small"
+                            value={startDate}
+                            onChange={(event) =>
+                                handleStartDateChange(event.target.value)
+                            }
+                            InputLabelProps={{ shrink: true }}
+                            className="report-date-input"
+                        />
+                        <TextField
+                            type="date"
+                            label="Đến ngày"
+                            size="small"
+                            value={endDate}
+                            onChange={(event) =>
+                                handleEndDateChange(event.target.value)
+                            }
+                            InputLabelProps={{ shrink: true }}
+                            className="report-date-input"
+                        />
+                    </div>
                 </div>
             </div>
 
