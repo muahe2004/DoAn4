@@ -14,7 +14,6 @@ from app.api.routes import (
     compare_material_codes,
     material_stores,
     exports,
-    materials,
     importDeclarations,
     countries,
     partners,

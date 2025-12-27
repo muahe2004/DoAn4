@@ -12,6 +12,7 @@ export const URL_API_IMPORT_DECLARATION = `${BASE_API_URL}/import_declarations`;
 export const URL_API_COUNTRY = `${BASE_API_URL}/countries`;
 export const URL_API_PARTNER = `${BASE_API_URL}/partners`;
 export const URL_API_CURRENCY = `${BASE_API_URL}/currencies`;
+export const URL_API_NORM_PRODUCT_INVENTORYS = `${BASE_API_URL}/norm-product-inventorys`;
 export const URL_API_SETTLEMENT_REPORT = `${BASE_API_URL}/settlement-reports`;
 export const URL_API_FISCAL_EXPORT_DECLARATION = `${BASE_API_URL}/fiscal-export-declarations`;
 export const URL_API_FISCAL_EXPORT_DECLARATION_DETAIL = `${BASE_API_URL}/fiscal-export-declaration-details`;
