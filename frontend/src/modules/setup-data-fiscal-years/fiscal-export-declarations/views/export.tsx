@@ -283,9 +283,6 @@ function SetupFiscalExportDeclarations() {
                       return (
                         <TableRow key={detail.id}>
                           <TableCell align="center">
-                            {(pageDetail - 1) * rowsPerPageDetail + index + 1}
-                          </TableCell>
-                          <TableCell align="center">
                             {detail.export_declaration_number || "-"}
                           </TableCell>
                           <TableCell align="center">
