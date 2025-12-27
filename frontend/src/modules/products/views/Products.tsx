@@ -308,7 +308,7 @@ export function Products() {
                         </TableRow>
                     </TableHead>
 
-                    <TableBody  className="primary-tbody">
+                    <TableBody className="primary-tbody">
                         {products?.data.map((prod) => {
                             const statusKey = prod.status?.toLowerCase?.() ?? "";
                             const badgeClass = STATUS_DISPLAY[statusKey] ? `status-${statusKey}` : "status-unknown";

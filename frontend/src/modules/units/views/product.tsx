@@ -104,7 +104,7 @@ const Product: React.FC = () => {
                 <TableCell className="table-header-cell" sx={{ width: 100, fontWeight: '400 !important', color: 'rgba(255,255,255,0.7) !important' }}>Xóa All</TableCell>
               </TableRow>
             </TableHead>
-            <TableBody>
+            <TableBody className="primary-tbody">
               <TableRow>
                 <TableCell colSpan={6} align="center" className="table-body-cell" sx={{ height: 200, color: '#999', border: 'none' }}>
                   {loading ? "Đang tải dữ liệu..." : "Chưa có dữ liệu"}

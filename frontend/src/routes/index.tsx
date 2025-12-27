@@ -42,10 +42,10 @@ import MaterialStore from "../modules/material-store/views/MaterialStore";
 import { MaterialSettlementReport } from "../modules/reports/views/MaterialSettlementReport";
 import { ProductSettlementReport } from "../modules/reports/views/ProductSettlementReport";
 import { MaterialInventorySummary } from "../modules/reports/views/MaterialInventorySummary";
-import MaterialStores from "src/modules/store-materials/views/MaterialStores";
-import SetupFiscalExportDeclarations from "src/modules/setup-data-fiscal-years/fiscal-export-declarations/views/export";
-import SetupFiscalImportDeclarations from "src/modules/setup-data-fiscal-years/fiscal-import-declarations/views/import";
-import { CompareMaterialCodes } from "src/modules/compare-material-codes/views/CompareMaterialCodes";
+import MaterialStores from "../modules/store-materials/views/MaterialStores";
+import SetupFiscalExportDeclarations from "../modules/setup-data-fiscal-years/fiscal-export-declarations/views/export";
+import SetupFiscalImportDeclarations from "../modules/setup-data-fiscal-years/fiscal-import-declarations/views/import";
+import { CompareMaterialCodes } from "../modules/compare-material-codes/views/CompareMaterialCodes";
 
 /* ===== Route Guards ===== */
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {

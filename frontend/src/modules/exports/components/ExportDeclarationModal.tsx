@@ -1126,7 +1126,7 @@ export default function ExportDeclarationModal({
               </div>
             </div>
 
-            <TableContainer className="primary-table-container table-modal">
+            <TableContainer className="primary-table-container">
               <Table size="small" stickyHeader>
                 {isCreateMode ? (
                   <>

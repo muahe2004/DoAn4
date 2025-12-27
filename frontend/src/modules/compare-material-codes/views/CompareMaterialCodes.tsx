@@ -245,8 +245,8 @@ export function CompareMaterialCodes() {
                         </TableRow>
                     </TableHead>
 
-                    <TableBody>
-                        {codes?.data.map((code) => {
+                    <TableBody className="primary-tbody">
+                        {codes?.data.map((code: any) => {
                             const statusKey = code.status?.toLowerCase?.() ?? "";
                             const badgeClass = STATUS_DISPLAY[statusKey] ? `status-${statusKey}` : "status-unknown";
 

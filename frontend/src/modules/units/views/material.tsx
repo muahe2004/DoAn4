@@ -120,7 +120,7 @@ const Material: React.FC = () => {
                 <TableCell className="table-header-cell" sx={{ width: 100, fontWeight: '400 !important', color: '#999 !important' }}>Xóa All</TableCell>
               </TableRow>
             </TableHead>
-            <TableBody>
+            <TableBody className="primary-tbody">
               {rows.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={6} align="center" sx={{ height: 200, color: '#999', border: 'none' }}>

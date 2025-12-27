@@ -1,6 +1,6 @@
 /* Container chính */
 .primary-container {
-    padding: 20px;
+    padding: 0px;
     background-color: #f8f9fa;
 }
 
@@ -33,6 +33,10 @@
     min-width: 280px; /* Cố định chiều rộng tối thiểu cho ô ngày */
 }
 
+.export-declarations-table {
+    padding-bottom: 0px !important;
+}
+
 .search-box-container {
     flex: 1; 
     max-width: 500px; /* Ô tìm kiếm sẽ rộng ra tối đa 500px */
@@ -53,7 +57,6 @@
     font-weight: 600 !important;
     font-size: 11px !important;
     text-transform: uppercase;
-    padding: 12px 8px !important;
     border-right: 1px solid rgba(255, 255, 255, 0.1) !important;
     white-space: nowrap; 
 }

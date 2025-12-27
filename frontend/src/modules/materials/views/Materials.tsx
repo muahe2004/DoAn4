@@ -22,6 +22,7 @@ import MaterialFormModal from "../components/MaterialFormModal";
 import { useGetMaterials } from "../apis/getMaterials";
 import { useMaterialHandlers } from "../services/materialServices";
 import type { IMaterialResponse } from "../types";
+import FileDownloadOutlinedIcon from "@mui/icons-material/FileDownloadOutlined";
 import "./materials.css";
 
 export function Materials() {
@@ -105,6 +106,7 @@ export function Materials() {
                         <Button
                             className="material-action-btn"
                             variant="outlined"
+                            startIcon={<FileDownloadOutlinedIcon />}
                             onClick={() =>
                                 showSnackbar({ message: "Chức năng import đang được phát triển", severity: "info" })
                             }

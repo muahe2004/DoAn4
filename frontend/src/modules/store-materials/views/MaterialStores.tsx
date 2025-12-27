@@ -52,7 +52,17 @@ function MaterialStores() {
         ...(statusFilter && { status: statusFilter }),
     };
 
-    const { data: materialStores } = useGetMaterialStores(Params);
+    const queryResult = useGetMaterialStores(Params);
+    const materialStores = (() => {
+        const qr = queryResult as any;
+        if (qr == null) return undefined;
+        // If hook already returns an object with data/total, keep it
+        if (qr.data !== undefined) return qr;
+        // If hook returns an array directly, adapt to expected shape
+        if (Array.isArray(qr)) return { data: qr, total: qr.length };
+        // Fallback empty shape
+        return { data: [], total: 0 };
+    })();
 
     const handlePageChange = (newPage: number) => {
         setPage(newPage);
@@ -344,9 +354,9 @@ function MaterialStores() {
                                     <TableCell align="center" sx={{ minWidth: 120 }}>GIÁ TRỊ</TableCell>
                                 </TableRow>
                             </TableHead>
-                            <TableBody>
+                            <TableBody className="primary-tbody">
                                 {materialStores?.data && materialStores.data.length > 0 ? (
-                                    materialStores.data.map((store, index) => {
+                                    materialStores.data.map((store: any, index: number) => {
                                         const statusKey = store.status?.toLowerCase?.() ?? "";
                                         const badgeClass = STATUS_DISPLAY[statusKey] ? `status-${statusKey}` : "status-unknown";
                                         

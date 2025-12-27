@@ -116,23 +116,28 @@ const MaterialStore: React.FC = () => {
 
   return (
     <Container maxWidth={false} className="material-store-container">
-      <Box sx={{ mb: 3 }}>
-        <Box sx={{ display: "flex", gap: 2, mb: 2 }}>
-          <TextField
-            label="Tìm kiếm"
-            variant="outlined"
-            size="small"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder="Tìm kiếm nguyên vật liệu..."
-            sx={{ minWidth: 300, flexGrow: 1 }}
-          />
+      <div className="exports-header">
+        <div className="exports-title">
+          <p className="exports-title__label">QUẢN LÝ CHỐT TỒN KHO NGUYÊN VẬT LIỆU</p>
+        </div>
+        <Box className="toolbar" sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 2, p: 0, mb: 2 }}>
+          <Box className="left-tools">
+            <TextField
+              label="Tìm kiếm"
+              variant="outlined"
+              size="small"
+              value={searchTerm}
+              
+              placeholder="Tìm kiếm nguyên vật liệu..."
+              sx={{ minWidth: 300, flexGrow: 1 }}
+            />
 
-          <Button variant="contained" onClick={handleAddNew}>
-            Thêm mới
-          </Button>
+          </Box>
+            <Button variant="contained" onClick={handleAddNew}>
+              Thêm mới
+            </Button>
         </Box>
-      </Box>
+      </div>
 
       {/* Loading */}
       {isLoading ? (
@@ -177,7 +182,7 @@ const MaterialStore: React.FC = () => {
                   ></TableCell>
                 </TableRow>
               </TableHead>
-              <TableBody>
+              <TableBody className="primary-tbody">
                 {materialInventorysData?.data.map((inventory, index) => (
                   <TableRow key={inventory.id}>
                     <TableCell

@@ -37,13 +37,16 @@ export function Norms() {
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [normToDelete, setNormToDelete] = useState<string | null>(null);
   const { showSnackbar } = useSnackbar();
-  const { mutateAsync: createNorm } = useCreateNorm({});
+const { mutateAsync: createNorm } = useCreateNorm({});
   const { mutateAsync: editNorm } = useEditNorm({});
   const { mutateAsync: deleteNorms } = useDeleteNorms();
+
+  const [search, setSearch] = useState("");
 
   const Params = {
     limit: rowsPerPage,
     skip: (page - 1) * rowsPerPage,
+    ...(search && { search }),
   };
 
   const { data: norms } = useGetNorms(Params);
@@ -54,6 +57,11 @@ export function Norms() {
 
   const handleItemsPerPageChange = (value: number) => {
     setRowsPerPage(value);
+    setPage(1);
+  };
+
+  const handleSearch = (value: string) => {
+    setSearch(value);
     setPage(1);
   };
 
@@ -142,12 +150,12 @@ export function Norms() {
               <p className="norm-title__label">DANH MỤC ĐỊNH MỨC</p>
           </div>
           <div className="norm-actions">
-              {/* <SearchEngine placeholder="Tên nguyên vật liệu, mã..."/> */}
-              <div className="norm-actions__buttons">
-                  <div className="norm-actions">
-                    <Button onClick={handleOpenAdd}>thêm mới</Button>
-                  </div>
+            <SearchEngine placeholder="Tên định mức, mô tả..." onSearch={handleSearch} />
+            <div className="norm-actions__buttons">
+              <div className="norm-actions">
+                <Button onClick={handleOpenAdd}>thêm mới</Button>
               </div>
+            </div>
           </div>
       </div>
       

@@ -9,6 +9,8 @@ from app.api.routes import (
     norms,
     fiscal_import_declarations,
     fiscal_import_declaration_details,
+    fiscal_export_declarations,
+    fiscal_export_declaration_details,
     compare_material_codes,
     material_stores,
     exports,
@@ -35,6 +37,8 @@ api_router.include_router(units.router, prefix="/units", tags=["units"])
 api_router.include_router(norms.router, prefix="/norms", tags=["norms"])
 api_router.include_router(fiscal_import_declarations.router, prefix="/fiscal-import-declarations", tags=["fiscal-import-declarations"])
 api_router.include_router(fiscal_import_declaration_details.router, prefix="/fiscal-import-declaration-details", tags=["fiscal-import-declaration-details"])
+api_router.include_router(fiscal_export_declarations.router, prefix="/fiscal-export-declarations", tags=["fiscal-export-declarations"])
+api_router.include_router(fiscal_export_declaration_details.router, prefix="/fiscal-export-declaration-details", tags=["fiscal-export-declaration-details"])
 api_router.include_router(compare_material_codes.router, prefix="/compare-material-codes", tags=["compare-material-codes"])
 api_router.include_router(material_stores.router, prefix="/material-stores", tags=["material-stores"])
 
