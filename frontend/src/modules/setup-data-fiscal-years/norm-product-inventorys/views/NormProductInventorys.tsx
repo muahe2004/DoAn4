@@ -7,26 +7,28 @@ import {
   MenuItem,
   Select,
   IconButton,
+  Table,
   TableHead,
   TableRow,
   TableCell,
+  TableBody,
 } from "@mui/material";
 import { Visibility } from "@mui/icons-material";
 import NormDetailModal from "../components/NormProductDetailModal";
+import PrimaryPagination from "../../../../components/Pagination/Pagination";
 
 const NormProductInventorys: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
-  const [viewMode, setViewMode] = useState<"table" | "grid">("table");
+  const [rowsPerPage, setRowsPerPage] = useState(10);
   const [selectedNormId, setSelectedNormId] = useState<string | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
-  const pageSize = 10;
 
   // API call
   const { data: normProductsData, isLoading } = useGetNormProducts({
     page: currentPage,
-    limit: pageSize,
+    limit: rowsPerPage,
     search: searchTerm,
     status: filterStatus === "all" ? undefined : filterStatus,
   });
@@ -46,7 +48,7 @@ const NormProductInventorys: React.FC = () => {
     },
     onError: (error) => {
       console.error("Export failed:", error);
-      alert("Xuấất bại. Vui lòng thử lại.");
+      alert("Xuất bại. Vui lòng thử lại.");
     },
   });
 
@@ -72,6 +74,11 @@ const NormProductInventorys: React.FC = () => {
     setCurrentPage(page);
   };
 
+  const handleItemsPerPageChange = (value: number) => {
+    setRowsPerPage(value);
+    setCurrentPage(1);
+  };
+
   const handleViewDetail = (normId: string) => {
     setSelectedNormId(normId);
     setModalOpen(true);
@@ -82,7 +89,7 @@ const NormProductInventorys: React.FC = () => {
     setSelectedNormId(null);
   };
 
-  const totalPages = Math.ceil((normProductsData?.total || 0) / pageSize);
+  const totalPages = Math.ceil((normProductsData?.total || 0) / rowsPerPage);
 
   return (
     <div className="norm-product-inventorys">
@@ -116,35 +123,12 @@ const NormProductInventorys: React.FC = () => {
 
       {/* Table Section */}
       <div className="norm-product-table-section">
-        <div className="table-header">
-          <h2 className="table-title">
-            DANH SÁCH CÁC SẢN PHẨM ĐƯỢC ÁP ĐỊNH MỨC
-          </h2>
-
-          <div className="table-controls">
-            <div className="view-toggle">
-              <button
-                className={`view-btn ${viewMode === "table" ? "active" : ""}`}
-                onClick={() => setViewMode("table")}
-              >
-                <span className="table-icon">⊞</span>
-              </button>
-              <button
-                className={`view-btn ${viewMode === "grid" ? "active" : ""}`}
-                onClick={() => setViewMode("grid")}
-              >
-                <span className="grid-icon">⊡</span>
-              </button>
-            </div>
-          </div>
-        </div>
-
         {isLoading ? (
           <div className="loading-state">Đang tải dữ liệu...</div>
         ) : (
           <>
             <div className="table-container">
-              <table className="norm-product-table">
+              <Table stickyHeader aria-label="norms table">
                 <TableHead className="primary-thead">
                   <TableRow>
                     <TableCell className="primary-tcell" align="center">
@@ -167,17 +151,43 @@ const NormProductInventorys: React.FC = () => {
                     </TableCell>
                   </TableRow>
                 </TableHead>
-                <tbody>
+                <TableBody>
                   {normProductsData?.data?.map((item, index) => (
                     <tr key={item.id}>
-                      <td>{(currentPage - 1) * pageSize + index + 1}</td>
-                      <td>{item.product_code}</td>
-                      <td>{item.product_name}</td>
-                      <td>{item.unit_name}</td>
-                      <td>
+                      <TableCell
+                        className="custom-border-tcell primary-tcell"
+                        align="center"
+                      >
+                        {(currentPage - 1) * rowsPerPage + index + 1}
+                      </TableCell>
+                      <TableCell
+                        className="custom-border-tcell primary-tcell"
+                        align="center"
+                      >
+                        {item.product_code}
+                      </TableCell>
+                      <TableCell
+                        className="custom-border-tcell primary-tcell"
+                        align="center"
+                      >
+                        {item.product_name}
+                      </TableCell>
+                      <TableCell
+                        className="custom-border-tcell primary-tcell"
+                        align="center"
+                      >
+                        {item.unit_name}
+                      </TableCell>
+                      <TableCell
+                        className="custom-border-tcell primary-tcell"
+                        align="center"
+                      >
                         <span className="norm-name">{item.norm_name}</span>
-                      </td>
-                      <td>
+                      </TableCell>
+                      <TableCell
+                        className="custom-border-tcell primary-tcell"
+                        align="center"
+                      >
                         <IconButton
                           size="small"
                           onClick={() => handleViewDetail(item.id)}
@@ -186,47 +196,20 @@ const NormProductInventorys: React.FC = () => {
                         >
                           <Visibility fontSize="small" />
                         </IconButton>
-                      </td>
+                      </TableCell>
                     </tr>
                   )) || []}
-                </tbody>
-              </table>
+                </TableBody>
+              </Table>
             </div>
 
-            {/* Pagination */}
-            {totalPages > 1 && (
-              <div className="pagination">
-                <button
-                  onClick={() => handlePageChange(currentPage - 1)}
-                  disabled={currentPage === 1}
-                  className="pagination-btn"
-                >
-                  ‹
-                </button>
-
-                {Array.from({ length: totalPages }, (_, i) => i + 1).map(
-                  (page) => (
-                    <button
-                      key={page}
-                      onClick={() => handlePageChange(page)}
-                      className={`pagination-btn ${
-                        currentPage === page ? "active" : ""
-                      }`}
-                    >
-                      {page}
-                    </button>
-                  )
-                )}
-
-                <button
-                  onClick={() => handlePageChange(currentPage + 1)}
-                  disabled={currentPage === totalPages}
-                  className="pagination-btn"
-                >
-                  ›
-                </button>
-              </div>
-            )}
+            <PrimaryPagination
+              totalItems={totalPages}
+              page={currentPage}
+              rowsPerPage={rowsPerPage}
+              onPageChange={handlePageChange}
+              onRowsPerPageChange={handleItemsPerPageChange}
+            />
           </>
         )}
       </div>

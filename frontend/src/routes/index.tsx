@@ -17,7 +17,8 @@ import {
   warehouseClosingMaterialsURL,
   prepareSettlementReportUserURL,
   prepareSettlementReportInventoryProductURL,
-  prepareSettlementReportInventorySummaryURL
+  prepareSettlementReportInventorySummaryURL,
+  applyProductNormURL,
 } from "./urls";
 import Layout from "../modules/app/Layout";
 import Test from "../modules/Test/Test";
@@ -37,6 +38,7 @@ import MaterialStore from "../modules/material-store/views/MaterialStore";
 import { MaterialSettlementReport } from "../modules/reports/views/MaterialSettlementReport";
 import { ProductSettlementReport } from "../modules/reports/views/ProductSettlementReport";
 import { MaterialInventorySummary } from "../modules/reports/views/MaterialInventorySummary";
+import NormProductInventorys from "../modules/setup-data-fiscal-years/norm-product-inventorys/views/NormProductInventorys";
 
 /* ===== Route Guards ===== */
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
@@ -108,18 +110,22 @@ export const createRouterConfig = () =>
               path: warehouseClosingMaterialsURL,
               element: <MaterialStore />,
             },
-                {
-                    path: prepareSettlementReportUserURL,
-                    element: <MaterialSettlementReport />,
-                },
-                {
-                    path: prepareSettlementReportInventoryProductURL,
-                    element: <ProductSettlementReport />,
-                },
-                {
-                    path: prepareSettlementReportInventorySummaryURL,
-                    element: <MaterialInventorySummary />,
-                },
+            {
+              path: prepareSettlementReportUserURL,
+              element: <MaterialSettlementReport />,
+            },
+            {
+              path: prepareSettlementReportInventoryProductURL,
+              element: <ProductSettlementReport />,
+            },
+            {
+              path: prepareSettlementReportInventorySummaryURL,
+              element: <MaterialInventorySummary />,
+            },
+            {
+              path: applyProductNormURL,
+              element: <NormProductInventorys />,
+            },
           ],
         },
         {

@@ -8,7 +8,6 @@ from app.api.routes import (
     units,
     norms,
     exports,
-    materials,
     importDeclarations,
     countries,
     partners,
