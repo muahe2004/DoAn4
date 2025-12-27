@@ -22,7 +22,7 @@ import {
   FiscalImportDeclarationsURL,
   FiscalExportDeclarationsURL,
   MaterialStoresURL,
-  productsURL
+  productsURL,
   applyProductNormURL,
 } from "./urls";
 import Layout from "../modules/app/Layout";
@@ -119,42 +119,42 @@ export const createRouterConfig = () =>
               path: warehouseClosingMaterialsURL,
               element: <MaterialStore />,
             },
-              {
-                  path: prepareSettlementReportUserURL,
-                  element: <MaterialSettlementReport />,
-              },
-              {
-                  path: prepareSettlementReportInventoryProductURL,
-                  element: <ProductSettlementReport />,
-              },
-              {
-                  path: productsURL,
-                  element: <Products/>
-              },
-              {
-                  path: unitsURL,
-                  element: <Units/>
-              },
-              {
-                  path: compareMaterialCodesURL,
-                  element: <CompareMaterialCodes/>
-              },
-              {
-                  path: FiscalImportDeclarationsURL,
-                  element: <SetupFiscalImportDeclarations/>
-              },
-              {
-                  path: FiscalExportDeclarationsURL,
-                  element: <SetupFiscalExportDeclarations/>
-              },
-              {
-                  path: MaterialStoresURL,
-                  element: <MaterialStores/>
-              },
-              {
-                  path: prepareSettlementReportInventorySummaryURL,
-                  element: <MaterialInventorySummary />,
-              },
+            {
+                path: prepareSettlementReportUserURL,
+                element: <MaterialSettlementReport />,
+            },
+            {
+                path: prepareSettlementReportInventoryProductURL,
+                element: <ProductSettlementReport />,
+            },
+            {
+                path: productsURL,
+                element: <Products/>
+            },
+            {
+                path: unitsURL,
+                element: <Units/>
+            },
+            {
+                path: compareMaterialCodesURL,
+                element: <CompareMaterialCodes/>
+            },
+            {
+                path: FiscalImportDeclarationsURL,
+                element: <SetupFiscalImportDeclarations/>
+            },
+            {
+                path: FiscalExportDeclarationsURL,
+                element: <SetupFiscalExportDeclarations/>
+            },
+            {
+                path: MaterialStoresURL,
+                element: <MaterialStores/>
+            },
+            {
+                path: prepareSettlementReportInventorySummaryURL,
+                element: <MaterialInventorySummary />,
+            },
             {
               path: prepareSettlementReportUserURL,
               element: <MaterialSettlementReport />,
