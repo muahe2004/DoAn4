@@ -163,14 +163,9 @@ input::-ms-reveal, input::-ms-clear {
   scrollbar-width: none;
   background-color: transparent !important;
   border-radius: 4px !important;
-  min-height: 620px;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
-}
-
-.table-modal {
-  min-height: 360px !important;
 }
 
 .primary-table-container::-webkit-scrollbar {
@@ -182,8 +177,19 @@ input::-ms-reveal, input::-ms-clear {
   width: 100%;
 }
 
-.primary-table-container .primary-tbody {
+.primary-table-container .primary-thead {
+  border: 1px solid #FFF !important;
+}
+
+.primary-table-container table tbody,
+.primary-table-container table .primary-tbody,
+.primary-table-container table .MuiTableBody-root,
+.primary-table-container table .MuiTableCell-body {
   border: 1px solid var(--primary-color) !important;
+}
+
+.css-127evc8-MuiCardContent-root:last-child {
+  padding-bottom: 0px !important;
 }
 
 .primary-thead .MuiTableCell-head {
@@ -198,7 +204,8 @@ input::-ms-reveal, input::-ms-clear {
 }
 
 .primary-thead .MuiTableCell-head:first-child {
-  border-left: 1px solid var(--primary-color);
+  border-left: 1px solid var(--primary-color) !important;
+  border-right: 1px solid #fff !important;
 }
 
 .custom-border-tcell {
@@ -216,6 +223,83 @@ input::-ms-reveal, input::-ms-clear {
 
 .primary-tcell {
   padding: 8px !important;
+}
+
+/* ================== Unified Table & Button Format ================== */
+.MuiTable-root {
+  border-collapse: collapse;
+  width: 100%;
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  border-radius: 8px;
+}
+
+.MuiTableHead-root .MuiTableCell-head {
+  background-color: var(--primary-color) !important;
+  color: #fff !important;
+  font-weight: 700 !important;
+  font-size: 12px !important;
+  text-transform: uppercase;
+  border-right: 1px solid rgba(255, 255, 255, 0.25) !important;
+  text-align: center !important;
+  padding: 12px 8px !important;
+}
+
+.MuiTableHead-root .MuiTableCell-head:last-child {
+  border-right: none !important;
+}
+
+.MuiTableBody-root .MuiTableRow-root .MuiTableCell-root {
+  font-size: 13px !important;
+  color: var(--text-primary) !important;
+  border-right: 1px solid var(--border-color) !important;
+  border-bottom: 1px solid var(--border-color) !important;
+  padding: 12px 8px !important;
+}
+
+.MuiTableBody-root .MuiTableRow-root .MuiTableCell-root:last-child {
+  border-right: none !important;
+}
+
+.MuiTableBody-root .MuiTableRow-root:last-child .MuiTableCell-root {
+  border-bottom: none !important;
+}
+
+.global-page-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--primary-color);
+  text-transform: uppercase;
+  margin-bottom: 20px;
+}
+
+.MuiButton-root {
+  text-transform: none !important;
+  border-radius: 6px !important;
+  font-weight: 700 !important;
+  font-size: 12px !important;
+  height: 36px;
+  padding: 0 16px;
+  min-width: 120px;
+}
+
+.MuiButton-containedPrimary {
+  background-color: var(--primary-color) !important;
+  color: #fff !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15) !important;
+}
+
+.MuiButton-containedPrimary:hover {
+  background-color: #0e1d35 !important;
+}
+
+.MuiButton-outlined {
+  border-color: var(--primary-color) !important;
+  color: var(--primary-color) !important;
+}
+
+.MuiButton-outlined:hover {
+  background-color: rgba(78, 164, 243, 0.08) !important;
 }
 
 /* ==================================== */

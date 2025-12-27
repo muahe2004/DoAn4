@@ -43,6 +43,8 @@ import {
   prepareSettlementReportInventorySummaryURL,
   manageCatalogUserURL,
   manageCatalogRoleURL,
+  FiscalImportDeclarationsURL,
+  FiscalExportDeclarationsURL,
 } from "../../routes/urls";
 import type { SidebarData } from "./types";
 import { FiBox, FiGrid, FiFileText, FiHome } from "react-icons/fi";
@@ -157,18 +159,18 @@ export const sidebarData: SidebarData = [
         path: standardNormsURL,
         icon: <FiGrid />,
       },
-      {
-        id: "norm-product",
-        label: "Định mức sản phẩm",
-        path: standardProductsNormURL,
-        icon: <FiFileText />,
-      },
-      {
-        id: "norm-semi-product",
-        label: "Định mức bán thành phẩm",
-        path: standardSemiProductsNormURL,
-        icon: <FiFileText />,
-      },
+      // {
+      //   id: "norm-product",
+      //   label: "Định mức sản phẩm",
+      //   path: standardProductsNormURL,
+      //   icon: <FiFileText />,
+      // },
+      // {
+      //   id: "norm-semi-product",
+      //   label: "Định mức bán thành phẩm",
+      //   path: standardSemiProductsNormURL,
+      //   icon: <FiFileText />,
+      // },
     ],
   },
   {
@@ -208,17 +210,36 @@ export const sidebarData: SidebarData = [
     icon: <FiFileText />,
     children: [
       {
-        id: "user",
+        id: "apply-import",
         label: "Áp dữ liệu tờ khai nhập",
-        path: applyUsersURL,
+        path: FiscalImportDeclarationsURL, 
         icon: <FiFileText />,
       },
+
       {
         id: "apply-export",
         label: "Áp dữ liệu tờ khai xuất",
-        path: applyExportURL,
+        path: FiscalExportDeclarationsURL,
         icon: <FiFileText />,
       },
+      // {
+      //   id: "apply-vat",
+      //   label: "Áp dữ liệu hóa đơn VAT",
+      //   path: "/settings/roles",
+      //   icon: <FiFileText />,
+      // },
+      // {
+      //   id: "apply-purchase",
+      //   label: "Áp dữ liệu sổ mua hàng",
+      //   path: "/settings/roles",
+      //   icon: <FiFileText />,
+      // },
+      // {
+      //   id: "apply-sales",
+      //   label: "Áp dữ liệu sổ bán hàng",
+      //   path: "/settings/roles",
+      //   icon: <FiFileText />,
+      // },
       // {
       //   id: "apply-vat",
       //   label: "Áp dữ liệu hóa đơn VAT",
@@ -237,12 +258,12 @@ export const sidebarData: SidebarData = [
       //   path: applySalesURL,
       //   icon: <FiFileText />,
       // },
-      {
-        id: "apply-product-norm",
-        label: "Áp định mức sản phẩm",
-        path: applyProductNormURL,
-        icon: <FiFileText />,
-      },
+      // {
+      //   id: "apply-product-norm",
+      //   label: "Áp định mức sản phẩm",
+      //   path: applyProductNormURL,
+      //   icon: <FiFileText />,
+      // },
       // {
       //   id: "inventory-material",
       //   label: "Tổng hợp tồn kho nvl/sổ kế toán 152",

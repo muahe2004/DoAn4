@@ -1,0 +1,117 @@
+/* Container chính */
+.primary-container {
+    padding: 0px;
+    background-color: #f8f9fa;
+}
+
+/* THIẾT KẾ LẠI BỘ LỌC ĐỂ KHÔNG BỊ CHÈN */
+.fiscal-search-filters {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px; /* Tăng khoảng cách giữa các nhóm bộ lọc */
+    margin-bottom: 16px;
+}
+
+.filter-left-side {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex: 1; /* Để nhóm này tự động giãn rộng */
+}
+
+/* Đảm bảo ô ngày và ô tìm kiếm đủ to */
+.date-range-picker {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 0 12px;
+    height: 38px;
+    min-width: 280px; /* Cố định chiều rộng tối thiểu cho ô ngày */
+}
+
+.export-declarations-table {
+    padding-bottom: 0px !important;
+}
+
+.search-box-container {
+    flex: 1; 
+    max-width: 500px; /* Ô tìm kiếm sẽ rộng ra tối đa 500px */
+}
+
+/* NHÓM NÚT CHỨC NĂNG - CÁCH NHAU THOÁNG HƠN */
+.fiscal-actions-group {
+    display: flex;
+    flex-wrap: wrap; 
+    gap: 12px; /* Tăng khoảng cách giữa các button */
+    margin-bottom: 20px;
+}
+
+/* GIỮ NGUYÊN TOÀN BỘ PHẦN CSS TABLE VÀ SCROLLBAR DƯỚI ĐÂY */
+.primary-table-theme .fiscal-table-head .MuiTableCell-root {
+    background-color: #1a3352 !important; 
+    color: #ffffff !important;
+    font-weight: 600 !important;
+    font-size: 11px !important;
+    text-transform: uppercase;
+    border-right: 1px solid rgba(255, 255, 255, 0.1) !important;
+    white-space: nowrap; 
+}
+
+.custom-scrollbar {
+    overflow-x: auto !important;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+    height: 8px; 
+    width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #1a3352; 
+    border-radius: 10px;
+}
+
+/* Thanh cuộn ngang */
+.custom-scrollbar {
+    overflow-x: auto !important;
+}
+
+
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #12253d;
+}
+
+.card-header-view {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    background: #fff;
+}
+
+.view-mode-icons {
+    display: flex;
+    background: #f0f2f5;
+    padding: 3px;
+    border-radius: 6px;
+}
+
+.view-mode-icons .active {
+    background: #fff;
+    color: #1a3352;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.15);
+}
+
+.table-title {
+    font-weight: 700 !important;
+    color: #1a3352;
+}

@@ -12,6 +12,9 @@ import {
   DialogContent,
   DialogContentText,
   DialogTitle,
+  Select,
+  MenuItem,
+  Box,
 } from "@mui/material";
 import { type ChangeEvent, useRef, useState } from "react";
 import { useGetUnits } from "../apis/getUnits";
@@ -23,6 +26,7 @@ import type { IUnit, IUnitResponse } from "../types";
 import UnitFormModel from "../components/UnitFormModel";
 import Button from "../../../components/Button/Button";
 import "./units.css";
+import FileDownloadOutlinedIcon from "@mui/icons-material/FileDownloadOutlined";
 import { useCreateUnit } from "../apis/addUnit";
 import { useEditUnit } from "../apis/editUnit";
 import { useDeleteUnit } from "../apis/deleteUnit";
@@ -93,6 +97,23 @@ export function Units() {
   const handleCloseDeleteDialog = () => {
     setDeleteDialogOpen(false);
     setUnitToDelete(null);
+  };
+
+  const triggerImport = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleDownloadTemplate = () => {
+    const header = "Tên đơn vị tính,Mô tả,Loại,Trạng thái\n";
+    const example = "Cái,Đơn vị chuẩn,PCE,active\n";
+    const blob = new Blob([header + example], {
+      type: "text/csv;charset=utf-8",
+    });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = "mau-doi-sanh-dvt.csv";
+    link.click();
+    URL.revokeObjectURL(link.href);
   };
 
   const handleConfirmDelete = async () => {
@@ -240,25 +261,49 @@ export function Units() {
 
   return (
     <Container maxWidth={false} className="primary-container">
-      <div className="unit-actions">
-        <SearchEngine placeholder="Tìm kiếm" onSearch={handleSearch} />
-        {/* <Button onClick={handleExport} className="unit-upload-button">
-          Xuất mẫu excel
-        </Button>
-        <Button onClick={handleImport} className="unit-upload-button">
-          tải lên
-        </Button> */}
-        <Button onClick={handleOpenAdd}>thêm mới</Button>
+      <div className="exports-header">
+        <div className="exports-title">
+          <p className="exports-title__label">QUẢN LÝ ĐƠN VỊ TÍNH</p>
+        </div>
+        <Box className="toolbar">
+          <Box className="left-tools">
+            <SearchEngine placeholder="Tìm kiếm" onSearch={handleSearch} />
+          </Box>
+          <Box className="right-tools">
+            <Button
+              className="btn-sample"
+              startIcon={<FileDownloadOutlinedIcon />}
+              onClick={handleDownloadTemplate}
+            >
+              Mẫu đối sánh ĐVT
+            </Button>
+            <Button
+              variant="outlined"
+              className="btn-import"
+              startIcon={<FileDownloadOutlinedIcon />}
+              onClick={() => triggerImport()}
+            >
+              Import từ file Excel
+            </Button>
+            <Button
+              className="btn-add"
+              variant="contained"
+              onClick={handleOpenAdd}
+            >
+              Thêm mới
+            </Button>
+          </Box>
+        </Box>
+        <input
+          type="file"
+          accept=".xlsx,.xls,.xlsm,.xlsb"
+          ref={fileInputRef}
+          onChange={handleFileChange}
+          style={{ display: "none" }}
+        />
       </div>
-      <input
-        type="file"
-        accept=".xlsx,.xls,.xlsm,.xlsb"
-        ref={fileInputRef}
-        onChange={handleFileChange}
-        style={{ display: "none" }}
-      />
 
-      <TableContainer className="primary-table-container">
+      <TableContainer className="primary-table-container custom-scrollbar primary-table-theme">
         <Table stickyHeader aria-label="units table">
           <TableHead className="primary-thead">
             <TableRow>
@@ -278,7 +323,7 @@ export function Units() {
             </TableRow>
           </TableHead>
 
-          <TableBody>
+          <TableBody className="primary-tbody">
             {units?.data.map((unit) => {
               const statusKey = unit.status?.toLowerCase?.() ?? "";
               const badgeClass = STATUS_DISPLAY[statusKey]
