@@ -1,18 +1,35 @@
 export interface MaterialSettlementRow {
-    material_id: string;
-    material_code: string;
-    material_name: string;
-    unit_name?: string | null;
-    opening_quantity: number;
-    import_quantity: number;
-    export_quantity: number;
-    closing_quantity: number;
+  material_id: string;
+  material_code: string;
+  material_name: string;
+  unit_name?: string | null;
+  opening_quantity: number;
+  import_quantity: number;
+  export_quantity: number;
+  closing_quantity: number;
 }
 
 export interface MaterialSettlementResponse {
-    start_date: string;
-    end_date: string;
-    total: number;
-    data: MaterialSettlementRow[];
+  start_date: string;
+  end_date: string;
+  total: number;
+  data: MaterialSettlementRow[];
 }
 
+export interface ProductSettlementRow {
+  product_id: string;
+  product_code: string;
+  product_name: string;
+  unit_name?: string | null;
+  opening_quantity: number;
+  production_quantity: number;
+  export_quantity: number;
+  closing_quantity: number;
+}
+
+export interface ProductSettlementResponse {
+  start_date: string;
+  end_date: string;
+  total: number;
+  data: ProductSettlementRow[];
+}
