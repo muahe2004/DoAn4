@@ -7,7 +7,6 @@ import {
   TableHead,
   TableRow,
   Paper,
-  TextField,
   IconButton,
   Box,
   Pagination,
@@ -312,20 +311,18 @@ const ProductStore: React.FC = () => {
 
   return (
     <div className="product-store-container">
-      <div className="exports-header">
-        <div className="exports-title">
-          <p className="exports-title__label">QUẢN LÝ CHỐT TỒN KHO SẢN PHẨM</p>
+      <div className="primary-header">
+        <div className="primary-header-title">
+          <p className="primary-header-title__label">QUẢN LÝ CHỐT TỒN KHO SẢN PHẨM</p>
         </div>
-        <Box className="toolbar">
-          <Box className="left-tools">
-            <SearchEngine placeholder="Tìm kiếm" onSearch={setSearchTerm} />
-          </Box>
-          <Box className="right-tools">
-            <Button variant="contained" onClick={handleCreate} color="primary">
-              Thêm mới
-            </Button>
-          </Box>
-        </Box>
+        <div className="primary-header-actions">
+            <SearchEngine placeholder="Tìm kiếm..." onSearch={setSearchTerm} />
+            <div className="primary-header-actions__buttons">
+                <Button className="primary-header-action-btn" onClick={handleCreate}>
+                  Thêm mới
+                </Button>
+            </div>
+        </div>
       </div>
       <TableContainer component={Paper}>
         <Table>
@@ -401,7 +398,7 @@ const ProductStore: React.FC = () => {
                   <TableCell className="custom-border-tcell primary-tcell">
                     {inventory.store_name}
                   </TableCell>
-                  <TableCell className="custom-border-tcell primary-tcell">
+                  <TableCell className="custom-border-tcell primary-tcell" width={150}>
                     <span
                       className={`status ${inventory.status.toLowerCase()}`}
                     >

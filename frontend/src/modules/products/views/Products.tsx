@@ -7,6 +7,7 @@ import {
     TableContainer,
     TableHead,
     TableRow,
+    Tooltip,
 } from "@mui/material";
 import { type ChangeEvent, useCallback, useRef, useState } from "react";
 import { useGetProducts } from "../apis/getProducts";
@@ -267,20 +268,20 @@ export function Products() {
 
     return (
         <Container maxWidth={false} className="primary-container">
-            <div className="product-header">
-                <div className="product-title">
-                    <p className="product-title__label">DANH MỤC SẢN PHẨM</p>
+            <div className="primary-header">
+                <div className="primary-header-title">
+                    <p className="primary-header-title__label">DANH MỤC SẢN PHẨM</p>
                 </div>
-                <div className="product-actions">
+                <div className="primary-header-actions">
                     <SearchEngine placeholder="Tên sản phẩm, mã..." onSearch={handleSearch} />
-                    <div className="product-actions__buttons">
-                        <Button className="product-action-btn" onClick={handleExport}>
+                    <div className="primary-header-actions__buttons">
+                        <Button className="primary-header-action-btn" onClick={handleExport}>
                             Xuất mẫu excel
                         </Button>
-                        <Button className="product-action-btn" onClick={handleImport}>
+                        <Button className="primary-header-action-btn" onClick={handleImport}>
                             Tải lên
                         </Button>
-                        <Button className="product-action-btn" onClick={handleOpenAdd}>
+                        <Button className="primary-header-action-btn" onClick={handleOpenAdd}>
                             Thêm mới
                         </Button>
                     </div>
@@ -296,10 +297,10 @@ export function Products() {
 
             <TableContainer className="primary-table-container">
                 <Table stickyHeader aria-label="majors table">
-                    <TableHead className="primary-thead">
-                        <TableRow>
-                            <TableCell className="primary-tcell" align="center">Mã sản phẩm</TableCell>
-                            <TableCell className="primary-tcell" align="center">Tên sản phẩm</TableCell>
+            <TableHead className="primary-thead">
+                <TableRow>
+                    <TableCell className="primary-tcell" align="center">STT</TableCell>
+                    <TableCell className="primary-tcell" align="center">Tên sản phẩm</TableCell>
                             <TableCell className="primary-tcell" align="center">Đơn vị tính</TableCell>
                             <TableCell className="primary-tcell" align="center">Đơn vị tính 2</TableCell>
                             <TableCell className="primary-tcell" align="center">Định mức</TableCell>
@@ -309,31 +310,39 @@ export function Products() {
                     </TableHead>
 
                     <TableBody className="primary-tbody">
-                        {products?.data.map((prod) => {
+                        {products?.data.map((prod, index) => {
                             const statusKey = prod.status?.toLowerCase?.() ?? "";
                             const badgeClass = STATUS_DISPLAY[statusKey] ? `status-${statusKey}` : "status-unknown";
 
                             return (
-                                <TableRow className="primary-trow" key={prod.id}>
-                                    <TableCell className="custom-border-tcell primary-tcell">{prod.product_code}</TableCell>
-                                    <TableCell className="custom-border-tcell primary-tcell">{prod.product_name}</TableCell>
-                                    <TableCell className="custom-border-tcell primary-tcell">{prod.unit_name}</TableCell>
-                                    <TableCell className="custom-border-tcell primary-tcell">{prod.unit_name_2}</TableCell>
-                                    <TableCell className="custom-border-tcell primary-tcell">{prod.norm_name}</TableCell>
-                                    <TableCell align="center" className="custom-border-tcell primary-tcell">
-                                        <span className={`status-badge ${badgeClass}`}>
-                                            {STATUS_DISPLAY[statusKey] ?? prod.status ?? "Unknown"}
-                                        </span>
-                                    </TableCell>
-                                    <TableCell align="center" className="custom-border-tcell primary-tcell"  width={150}>
-                                        <IconButton className="primary-edit-btn" size="small" onClick={() => handleOpenEdit(prod)}>
-                                            <FiEdit />
-                                        </IconButton>
-                                        <IconButton className="primary-delete-btn" size="small" onClick={() => console.log("Delete clicked")}>
-                                            <PiTrashSimpleFill />
-                                        </IconButton>
-                                    </TableCell>
-                                </TableRow>
+                        <TableRow className="primary-trow" key={prod.id}>
+                            <TableCell className="custom-border-tcell primary-tcell" align="center">
+                                {(page - 1) * rowsPerPage + index + 1}
+                            </TableCell>
+                            <Tooltip title={prod.product_name || ""} arrow placement="top" className="tcell-tooltip">
+                                <TableCell className="custom-border-tcell primary-tcell tcell-lg">
+                                    {prod.product_name}
+                                </TableCell>
+                            </Tooltip>
+                            <TableCell className="custom-border-tcell primary-tcell tcell-sm">{prod.unit_name}</TableCell>
+                            <TableCell className="custom-border-tcell primary-tcell tcell-sm">{prod.unit_name_2}</TableCell>
+                            <Tooltip title={prod.norm_name || ""} arrow placement="top">
+                                <TableCell className="custom-border-tcell primary-tcell tcell-lg">{prod.norm_name}</TableCell>
+                            </Tooltip>  
+                            <TableCell align="center" className="custom-border-tcell primary-tcell">
+                                <span className={`status-badge ${badgeClass}`}>
+                                    {STATUS_DISPLAY[statusKey] ?? prod.status ?? "Unknown"}
+                                </span>
+                            </TableCell>
+                            <TableCell align="center" className="custom-border-tcell primary-tcell"  width={100}>
+                                <IconButton className="primary-edit-btn" size="small" onClick={() => handleOpenEdit(prod)}>
+                                    <FiEdit />
+                                </IconButton>
+                                <IconButton className="primary-delete-btn" size="small" onClick={() => console.log("Delete clicked")}>
+                                    <PiTrashSimpleFill />
+                                </IconButton>
+                            </TableCell>
+                        </TableRow>
                             );
                         })}
                     </TableBody>

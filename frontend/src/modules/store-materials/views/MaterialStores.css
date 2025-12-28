@@ -1,11 +1,3 @@
-/* Sử dụng lại CSS từ fiscal-import-declarations để đồng nhất */
-
-/* Container chính */
-.primary-container {
-    padding: 20px;
-    background-color: #f8f9fa;
-}
-
 /* Bộ lọc */
 .fiscal-search-filters {
     display: flex;
@@ -71,11 +63,6 @@
 
 .custom-border-tcell {
     border-right: 1px solid #e0e0e0;
-}
-
-.primary-tcell {
-    padding: 8px !important;
-    font-size: 13px;
 }
 
 /* Scrollbar */

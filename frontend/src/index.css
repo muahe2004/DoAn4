@@ -67,6 +67,7 @@ body {
   padding: 0 !important;
   margin: 0 !important;
   width: 100% !important;
+  background-color: #fafafa !important;
 }
 
 /* ================== custom input ================== */
@@ -142,6 +143,54 @@ input::-ms-reveal, input::-ms-clear {
 .MuiPickersTextField-root:focus-visible .MuiPickersOutlinedInput-notchedOutline {
   border: 2px solid var(--primary-color) !important; 
 }
+
+.primary-header {
+    margin-bottom: 20px;
+}
+
+.primary-header-title {
+    display: flex;
+    flex-direction: column;
+}
+
+.primary-header-title__label {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--primary-color);
+    margin-bottom: 4px;
+}
+
+.primary-header-actions {
+    font-size: 14px;
+    color: var(--secondary-color);
+}
+
+.primary-header-actions {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    width: 100%;
+}
+
+.primary-header-actions .search-engine__input {
+    flex: 1;
+    min-width: 250px;
+    max-width: 450px;
+}
+
+.primary-header-actions__buttons, .primary-header-filters {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.primary-header-action-btn {
+    min-width: 150px !important;
+}
+
+
 
 /* ================== tab ================== */
 .MuiTabs-indicator {
@@ -223,6 +272,23 @@ input::-ms-reveal, input::-ms-clear {
 
 .primary-tcell {
   padding: 8px !important;
+  max-width: 180px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tcell-lg { max-width: 260px; }
+.tcell-sm { max-width: 120px; }
+.MuiTooltip-tooltip {
+  background-color: #FFF !important;
+  color: var(--tooltip-color) !important;
+  border: 1px solid var(--primary-color) !important;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18) !important;
+}
+
+.MuiTooltip-tooltip .MuiTooltip-arrow {
+  color: #FFFF !important;
 }
 
 /* ================== Unified Table & Button Format ================== */

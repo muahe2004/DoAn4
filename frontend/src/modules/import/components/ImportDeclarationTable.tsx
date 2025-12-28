@@ -15,17 +15,22 @@ interface ImportDeclarationTableProps {
     data: ImportDeclarationResponse[];
     onEdit?: (row: ImportDeclarationResponse) => void;
     onDelete?: (row: ImportDeclarationResponse) => void;
+    startIndex?: number;
 }
 
 export default function ImportDeclarationTable({
     data,
     onEdit,
+    startIndex = 0,
 }: ImportDeclarationTableProps) {
     return (
         <TableContainer className="primary-table-container">
             <Table stickyHeader aria-label="import declarations table">
                 <TableHead className="primary-thead">
                     <TableRow>
+                        <TableCell className="primary-tcell" align="center">
+                            STT
+                        </TableCell>
                         <TableCell className="primary-tcell" align="center">
                             Số tờ khai
                         </TableCell>
@@ -59,7 +64,7 @@ export default function ImportDeclarationTable({
                         </TableRow>
                     )}
 
-                    {data.map((row) => {
+                    {data.map((row, index) => {
                         const statusKey = row.status?.toLowerCase?.() ?? "";
                         const badgeClass = STATUS_DISPLAY[statusKey]
                             ? `status-${statusKey}`
@@ -67,6 +72,13 @@ export default function ImportDeclarationTable({
 
                         return (
                             <TableRow className="primary-trow" key={row.id}>
+                                <TableCell
+                                    className="custom-border-tcell primary-tcell"
+                                    align="center"
+                                    width={50}
+                                >
+                                    {startIndex + index + 1}
+                                </TableCell>
                                 <TableCell className="custom-border-tcell primary-tcell" align="center">
                                     <Typography onClick={() => onEdit?.(row)} sx={{ textDecoration: "underline", color: "#1976d2", cursor: "pointer", display: "flex", alignItems: "center", gap: "2px",}} >
                                         {row.import_declaration_number}

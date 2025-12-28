@@ -14,10 +14,10 @@ import {
   DialogContentText,
   DialogTitle,
   Box,
-  TextField,
 } from "@mui/material";
 import { FiEdit } from "react-icons/fi";
 import { PiTrashSimpleFill } from "react-icons/pi";
+import SearchEngine from "../../../components/SearchEngine/SearchEngine";
 import { useGetMaterialInventorys } from "../apis/getMaterialInventorys";
 import { useDeleteMaterialInventory } from "../apis/deleteMaterialInventory";
 import { useSnackbar } from "../../../components/SnackBar/SnackBar";
@@ -116,27 +116,24 @@ const MaterialStore: React.FC = () => {
 
   return (
     <Container maxWidth={false} className="material-store-container">
-      <div className="exports-header">
-        <div className="exports-title">
-          <p className="exports-title__label">QUẢN LÝ CHỐT TỒN KHO NGUYÊN VẬT LIỆU</p>
+      <div className="primary-header">
+        <div className="primary-header-title">
+          <p className="primary-header-title__label">QUẢN LÝ CHỐT TỒN KHO NGUYÊN VẬT LIỆU</p>
         </div>
-        <Box className="toolbar" sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 2, p: 0, mb: 2 }}>
-          <Box className="left-tools">
-            <TextField
-              label="Tìm kiếm"
-              variant="outlined"
-              size="small"
-              value={searchTerm}
-              
-              placeholder="Tìm kiếm nguyên vật liệu..."
-              sx={{ minWidth: 300, flexGrow: 1 }}
-            />
-
-          </Box>
-            <Button variant="contained" onClick={handleAddNew}>
+        <div className="primary-header-actions">
+          <SearchEngine
+            placeholder="Tìm kiếm nguyên vật liệu..."
+            onSearch={(value) => {
+              setSearchTerm(value);
+              setCurrentPage(1);
+            }}
+          />
+          <div className="primary-header-actions__buttons">
+            <Button className="primary-header-action-btn" onClick={handleAddNew}>
               Thêm mới
             </Button>
-        </Box>
+          </div>
+        </div>
       </div>
 
       {/* Loading */}
@@ -238,6 +235,7 @@ const MaterialStore: React.FC = () => {
                     <TableCell
                       className="custom-border-tcell primary-tcell"
                       align="center"
+                      width={150}
                     >
                       <span
                         className={`status-badge ${

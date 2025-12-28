@@ -1,9 +1,3 @@
-/* Container chính */
-.primary-container {
-    padding: 20px;
-    background-color: #f8f9fa;
-}
-
 /* THIẾT KẾ LẠI BỘ LỌC ĐỂ KHÔNG BỊ CHÈN */
 .fiscal-search-filters {
     display: flex;
