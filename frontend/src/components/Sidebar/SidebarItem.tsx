@@ -101,7 +101,7 @@ export const SidebarItem: React.FC<Props> = ({
         <div className="sidebar__children" style={{ display: shouldExpand ? "block" : "none" }}>
           {parent.children!.map((child, index) => {          
             return (    
-              <Tooltip className="sidebar__link" key={child.id} title={child.label} placement="top" arrow>
+              <Tooltip className="sidebar__link" key={child.id} title={""} placement="top" arrow>
                 <NavLink key={`${child.id}-${index}`} to={child.path}
                   className={({ isActive }) => `sidebar__link ${isActive ? "sidebar__link--active" : ""}`}>
                     {child.icon && (

@@ -11,23 +11,22 @@ import {
   TableRow,
   Paper,
   IconButton,
-  Pagination,
-  PaginationItem,
   Dialog,
   DialogTitle,
   DialogContent,
   DialogActions,
   Grid,
+  Container,
+  Tooltip,
 } from "@mui/material";
 import FileDownloadOutlinedIcon from "@mui/icons-material/FileDownloadOutlined";
 import CloseIcon from "@mui/icons-material/Close";
-import EditIcon from "@mui/icons-material/Edit";
-import DeleteIcon from "@mui/icons-material/Delete";
-import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
-import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import "./UoM.css";
 import SearchEngine from "../../../components/SearchEngine/SearchEngine";
 import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
+import PrimaryPagination from "../../../components/Pagination/Pagination";
+import { FiEdit } from "react-icons/fi";
+import { PiTrashSimpleFill } from "react-icons/pi";
 
 const UoM: React.FC = () => {
   const [loading, setLoading] = useState(false);
@@ -49,6 +48,8 @@ const UoM: React.FC = () => {
     },
   ]);
   const [search, setSearch] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
   const [dialogMode, setDialogMode] = useState<"add" | "edit">("add");
   const [activeRowId, setActiveRowId] = useState<number | null>(null);
   const [formState, setFormState] = useState({
@@ -77,6 +78,11 @@ const UoM: React.FC = () => {
         row.description.toLowerCase().includes(keyword)
     );
   }, [search, rows]);
+
+  const paginatedRows = useMemo(() => {
+    const start = (currentPage - 1) * rowsPerPage;
+    return filteredRows.slice(start, start + rowsPerPage);
+  }, [filteredRows, currentPage, rowsPerPage]);
 
   const resetForm = () => {
     setFormState({
@@ -204,41 +210,38 @@ const UoM: React.FC = () => {
   };
 
   return (
-    <Box className="root-page">
-      <div className="exports-header">
-        <div className="exports-title">
-          <p className="exports-title__label">BẢNG QUY ĐỔI ĐƠN VỊ TÍNH</p>
+    <Container maxWidth={false} className="primary-container">
+      <div className="primary-header">
+        <div className="primary-header-title">
+          <p className="primary-header-title__label">BẢNG QUY ĐỔI ĐƠN VỊ TÍNH</p>
         </div>
-        <Box className="toolbar">
-          <Box className="left-tools">
-            <SearchEngine placeholder="Tìm kiếm" onSearch={handleSearch} />
-          </Box>
-
-          <Box className="right-tools">
-            <Button
-              className="btn-sample"
-              startIcon={<FileDownloadOutlinedIcon />}
-              onClick={handleDownloadTemplate}
-            >
-              Mẫu đối sánh ĐVT
-            </Button>
-            <Button
-              variant="outlined"
-              className="btn-add"
-              startIcon={<FileDownloadOutlinedIcon />}
-              onClick={triggerImport}
-            >
-              Import từ file Excel
-            </Button>
-            <Button
-              className="btn-add"
-              variant="contained"
-              onClick={() => openDialog("add")}
-            >
-              Thêm mới
-            </Button>
-          </Box>
-        </Box>
+        <div className="primary-header-actions">
+            <SearchEngine placeholder="Tìm kiếm..." onSearch={handleSearch} />
+            <div className="primary-header-actions__buttons">
+              <Button
+                className="btn-sample"
+                startIcon={<FileDownloadOutlinedIcon />}
+                onClick={handleDownloadTemplate}
+              >
+                Mẫu đối sánh ĐVT
+              </Button>
+              <Button
+                variant="outlined"
+                className="btn-add"
+                startIcon={<FileDownloadOutlinedIcon />}
+                onClick={triggerImport}
+              >
+                Import từ file Excel
+              </Button>
+              <Button
+                className="btn-add"
+                variant="contained"
+                onClick={() => openDialog("add")}
+              >
+                Thêm mới
+              </Button>
+            </div>
+        </div>
       </div>
 
       <Paper
@@ -275,11 +278,8 @@ const UoM: React.FC = () => {
                   className="table-header-cell"
                   sx={{
                     width: 100,
-                    fontWeight: "400 !important",
-                    color: "rgba(255,255,255,0.7) !important",
                   }}
                 >
-                  Hành động
                 </TableCell>
               </TableRow>
             </TableHead>
@@ -295,7 +295,7 @@ const UoM: React.FC = () => {
                     Đang tải dữ liệu...
                   </TableCell>
                 </TableRow>
-              ) : filteredRows.length === 0 ? (
+              ) : paginatedRows.length === 0 ? (
                 <TableRow>
                   <TableCell
                     colSpan={6}
@@ -307,96 +307,64 @@ const UoM: React.FC = () => {
                   </TableCell>
                 </TableRow>
               ) : (
-                filteredRows.map((row, index) => (
-                  <TableRow key={row.id}>
-                    <TableCell className="table-body-cell">
-                      {!loading ? index + 1 : "..."}
-                    </TableCell>
-                    <TableCell className="table-body-cell" align="left">
-                      {row.localCode}
-                    </TableCell>
-                    <TableCell className="table-body-cell" align="left">
-                      {row.customsCode}
-                    </TableCell>
-                    <TableCell className="table-body-cell">
-                      {row.createdAt}
-                    </TableCell>
-                    <TableCell className="table-body-cell" align="left">
-                      {row.description || "-"}
-                    </TableCell>
-                    <TableCell className="table-body-cell">
-                      <IconButton
-                        size="small"
-                        onClick={() => openDialog("edit", row.id)}
+                (() => {
+                  const startSerial = (currentPage - 1) * rowsPerPage;
+                  return paginatedRows.map((row, index) => (
+                    <TableRow key={row.id}>
+                      <TableCell className="table-body-cell" align="center">
+                        {!loading ? startSerial + index + 1 : "..."}
+                      </TableCell>
+                      <TableCell className="table-body-cell" align="left">
+                        {row.localCode}
+                      </TableCell>
+                      <TableCell className="table-body-cell" align="left">
+                        {row.customsCode}
+                      </TableCell>
+                      <TableCell className="table-body-cell">
+                        {row.createdAt}
+                      </TableCell>
+                      <Tooltip title={row.description || ""} arrow placement="top">
+                        <TableCell className="table-body-cell tcell-lg" align="left">
+                          {row.description || "-"}
+                        </TableCell>
+                      </Tooltip>  
+                      <TableCell
+                        className="table-body-cell"
+                        align="center"
+                        width={150}
                       >
-                        <EditIcon fontSize="small" />
-                      </IconButton>
-                      <IconButton
-                        size="small"
-                        onClick={() => handleDelete(row.id)}
-                      >
-                        <DeleteIcon fontSize="small" />
-                      </IconButton>
-                    </TableCell>
-                  </TableRow>
-                ))
+                        <IconButton
+                          size="small"
+                          className="primary-edit-btn"
+                          onClick={() => openDialog("edit", row.id)}
+                        >
+                          <FiEdit />
+                        </IconButton>
+                        <IconButton
+                          size="small"
+                          className="primary-delete-btn"
+                          onClick={() => handleDelete(row.id)}
+                        >
+                          <PiTrashSimpleFill />
+                        </IconButton>
+                      </TableCell>
+                    </TableRow>
+                  ));
+                })()
               )}
             </TableBody>
           </Table>
         </TableContainer>
-
-        <Box
-          sx={{
-            p: 1.5,
-            display: "flex",
-            justifyContent: "flex-end",
-            alignItems: "center",
-            bgcolor: "#fafafa",
-            borderTop: "1px solid var(--border-color)",
-            gap: 1,
+        <PrimaryPagination
+          totalItems={filteredRows.length}
+          page={currentPage}
+          rowsPerPage={rowsPerPage}
+          onPageChange={(value) => setCurrentPage(value)}
+          onRowsPerPageChange={(value) => {
+            setRowsPerPage(value);
+            setCurrentPage(1);
           }}
-        >
-          <Pagination
-            count={Math.max(1, Math.ceil(rows.length / 10))}
-            shape="rounded"
-            variant="outlined"
-            size="small"
-            renderItem={(item) => (
-              <PaginationItem
-                slots={{
-                  previous: ArrowBackIosNewIcon,
-                  next: ArrowForwardIosIcon,
-                }}
-                {...item}
-                sx={{
-                  "&.Mui-selected": {
-                    bgcolor: "#e6f7ff",
-                    borderColor: "var(--primary-color)",
-                    color: "var(--primary-color)",
-                  },
-                }}
-              />
-            )}
-          />
-          <Box
-            sx={{
-              ml: 2,
-              border: "1px solid var(--border-color)",
-              p: "4px 8px",
-              borderRadius: 1,
-              fontSize: 13,
-              display: "flex",
-              alignItems: "center",
-              bgcolor: "#fff",
-              cursor: "pointer",
-            }}
-          >
-            10 / trang{" "}
-            <KeyboardArrowRightIcon
-              sx={{ transform: "rotate(90deg)", fontSize: 16 }}
-            />
-          </Box>
-        </Box>
+        />
       </Paper>
 
       <input
@@ -486,7 +454,7 @@ const UoM: React.FC = () => {
           </Button>
         </DialogActions>
       </Dialog>
-    </Box>
+    </Container>
   );
 };
 

@@ -16,3 +16,4 @@ export const URL_API_NORM_PRODUCT_INVENTORYS = `${BASE_API_URL}/norm-product-inv
 export const URL_API_SETTLEMENT_REPORT = `${BASE_API_URL}/settlement-reports`;
 export const URL_API_FISCAL_EXPORT_DECLARATION = `${BASE_API_URL}/fiscal-export-declarations`;
 export const URL_API_FISCAL_EXPORT_DECLARATION_DETAIL = `${BASE_API_URL}/fiscal-export-declaration-details`;
+export const URL_API_EXCHANGE_RATE = `${BASE_API_URL}/currencies/exchange-rate`;

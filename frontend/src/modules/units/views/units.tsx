@@ -12,9 +12,7 @@ import {
   DialogContent,
   DialogContentText,
   DialogTitle,
-  Select,
-  MenuItem,
-  Box,
+  Tooltip
 } from "@mui/material";
 import { type ChangeEvent, useRef, useState } from "react";
 import { useGetUnits } from "../apis/getUnits";
@@ -261,46 +259,44 @@ export function Units() {
 
   return (
     <Container maxWidth={false} className="primary-container">
-      <div className="exports-header">
-        <div className="exports-title">
-          <p className="exports-title__label">QUẢN LÝ ĐƠN VỊ TÍNH</p>
+      <div className="primary-header">
+        <div className="primary-header-title">
+          <p className="primary-header-title__label">QUẢN LÝ ĐƠN VỊ TÍNH</p>
         </div>
-        <Box className="toolbar">
-          <Box className="left-tools">
-            <SearchEngine placeholder="Tìm kiếm" onSearch={handleSearch} />
-          </Box>
-          <Box className="right-tools">
-            <Button
-              className="btn-sample"
-              startIcon={<FileDownloadOutlinedIcon />}
-              onClick={handleDownloadTemplate}
-            >
-              Mẫu đối sánh ĐVT
-            </Button>
-            <Button
-              variant="outlined"
-              className="btn-import"
-              startIcon={<FileDownloadOutlinedIcon />}
-              onClick={() => triggerImport()}
-            >
-              Import từ file Excel
-            </Button>
-            <Button
-              className="btn-add"
-              variant="contained"
-              onClick={handleOpenAdd}
-            >
-              Thêm mới
-            </Button>
-          </Box>
-        </Box>
-        <input
-          type="file"
-          accept=".xlsx,.xls,.xlsm,.xlsb"
-          ref={fileInputRef}
-          onChange={handleFileChange}
-          style={{ display: "none" }}
-        />
+        <div className="primary-header-actions">
+            <SearchEngine placeholder="Tìm kiếm..." onSearch={handleSearch} />
+            <input
+              type="file"
+              accept=".xlsx,.xls,.xlsm,.xlsb"
+              ref={fileInputRef}
+              onChange={handleFileChange}
+              style={{ display: "none" }}
+            />
+            <div className="primary-header-actions__buttons">
+              <Button
+                className="btn-sample"
+                startIcon={<FileDownloadOutlinedIcon />}
+                onClick={handleDownloadTemplate}
+              >
+                Mẫu đối sánh ĐVT
+              </Button>
+              <Button
+                variant="outlined"
+                className="btn-import"
+                startIcon={<FileDownloadOutlinedIcon />}
+                onClick={() => triggerImport()}
+              >
+                Import từ file Excel
+              </Button>
+              <Button
+                className="btn-add"
+                variant="contained"
+                onClick={handleOpenAdd}
+              >
+                Thêm mới
+              </Button>
+            </div>
+        </div>
       </div>
 
       <TableContainer className="primary-table-container custom-scrollbar primary-table-theme">
@@ -332,18 +328,21 @@ export function Units() {
 
               return (
                 <TableRow className="primary-trow" key={unit.id}>
-                  <TableCell className="custom-border-tcell primary-tcell">
+                  <TableCell className="custom-border-tcell primary-tcell" width={150}>
                     {unit.unit_name}
                   </TableCell>
-                  <TableCell className="custom-border-tcell primary-tcell">
-                    {unit.description}
-                  </TableCell>
+                  <Tooltip title={unit.description || ""} arrow placement="top">
+                    <TableCell className="custom-border-tcell primary-tcell tcell-lg">
+                      {unit.description}
+                    </TableCell>
+                  </Tooltip>  
                   <TableCell className="custom-border-tcell primary-tcell">
                     {unit.type}
                   </TableCell>
                   <TableCell
                     align="center"
                     className="custom-border-tcell primary-tcell"
+                    width={150}
                   >
                     <span className={`status-badge ${badgeClass}`}>
                       {STATUS_DISPLAY[statusKey] ?? unit.status ?? "Unknown"}
@@ -352,6 +351,7 @@ export function Units() {
                   <TableCell
                     align="center"
                     className="custom-border-tcell primary-tcell"
+                    width={150}
                   >
                     <IconButton
                       className="primary-edit-btn"

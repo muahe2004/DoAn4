@@ -5,11 +5,14 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  Tooltip,
 } from "@mui/material";
 import type { ProductSettlementRow } from "../types";
 
 interface ProductSettlementTableProps {
   data: ProductSettlementRow[];
+  page?: number;
+  rowsPerPage?: number;
 }
 
 const formatNumber = (value: number) =>
@@ -17,12 +20,18 @@ const formatNumber = (value: number) =>
 
 export default function ProductSettlementTable({
   data,
+  page = 1,
+  rowsPerPage = 10,
 }: ProductSettlementTableProps) {
+  const startIndex = (page - 1) * rowsPerPage;
   return (
     <TableContainer className="primary-table-container">
       <Table stickyHeader aria-label="product settlement report table">
         <TableHead className="primary-thead">
           <TableRow>
+            <TableCell className="primary-tcell" align="center">
+              STT
+            </TableCell>
             <TableCell className="primary-tcell" align="center">
               Mã SP
             </TableCell>
@@ -52,23 +61,31 @@ export default function ProductSettlementTable({
               <TableCell
                 className="custom-border-tcell primary-tcell"
                 align="center"
-                colSpan={7}
+                colSpan={8}
               >
                 Chưa có dữ liệu báo cáo.
               </TableCell>
             </TableRow>
           )}
-          {data.map((row) => (
+          {data.map((row, index) => (
             <TableRow className="primary-trow" key={row.product_id}>
+              <TableCell
+                className="custom-border-tcell primary-tcell"
+                align="center"
+              >
+                {startIndex + index + 1}
+              </TableCell>
               <TableCell
                 className="custom-border-tcell primary-tcell"
                 align="center"
               >
                 {row.product_code}
               </TableCell>
-              <TableCell className="custom-border-tcell primary-tcell">
-                {row.product_name}
-              </TableCell>
+              <Tooltip title={row.product_name || ""} arrow placement="top">
+                <TableCell className="custom-border-tcell primary-tcell tcell-lg">
+                  {row.product_name}
+                </TableCell>
+              </Tooltip>
               <TableCell
                 className="custom-border-tcell primary-tcell"
                 align="center"

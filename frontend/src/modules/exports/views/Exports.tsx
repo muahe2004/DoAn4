@@ -99,7 +99,7 @@ export function ExportDeclaration() {
       type_inventory: header.type_inventory,
       usd_exchange_rate: parseExchangeRate(header.usd_exchange_rate),
       currency_id: header.currency_id || undefined,
-      status: "active",
+      status: STATUS_DISPLAY.active,
       details,
     };
 
@@ -137,7 +137,7 @@ export function ExportDeclaration() {
       type_inventory: header.type_inventory,
       usd_exchange_rate: parseExchangeRate(header.usd_exchange_rate),
       currency_id: header.currency_id || undefined,
-      status: "active",
+      status: STATUS_DISPLAY.active,
       details,
     };
 
@@ -183,13 +183,13 @@ export function ExportDeclaration() {
 
   return (
     <Container className="primary-container" maxWidth={false}>
-      <div className="exports-header">
-        <div className="exports-title">
-          <p className="exports-title__label">DANH SÁCH TỜ KHAI XUẤT KHẨU</p>
+      <div className="primary-header">
+        <div className="primary-header-title">
+          <p className="primary-header-title__label">DANH SÁCH TỜ KHAI XUẤT KHẨU</p>
         </div>
-        <div className="exports-actions">
-          <Grid container spacing={1} className="exports-actions__filters">
-            <Grid size={5} className="exports-actions__filter-item">
+        <div className="primary-header-actions">
+          <Grid container spacing={1} className="primary-header-actions__filters">
+            <Grid size={5}>
               <SearchEngine
                 placeholder="Nhập số tờ khai"
                 onSearch={handleDeclarationSearch}
@@ -209,7 +209,7 @@ export function ExportDeclaration() {
               />
             </ Grid>
           </Grid>
-          <div className="exports-actions__buttons">
+          <div className="primary-header-actions__buttons">
             <Button className="product-action-btn" label="Tạo tờ khai" onClick={() => setCreateOpen(true)} />
           </div>
         </div>
@@ -219,6 +219,9 @@ export function ExportDeclaration() {
         <Table stickyHeader aria-label="materials table">
           <TableHead className="primary-thead">
             <TableRow>
+              <TableCell className="primary-tcell" align="center">
+                STT
+              </TableCell>
               <TableCell className="primary-tcell" align="center">
                 Số tờ khai
               </TableCell>
@@ -242,13 +245,13 @@ export function ExportDeclaration() {
           <TableBody className="primary-tbody">
             {rows.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={6} align="center">
+                <TableCell colSpan={7} align="center">
                   {isFetching
                     ? "Đang tải dữ liệu..." : "Không có dữ liệu phù hợp"}
                 </TableCell>
               </TableRow>
             ) : (
-              rows.map((row) => {
+              rows.map((row, index) => {
                 const statusKey = row.status?.toLowerCase?.() ?? "";
                 const badgeClass = STATUS_DISPLAY[statusKey]
                   ? `status-${statusKey}`
@@ -258,11 +261,18 @@ export function ExportDeclaration() {
                   row.status ??
                   "-";
                 return (
-                  <TableRow
-                    key={row.id}
+                <TableRow
+                    key={`${row.id} - ${index}`}
                     hover
-                    sx={{ cursor: "pointer" }}
+                    className="primary-trow"
                   >
+                    <TableCell
+                      className="custom-border-tcell primary-tcell"
+                      align="center"
+                      width={50}
+                    >
+                      {index + 1}
+                    </TableCell>
                     <TableCell
                       className="custom-border-tcell primary-tcell"
                       width={150}

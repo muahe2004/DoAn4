@@ -12,6 +12,7 @@ import {
   DialogContent,
   DialogContentText,
   DialogActions,
+  Tooltip,
 } from "@mui/material";
 import { useState } from "react";
 import { useGetNorms } from "../apis/getNorms";
@@ -27,6 +28,7 @@ import { useCreateNorm } from "../apis/addNorm";
 import { useEditNorm } from "../apis/editNorm";
 import { useDeleteNorms } from "../apis/deleteNorm";
 import SearchEngine from "../../../../components/SearchEngine/SearchEngine";
+import { STATUS_DISPLAY } from "../../../../utils/statusDisplay";
 
 export function Norms() {
   const [page, setPage] = useState(1);
@@ -145,21 +147,20 @@ const { mutateAsync: createNorm } = useCreateNorm({});
 
   return (
     <Container maxWidth={false} className="primary-container">
-      <div className="norm-header">
-          <div className="norm-title">
-              <p className="norm-title__label">DANH MỤC ĐỊNH MỨC</p>
+      <div className="primary-header">
+          <div className="primary-header-title">
+              <p className="primary-header-title__label">DANH MỤC ĐỊNH MỨC</p>
           </div>
-          <div className="norm-actions">
+          <div className="primary-header-actions">
             <SearchEngine placeholder="Tên định mức, mô tả..." onSearch={handleSearch} />
-            <div className="norm-actions__buttons">
-              <div className="norm-actions">
+            <div className="primary-header-actions__buttons">
+              <div className="primary-header-actions">
                 <Button onClick={handleOpenAdd}>thêm mới</Button>
               </div>
             </div>
           </div>
       </div>
       
-
       <TableContainer className="primary-table-container">
         <Table stickyHeader aria-label="norms table">
           <TableHead className="primary-thead">
@@ -177,55 +178,67 @@ const { mutateAsync: createNorm } = useCreateNorm({});
                 Trạng thái
               </TableCell>
               <TableCell className="primary-tcell" align="center">
-                Hành động
               </TableCell>
             </TableRow>
           </TableHead>
 
           <TableBody className="primary-tbody">
-            {norms?.data?.map((norm, index) => (
-              <TableRow className="primary-trow" key={norm.id}>
-                <TableCell
-                  className="custom-border-tcell primary-tcell"
-                  align="center"
-                >
-                  {(page - 1) * rowsPerPage + index + 1}
-                </TableCell>
-                <TableCell className="custom-border-tcell primary-tcell">
-                  {norm.norm_name}
-                </TableCell>
-                <TableCell className="custom-border-tcell primary-tcell">
-                  {norm.description}
-                </TableCell>
-                <TableCell
-                  align="center"
-                  className="custom-border-tcell primary-tcell"
-                >
-                  {norm.status}
-                </TableCell>
-                <TableCell
-                  align="center"
-                  className="custom-border-tcell primary-tcell"
-                >
-                  <IconButton
-                    className="primary-edit-btn"
-                    size="small"
-                    onClick={() => handleOpenEdit(norm)}
-                    title="Chỉnh sửa"
-                  >
-                    <FiEdit />
-                  </IconButton>
-                  <IconButton
-                    className="primary-delete-btn"
-                    size="small"
-                    onClick={() => handleDeleteClick(norm.id!)}
-                    title="Xóa"
-                  >
-                    <PiTrashSimpleFill />
-                  </IconButton>
-                </TableCell>
-              </TableRow>
-            ))}
+            {norms?.data?.map((norm, index) => 
+              {
+                const statusKey = norm.status?.toLowerCase?.() ?? "";
+                const badgeClass = STATUS_DISPLAY[statusKey]
+                ? `status-${statusKey}`
+                : "status-unknown";
+                return (
+                  <TableRow className="primary-trow" key={norm.id}>
+                    <TableCell
+                      className="custom-border-tcell primary-tcell"
+                      align="center"
+                    >
+                      {(page - 1) * rowsPerPage + index + 1}
+                    </TableCell>
+                    <Tooltip title={norm.norm_name || ""} arrow placement="top">
+                      <TableCell className="custom-border-tcell primary-tcell tcell-lg">
+                        {norm.norm_name}
+                      </TableCell>
+                    </Tooltip>  
+                    <TableCell className="custom-border-tcell primary-tcell">
+                      {norm.description}
+                    </TableCell>
+                    <TableCell
+                      align="center"
+                      className="custom-border-tcell primary-tcell"
+                      width={150}
+                    >
+                      <span className={`status-badge ${badgeClass}`}>
+                        {STATUS_DISPLAY[statusKey] ?? norm.status ?? "Unknown"}
+                      </span>
+                    </TableCell>
+                    <TableCell
+                      align="center"
+                      className="custom-border-tcell primary-tcell"
+                      width={150}
+                    >
+                      <IconButton
+                        className="primary-edit-btn"
+                        size="small"
+                        onClick={() => handleOpenEdit(norm)}
+                        title="Chỉnh sửa"
+                      >
+                        <FiEdit />
+                      </IconButton>
+                      <IconButton
+                        className="primary-delete-btn"
+                        size="small"
+                        onClick={() => handleDeleteClick(norm.id!)}
+                        title="Xóa"
+                      >
+                        <PiTrashSimpleFill />
+                      </IconButton>
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
           </TableBody>
         </Table>
       </TableContainer>

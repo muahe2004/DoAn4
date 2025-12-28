@@ -13,6 +13,7 @@ import type { ImportDeclarationResponse } from "../types";
 import { useCreateImportDeclaration } from "../apis/addImportDeclaration";
 import { useSnackbar } from "../../../components/SnackBar/SnackBar";
 import type { ImportMaterialRow } from "../components/ImportFormTable";
+import { STATUS_DISPLAY } from "../../../utils/statusDisplay";
 
 export function ImportDeclarations() {
     const [openModal, setOpenModal] = useState(false);
@@ -100,7 +101,7 @@ export function ImportDeclarations() {
                 country_id: row.country_id || undefined,
                 country_code: row.country_id ? undefined : row.country_code || row.country_name || undefined,
                 country_name: row.country_id ? undefined : row.country_name || undefined,
-                status: data.status || "active",
+                status: data.status || STATUS_DISPLAY.active,
                 quantity: row.quantity ? Number(row.quantity) : undefined,
                 quantity2: row.quantity2 ? Number(row.quantity2) : undefined,
                 unit_price: row.unit_price ? Number(row.unit_price) : undefined,
@@ -131,14 +132,14 @@ export function ImportDeclarations() {
 
     return (
         <Container maxWidth={false} className="primary-container">
-            <div className="product-header">
-                <div className="product-title">
-                    <p className="product-title__label">DANH SÁCH TỜ KHAI NHẬP KHẨU</p>
+            <div className="primary-header">
+                <div className="primary-header-title">
+                    <p className="primary-header-title__label">DANH SÁCH TỜ KHAI NHẬP KHẨU</p>
                 </div>
-                <div className="product-actions">
+                <div className="primary-header-actions">
                     <SearchEngine placeholder="Số tờ khai..." onSearch={handleSearch} />
-                    <div className="product-actions__buttons">
-                        <Button className="product-action-btn" onClick={handleOpen}>
+                    <div className="primary-header-actions__buttons">
+                        <Button className="primary-header-action-btn" onClick={handleOpen}>
                             Tạo tờ khai
                         </Button>
                     </div>
@@ -148,6 +149,7 @@ export function ImportDeclarations() {
             <ImportDeclarationTable
                 data={importDeclarations?.data || []}
                 onEdit={handleEdit}
+                startIndex={(page - 1) * rowsPerPage}
             />
 
             <PrimaryPagination

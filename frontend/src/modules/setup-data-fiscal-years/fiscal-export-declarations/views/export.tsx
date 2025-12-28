@@ -92,44 +92,44 @@ function SetupFiscalExportDeclarations() {
 
   return (
     <Container maxWidth={false} className="primary-container">
-      <div className="exports-header">
-        <div className="exports-title">
-          <p className="exports-title__label">ÁP DỮ LIỆU TỜ KHAI XUẤT</p>
+      <div className="primary-header">
+        <div className="primary-header-title">
+          <p className="primary-header-title__label">ÁP DỮ LIỆU TỜ KHAI XUẤT</p>
         </div>
         <Box className="filter-left-side" sx={{ display: "flex", justifyContent: "space-between", alignItems: "center"}}>
             <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-            <Box className="date-range-picker">
-                <TextField
-                size="small"
-                type="date"
-                variant="standard"
-                InputProps={{ disableUnderline: true }}
-                value={fromDate}
-                onChange={(event) => {
-                    setFromDate(event.target.value);
-                    resetActivePage();
-                }}
-                />
-                <span>→</span>
-                <TextField
-                size="small"
-                type="date"
-                variant="standard"
-                InputProps={{ disableUnderline: true }}
-                value={toDate}
-                onChange={(event) => {
-                    setToDate(event.target.value);
-                    resetActivePage();
-                }}
-                />
-            </Box>
+              <Box className="date-range-picker">
+                  <TextField
+                  size="small"
+                  type="date"
+                  variant="standard"
+                  InputProps={{ disableUnderline: true }}
+                  value={fromDate}
+                  onChange={(event) => {
+                      setFromDate(event.target.value);
+                      resetActivePage();
+                  }}
+                  />
+                  <span>→</span>
+                  <TextField
+                  size="small"
+                  type="date"
+                  variant="standard"
+                  InputProps={{ disableUnderline: true }}
+                  value={toDate}
+                  onChange={(event) => {
+                      setToDate(event.target.value);
+                      resetActivePage();
+                  }}
+                  />
+              </Box>
 
-            <Box className="search-box-container">
+              <Box className="search-box-container">
                 <SearchEngine
-                placeholder="Số tờ khai xuất, bill, HS code..."
-                onSearch={handleSearch}
+                  placeholder="Số tờ khai xuất, bill, HS code..."
+                  onSearch={handleSearch}
                 />
-            </Box>
+              </Box>
             </Box>
             <Button startIcon={<FiCpu />}>Tính toán đối soát</Button>
         </Box>
@@ -163,8 +163,11 @@ function SetupFiscalExportDeclarations() {
             <Table stickyHeader size="small">
               <TableHead className="fiscal-table-head primary-thead">
                 {viewMode === "list" ? (
-                  <TableRow>
-                    <TableCell align="center">SỐ TỜ KHAI</TableCell>
+                <TableRow>
+                  <TableCell align="center" sx={{ minWidth: 60 }}>
+                    STT
+                  </TableCell>
+                  <TableCell align="center">SỐ TỜ KHAI</TableCell>
                     <TableCell align="center">NGÀY</TableCell>
                     <TableCell align="center">MÃ LOẠI HÌNH</TableCell>
                     <TableCell align="center">SỐ HÓA ĐƠN</TableCell>
@@ -174,9 +177,12 @@ function SetupFiscalExportDeclarations() {
                     <TableCell align="center">TRẠNG THÁI</TableCell>
                   </TableRow>
                 ) : (
-                  <TableRow>
-                    <TableCell align="center" sx={{ minWidth: 120 }}>
-                      SỐ TỜ KHAI
+                <TableRow>
+                  <TableCell align="center" sx={{ minWidth: 60 }}>
+                    STT
+                  </TableCell>
+                  <TableCell align="center" sx={{ minWidth: 120 }}>
+                    SỐ TỜ KHAI
                     </TableCell>
                     <TableCell align="center" sx={{ minWidth: 100 }}>
                       NGÀY
@@ -212,13 +218,16 @@ function SetupFiscalExportDeclarations() {
                   fiscalExportDeclarationsData.data.length > 0 ? (
                     fiscalExportDeclarationsData.data.map(
                       (declaration, index) => {
+                        const serialList =
+                          (pageList - 1) * rowsPerPageList + index + 1;
                         const statusKey =
                           declaration.status?.toLowerCase?.() ?? "";
                         const badgeClass = STATUS_DISPLAY[statusKey]
                           ? `status-${statusKey}`
                           : "status-unknown";
                         return (
-                          <TableRow key={`${declaration.export_declaration_number}-${index}`}>
+                        <TableRow key={`${declaration.export_declaration_number}-${index}`}>
+                            <TableCell align="center">{serialList}</TableCell>
                             <TableCell align="center">
                               {declaration.export_declaration_number || "-"}
                             </TableCell>
@@ -242,7 +251,7 @@ function SetupFiscalExportDeclarations() {
                             <TableCell align="center">
                               {declaration.shipping_term || "-"}
                             </TableCell>
-                            <TableCell align="center">
+                            <TableCell align="center" width={150}>
                               <span className={`status-badge ${badgeClass}`}>
                                 {STATUS_DISPLAY[statusKey] ??
                                   declaration.status ??
@@ -266,8 +275,10 @@ function SetupFiscalExportDeclarations() {
                   )
                 ) : fiscalExportDeclarationDetailsData?.data &&
                   fiscalExportDeclarationDetailsData.data.length > 0 ? (
-                  fiscalExportDeclarationDetailsData.data.map(
+                    fiscalExportDeclarationDetailsData.data.map(
                     (detail, index) => {
+                      const serialDetail =
+                        (pageDetail - 1) * rowsPerPageDetail + index + 1;
                       const quantity = detail.quantity ?? 0;
                       const quantity2 = detail.quantity2 ?? 0;
                       const conversion = detail.conversion_factor ?? 1;
@@ -281,7 +292,8 @@ function SetupFiscalExportDeclarations() {
                       );
 
                       return (
-                        <TableRow key={detail.id}>
+                        <TableRow key={`${detail.id} - ${index}`}>
+                          <TableCell align="center">{serialDetail}</TableCell>
                           <TableCell align="center">
                             {detail.export_declaration_number || "-"}
                           </TableCell>
@@ -392,12 +404,7 @@ function SetupFiscalExportDeclarations() {
           </TableContainer>
         </CardContent>
       </Card>
-        <Box
-        sx={{
-            p: 1,
-            display: "flex",
-            justifyContent: "flex-end",
-        }}
+      <Box
         >
         <PrimaryPagination
             totalItems={
@@ -412,7 +419,7 @@ function SetupFiscalExportDeclarations() {
             onPageChange={handlePageChange}
             onRowsPerPageChange={handleItemsPerPageChange}
         />
-        </Box>
+      </Box>
     </Container>
   );
 }

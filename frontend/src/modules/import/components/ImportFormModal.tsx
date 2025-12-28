@@ -17,8 +17,10 @@ import { useGetDropdownUnits } from "../../units/apis/dropdown";
 import { useGetDropdownCountries } from "../../countries/apis/dropdown";
 import { useGetDropdownPartners } from "../../partners/apis/dropdown";
 import { useGetDropdownCurrencies } from "../../currencies/apis/dropdown";
+import { useGetExchangeRate } from "../../currencies/apis/getExchangeRate";
 import AutocompletePrimary from "../../../components/Autocomplete/AutoComplete";
 import { exportExcel } from "../../../utils/exportExcel";
+import { STATUS_DISPLAY } from "../../../utils/statusDisplay";
 
 export type ImportDeclarationFormValues = {
     import_declaration_number: string;
@@ -57,7 +59,7 @@ const defaultFormValues: ImportDeclarationFormValues = {
     currency_name: "",
     usd_exchange_rate: "",
     shipping_fee: "",
-    status: "active",
+    status: STATUS_DISPLAY.active,
 };
 
 const createEmptyRow = (): ImportMaterialRow => ({
@@ -104,6 +106,10 @@ const ImportFormModal: React.FC<ImportFormModalProps> = ({
     const { data: countries = [] } = useGetDropdownCountries(paramsCountry);
     const { data: partners = [] } = useGetDropdownPartners({ skip: 0, limit: 50 });
     const { data: currencies = [] } = useGetDropdownCurrencies({ skip: 0, limit: 50 });
+    const { data: exchangeRateData } = useGetExchangeRate(
+        { base: "USD", target: "VND" },
+        { enabled: open }
+    );
 
     useEffect(() => {
         if (!open) return;
@@ -122,7 +128,7 @@ const ImportFormModal: React.FC<ImportFormModalProps> = ({
                 currency_name: initialData.currency_name || "",
                 usd_exchange_rate: initialData.usd_exchange_rate?.toString() ?? "",
                 shipping_fee: initialData.shipping_fee?.toString() ?? "",
-                status: initialData.status || "active",
+                status: initialData.status || STATUS_DISPLAY.active,
             });
 
             const mappedDetails = initialData.details.map((detail) => ({
@@ -149,6 +155,18 @@ const ImportFormModal: React.FC<ImportFormModalProps> = ({
         setFormData(defaultFormValues);
         setRows([createEmptyRow()]);
     }, [open, mode, initialData]);
+
+    useEffect(() => {
+        if (!open || mode !== "add") return;
+        if (formData.usd_exchange_rate) return;
+        const rate = exchangeRateData?.rate;
+        if (rate) {
+            setFormData((prev) => ({
+                ...prev,
+                usd_exchange_rate: rate.toFixed(4),
+            }));
+        }
+    }, [open, mode, formData.usd_exchange_rate, exchangeRateData?.rate]);
 
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = event.target;

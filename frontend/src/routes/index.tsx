@@ -65,120 +65,36 @@ export const createRouterConfig = () =>
   createBrowserRouter([
     {
       path: layoutUrl,
-      element: <Layout />,
+      element: (
+        <ProtectedRoute>
+          <Layout />     {/* Chỉ render Layout ở đây */}
+        </ProtectedRoute>
+      ),
       children: [
-        {
-          path: layoutUrl,
-          element: (
-            <ProtectedRoute>
-              <Layout />
-            </ProtectedRoute>
-          ),
-          children: [
-            {
-              path: homeUrl,
-              element: <div>Trang chủ</div>,
-            },
-            {
-              path: testURL,
-              element: <Test />,
-            },
-            {
-              path: warehouseProductsURL,
-              element: <Products />,
-            },
-            {
-              path: warehouseMaterialsURL,
-              element: <Materials />,
-            },
-            {
-              path: seaManagementInvoiceImportURL,
-              element: <ImportDeclarations />,
-            },
-            {
-              path: seaManagementInvoiceExportURL,
-              element: <ExportDeclaration />,
-            },
-            {
-              path: standardNormsURL,
-              element: <Norms />,
-            },
-            {
-              path: unitsURL,
-              element: <Units />,
-            },
-            {
-              path: unitConversionURL,
-              element: <UoM />,
-            },
-            {
-              path: warehouseClosingProductsURL,
-              element: <ProductStore />,
-            },
-            {
-              path: warehouseClosingMaterialsURL,
-              element: <MaterialStore />,
-            },
-            {
-                path: prepareSettlementReportUserURL,
-                element: <MaterialSettlementReport />,
-            },
-            {
-                path: prepareSettlementReportInventoryProductURL,
-                element: <ProductSettlementReport />,
-            },
-            {
-                path: productsURL,
-                element: <Products/>
-            },
-            {
-                path: unitsURL,
-                element: <Units/>
-            },
-            {
-                path: compareMaterialCodesURL,
-                element: <CompareMaterialCodes/>
-            },
-            {
-                path: FiscalImportDeclarationsURL,
-                element: <SetupFiscalImportDeclarations/>
-            },
-            {
-                path: FiscalExportDeclarationsURL,
-                element: <SetupFiscalExportDeclarations/>
-            },
-            {
-                path: MaterialStoresURL,
-                element: <MaterialStores/>
-            },
-            {
-                path: prepareSettlementReportInventorySummaryURL,
-                element: <MaterialInventorySummary />,
-            },
-            {
-              path: prepareSettlementReportUserURL,
-              element: <MaterialSettlementReport />,
-            },
-            {
-              path: prepareSettlementReportInventoryProductURL,
-              element: <ProductSettlementReport />,
-            },
-            {
-              path: prepareSettlementReportInventorySummaryURL,
-              element: <MaterialInventorySummary />,
-            },
-            {
-              path: applyProductNormURL,
-              element: <NormProductInventorys />,
-            },
-          ],
-        },
-        {
-          path: testURL,
-          element: <Test />,
-        },
+        { path: homeUrl, element: <div>Trang chủ</div> },
+        { path: testURL, element: <Test /> },
+        { path: warehouseProductsURL, element: <Products /> },
+        { path: warehouseMaterialsURL, element: <Materials /> },
+        { path: seaManagementInvoiceImportURL, element: <ImportDeclarations /> },
+        { path: seaManagementInvoiceExportURL, element: <ExportDeclaration /> },
+        { path: standardNormsURL, element: <Norms /> },
+        { path: unitsURL, element: <Units /> },
+        { path: unitConversionURL, element: <UoM /> },
+        { path: warehouseClosingProductsURL, element: <ProductStore /> },
+        { path: warehouseClosingMaterialsURL, element: <MaterialStore /> },
+
+        { path: prepareSettlementReportUserURL, element: <MaterialSettlementReport /> },
+        { path: prepareSettlementReportInventoryProductURL, element: <ProductSettlementReport /> },
+        { path: prepareSettlementReportInventorySummaryURL, element: <MaterialInventorySummary /> },
+
+        { path: compareMaterialCodesURL, element: <CompareMaterialCodes /> },
+        { path: FiscalImportDeclarationsURL, element: <SetupFiscalImportDeclarations /> },
+        { path: FiscalExportDeclarationsURL, element: <SetupFiscalExportDeclarations /> },
+        { path: MaterialStoresURL, element: <MaterialStores /> },
+        { path: applyProductNormURL, element: <NormProductInventorys /> },
       ],
     },
+
     {
       path: signinUrl,
       element: (
@@ -195,8 +111,6 @@ export const createRouterConfig = () =>
         </AuthOnlyRoute>
       ),
     },
-    {
-      path: "*",
-      element: <NotFound />,
-    },
+    { path: "*", element: <NotFound /> },
   ]);
+

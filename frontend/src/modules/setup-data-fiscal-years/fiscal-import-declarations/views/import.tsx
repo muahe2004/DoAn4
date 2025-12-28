@@ -3,7 +3,6 @@ import {
   Typography,
   Box,
   Card,
-  CardContent,
   Table,
   TableBody,
   TableCell,
@@ -11,17 +10,12 @@ import {
   TableHead,
   TableRow,
   IconButton,
-  Select,
-  MenuItem,
   TextField,
 } from "@mui/material";
 import {
-  FiDownload,
   FiFileText,
-  FiCheckCircle,
   FiGrid,
   FiCpu,
-  FiPrinter,
 } from "react-icons/fi";
 import { useState } from "react";
 
@@ -121,9 +115,9 @@ function SetupFiscalImportDeclarations() {
 
   return (
     <Container maxWidth={false} className="primary-container">
-      <div className="exports-header">
-        <div className="exports-title">
-          <p className="exports-title__label">ÁP DỮ LIỆU TỜ KHAI NHẬP</p>
+      <div className="primary-header">
+        <div className="primary-header-title">
+          <p className="primary-header-title__label">ÁP DỮ LIỆU TỜ KHAI NHẬP</p>
         </div>
         <Box className="fiscal-search-filters">
           <Box className="filter-left-side">
@@ -192,6 +186,9 @@ function SetupFiscalImportDeclarations() {
             <TableHead className="fiscal-table-head">
               {viewMode === "list" ? (
                 <TableRow>
+                  <TableCell align="center" sx={{ minWidth: 60 }}>
+                    STT
+                  </TableCell>
                   <TableCell align="center" sx={{ minWidth: 120 }}>
                     MÃ HẢI QUAN
                   </TableCell>
@@ -209,6 +206,9 @@ function SetupFiscalImportDeclarations() {
                 </TableRow>
               ) : (
                 <TableRow>
+                  <TableCell align="center" sx={{ minWidth: 60 }}>
+                    STT
+                  </TableCell>
                   <TableCell align="center" sx={{ minWidth: 120 }}>
                     SỐ TỜ KHAI
                   </TableCell>
@@ -261,8 +261,10 @@ function SetupFiscalImportDeclarations() {
                         ? `status-${statusKey}`
                         : "status-unknown";
 
+                      const serialList = (pageList - 1) * rowsPerPageList + index + 1;
                       return (
                         <TableRow key={`${declaration.import_declaration_number}-${index}`}>
+                          <TableCell align="center">{serialList}</TableCell>
                           <TableCell align="center">
                             {declaration.external_code || "-"}
                           </TableCell>
@@ -294,7 +296,7 @@ function SetupFiscalImportDeclarations() {
                           <TableCell align="center">
                             {declaration.type_inventory || "-"}
                           </TableCell>
-                          <TableCell align="center">
+                          <TableCell align="center" width={150}>
                             <span className={`status-badge ${badgeClass}`}>
                               {STATUS_DISPLAY[statusKey] ??
                                 declaration.status ??
@@ -323,6 +325,8 @@ function SetupFiscalImportDeclarations() {
                     detail: IFiscalImportDeclarationDetailResponse,
                     index: number
                   ) => {
+                    const serialDetail =
+                      (pageDetail - 1) * rowsPerPageDetail + index + 1;
                     // Backend đã tính sẵn các giá trị
                     const convertedDeclQty =
                       detail.converted_declaration_quantity || 0;
@@ -362,7 +366,8 @@ function SetupFiscalImportDeclarations() {
                     }
 
                     return (
-                      <TableRow key={detail.id}>
+                      <TableRow key={`${detail.id} - ${index}`}>
+                        <TableCell align="center">{serialDetail}</TableCell>
                         <TableCell align="center">
                           {detail.import_declaration_number || "-"}
                         </TableCell>
@@ -455,7 +460,7 @@ function SetupFiscalImportDeclarations() {
           </Table>
         </TableContainer>
       </Card>
-      <Box sx={{ p: 1, display: "flex", justifyContent: "flex-end" }}>
+      <Box>
         <PrimaryPagination
           totalItems={
             viewMode === "list"

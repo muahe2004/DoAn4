@@ -32,6 +32,8 @@ import { useGetDropdownCurrencies } from "../../currencies/apis/dropdown";
 import { exportExcel } from "../../../utils/exportExcel";
 import { PiTrashSimpleFill } from "react-icons/pi";
 import "./ExportDeclarationModal.css";
+import { useGetExchangeRate } from "../../currencies/apis/getExchangeRate";
+import { STATUS_DISPLAY } from "../../../utils/statusDisplay";
 
 type Mode = "create" | "detail";
 
@@ -83,7 +85,7 @@ const createEmptyDetail = (): ExportDetailRow => ({
   unit_price_transport: undefined,
   invoice_value: undefined,
   taxable_price: undefined,
-  status: "active",
+  status: STATUS_DISPLAY.active,
 });
 
 const detailInputNoUnderlineSx = {
@@ -308,7 +310,7 @@ export default function ExportDeclarationModal({
   saving = false,
 }: ExportDeclarationModalProps) {
   const isCreateMode = mode === "create";
-  const status = data?.header?.status || "active";
+  const status = data?.header?.status || STATUS_DISPLAY.active;
   const headerEditable = isCreateMode || status !== "posted";
   const [headerData, setHeaderData] = useState<HeaderState>(defaultHeader);
   const [detailRows, setDetailRows] = useState<ExportDetailRow[]>([]);
@@ -320,6 +322,10 @@ export default function ExportDeclarationModal({
   const { data: countries = [] } = useGetDropdownCountries(paramsCountry);
   const { data: partners = [] } = useGetDropdownPartners({ skip: 0, limit: 50 });
   const { data: currencies = [] } = useGetDropdownCurrencies({ skip: 0, limit: 50 });
+  const { data: exchangeRateData } = useGetExchangeRate(
+    { base: "USD", target: "VND" },
+    { enabled: open }
+  );
 
   const handleDetailChange = (
     index: number,
@@ -412,7 +418,7 @@ export default function ExportDeclarationModal({
         unit_price_transport: detail.unit_price_transport,
         invoice_value: detail.invoice_value,
         taxable_price: detail.taxable_price,
-        status: detail.status ?? "active",
+        status: detail.status ?? STATUS_DISPLAY.active,
       }));
       setDetailRows(mappedDetails);
       setBaseDetails(mappedDetails.map((detail) => ({ ...detail })));
@@ -425,6 +431,23 @@ export default function ExportDeclarationModal({
       setDetailRows([createEmptyDetail()]);
     }
   }, [isCreateMode, open]);
+
+  useEffect(() => {
+    if (!open || !isCreateMode) return;
+    if (headerData.usd_exchange_rate) return;
+    const rate = exchangeRateData?.rate;
+    if (rate) {
+      setHeaderData((prev) => ({
+        ...prev,
+        usd_exchange_rate: rate.toFixed(4),
+      }));
+    }
+  }, [
+    open,
+    isCreateMode,
+    headerData.usd_exchange_rate,
+    exchangeRateData?.rate,
+  ]);
 
   useEffect(() => {
     if (!isCreateMode) {
@@ -536,8 +559,19 @@ export default function ExportDeclarationModal({
     onSubmit(headerData, normalizeDetailRows(detailRows));
   };
 
+  const hasHeaderChanges = useMemo(() => {
+    if (!detailHeader) return false;
+    const headerDiff = Object.entries(headerData).some(([field, value]) => {
+      const headerValue =
+        (detailHeader as Partial<HeaderState>)[field as keyof HeaderState];
+      return `${headerValue ?? ""}` !== `${value ?? ""}`;
+    });
+    return headerDiff;
+  }, [headerData, detailHeader]);
+
   const hasChanges = useMemo(() => {
     if (isCreateMode) return false;
+    if (hasHeaderChanges) return true;
     if (detailRows.length !== baseDetails.length) return true;
     return detailRows.some((detail, idx) => {
       const base = baseDetails[idx];
@@ -546,7 +580,7 @@ export default function ExportDeclarationModal({
       const { row_id: _baseRowId, ...baseRest } = base;
       return JSON.stringify(rest) !== JSON.stringify(baseRest);
     });
-  }, [detailRows, baseDetails, isCreateMode]);
+  }, [detailRows, baseDetails, isCreateMode, hasHeaderChanges]);
 
   const handleSave = () => {
     if (isCreateMode || !onSave || !detailRows.length || !hasChanges) return;
@@ -555,6 +589,24 @@ export default function ExportDeclarationModal({
 
   const getHeaderValue = (field: keyof HeaderState) => {
     return headerData[field] ?? "";
+  };
+
+  const cleanRateInput = (value: string) =>
+    value
+      .replace(/,/g, "")
+      .replace(/[^0-9.]/g, "")
+      .replace(/(\..*)\./g, "$1");
+
+  const formatRateForDisplay = (value: string) => {
+    if (!value) return "";
+    const normalized = value.replace(/,/g, "");
+    if (normalized === "") return "";
+    const [intPart, decimalPart] = normalized.split(".");
+    const intNumber = intPart ? Number(intPart) : 0;
+    const formattedInt = Number.isNaN(intNumber)
+      ? intPart
+      : intNumber.toLocaleString("en-US");
+    return decimalPart ? `${formattedInt}.${decimalPart}` : formattedInt;
   };
 
   const renderHeaderField = ({
@@ -568,12 +620,16 @@ export default function ExportDeclarationModal({
     type?: "text" | "date" | "number";
     required?: boolean;
   }) => (
-    <Grid size={3} mt={2}>
+      <Grid size={3} mt={2}>
       <LabelPrimary value={label} required={required && isCreateMode} />
       <TextField
         type={type}
         fullWidth
-        value={getHeaderValue(field)}
+        value={
+          field === "usd_exchange_rate"
+            ? formatRateForDisplay(getHeaderValue(field))
+            : getHeaderValue(field)
+        }
         disabled={!headerEditable}
         className="primary-text__field"
         size="small"
@@ -583,9 +639,14 @@ export default function ExportDeclarationModal({
         InputLabelProps={{
           shrink: type === "date" ? true : undefined,
         }}
-        onChange={(event) =>
-          headerEditable && handleHeaderChange(field, event.target.value)
-        }
+        onChange={(event) => {
+          const rawValue = event.target.value;
+          const nextValue =
+            field === "usd_exchange_rate"
+              ? cleanRateInput(rawValue)
+              : rawValue;
+          headerEditable && handleHeaderChange(field, nextValue);
+        }}
       />
     </Grid>
   );
